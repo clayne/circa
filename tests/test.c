@@ -1,18 +1,13 @@
 #include "../circa.h"
 
-int sum(int a, int b) {
-  return a + b;
+void puti(int n) {
+  printf("%i\n", n);
 }
 
 int main() {
-  Seq(int) a = seq_new(int, 5);
-  int b = 0;
-
-  for (int i = 0; i < 5; i++) seq_set(int, a, i, i);
-
-  seq_reduce(int, a, sum, b);
-
-  printf("%i\n", b);
-
+  Arena a = arena_new(int, 5);
+  int *n = arena_take(int, a);
+  arena_give(int, a, n);
+  arena_del(int, a);
   return 0;
 }
