@@ -1,13 +1,95 @@
+   //                                                                ///////////
+  // test.c | Circa's test suite, using the Snow testing framework. ///////////
+ // Source: https://github.com/davidgarland/circa                  ///////////
+//                                                                ///////////
+
+#include "../lib/snow/snow/snow.h"
 #include "../circa.h"
 
-void puti(int n) {
-  printf("%i\n", n);
-}
+Arena(int) ar = NULL;
+Seq(int) sq   = NULL;
+Str st        = NULL;
 
-int main() {
-  Arena a = arena_new(int, 5);
-  int *n = arena_take(int, a);
-  arena_give(int, a, n);
-  arena_del(int, a);
-  return 0;
-}
+describe(Arena, {
+  subdesc(Allocators, {
+    it("arena_new", {
+      ar = arena_new(int, 5);
+      assert(ar != NULL);
+      assert(arena(ar)->cap == 5);
+    });
+
+    it("arena_rsz", {
+      arena_rsz(int, ar, 10);
+      assert(ar != NULL);
+      assert(arena(ar)->cap == 10);
+    });
+
+    it("arena_del", {
+      arena_del(int, ar);
+    });
+  });
+});
+
+describe(Seq,
+  subdesc(Allocators, {
+    it("seq_new", {
+      sq = seq_new(int, 5);
+      assert(sq != NULL);
+      assert(seq(sq)->cap == 5);
+    });
+
+    it("seq_rsz", {
+      seq_rsz(int, sq, 10);
+      assert(sq != NULL);
+      assert(seq(sq)->cap == 10);
+    });
+
+    it("seq_rqr", {
+      seq_rqr(int, sq, 5);
+      assert(sq != NULL);
+      assert(seq(sq)->cap == 10);
+      seq_rqr(int, sq, 15);
+      assert(sq != NULL);
+      assert(seq(sq)->cap == 15);
+    });
+
+    it("seq_del", {
+      seq_del(int, sq);
+      seq_del(int, sq);
+      assert(sq == NULL);
+    });
+  });
+);
+
+describe(Str,
+  subdesc(Allocators, {
+    it("str_new", {
+      st = str_new(5);
+      assert(st != NULL);
+      assert(str(st)->cap == 5);
+    });
+
+    it("str_rsz", {
+      str_rsz(st, 10);
+      assert(st != NULL);
+      assert(str(st)->cap == 10);
+    });
+
+    it("str_rqr", {
+      str_rqr(st, 5);
+      assert(st != NULL);
+      assert(str(st)->cap == 10);
+      str_rqr(st, 15);
+      assert(st != NULL);
+      assert(str(st)->cap == 15);
+    });
+
+    it("str_del", {
+      str_del(st);
+      str_del(st);
+      assert(st == NULL);
+    });
+  });
+);
+
+snow_main();

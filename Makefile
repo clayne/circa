@@ -7,12 +7,18 @@ CC=clang
 CFLAGS=-Og
 LDFLAGS=
 
+CLEANUP=test odd sum
+
 MUTE=>/dev/null 2>/dev/null || true
 
 default: build
 
 build:
-	-@$(CC) $(CFLAGS) tests/test.c -o test $(LDFLAGS)
+	-@$(CC) $(CFLAGS) ex/odd.c -o odd $(CFLAGS)
+	-@$(CC) $(CFLAGS) ex/sum.c -o sum $(CFLAGS)
+
+test:
+	-@$(CC) $(CFLAGS) tests/test.c -Ilib/snow -DSNOW_ENABLED -g -o test
 
 clean:
-	-@rm -rf test *.o *.out *.a *.so *.gch src/*.gch src/core/*.gch $(MUTE)
+	-@rm -rf $(CLEANUP) *.o *.out *.a *.so *.gch src/*.gch src/core/*.gch $(MUTE)

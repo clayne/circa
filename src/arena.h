@@ -67,7 +67,7 @@ Arena arena_rsz_(size_t siz, Arena a, size_t cap) {
     circa_assert(cap > 0);
   }
   struct ArenaData *a2 = NULL;
-  while (a2 == NULL) a2 = realloc(a, sizeof(*a2) + (cap * siz));
+  while (a2 == NULL) a2 = realloc(arena(a), sizeof(*a2) + (cap * siz));
   a2->cap = cap;
   void *in_use = NULL;
   while (in_use == NULL) in_use = realloc(a2->in_use, (cap * sizeof(bool)));

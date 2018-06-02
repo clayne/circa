@@ -169,13 +169,13 @@ Str str_shr_(Str s) {
 
 _circa_
 Str str_del_(Str s) {
-  #ifdef CIRCA_SECURE
-    // Zero out the freed memory, if any.
-    if (s != NULL) {
+  if (s != NULL) {
+    #ifdef CIRCA_SECURE
+      // Zero out the memory to be freed.
       memset(str(s), 0, str(s)->cap);
-    }
-  #endif
-  free(seq(s));
+    #endif
+    free(seq(s));
+  }
   return NULL;
 }
 

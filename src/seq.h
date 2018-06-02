@@ -203,17 +203,18 @@ Seq seq_shr_(size_t siz, Seq s) {
 //   void
 
 _circa_
-void seq_del_(size_t siz, Seq s) {
+Seq seq_del_(size_t siz, Seq s) {
   {
     circa_assert(siz > 0);
   }
-  #ifdef CIRCA_SECURE
-    // Zero out the freed memory, if any.
-    if (s != NULL) {
+  if (s != NULL) {
+    #ifdef CIRCA_SECURE
+      // Zero out the memory to be freed.
       memset(seq(s), 0, siz * seq(s)->cap);
-    }
-  #endif
-  free(seq(s));
+    #endif
+    free(seq(s));
+  }
+  return NULL;
 }
 
   //              //////////////////////////////////////////////////////////////

@@ -65,7 +65,7 @@
 #define circa_error(...) circa_error_(__VA_ARGS__, __FILE__, __LINE__, __func__)
 
 #define circa_error_(MSG, FNAME, LINE, FUNC) circa_dbg({                       \
-  printf("Error in file '%s', on line %i:\n", FNAME, LINE);                    \
+  printf("\nError in file '%s', on line %i:\n", FNAME, LINE);                    \
   printf("  In function '%s': '%s'\n", FUNC, MSG);                             \
   exit(1);                                                                     \
 })
@@ -123,6 +123,9 @@ _circa_ struct ArenaData *arena(Arena a);
 #define arena_new(T, C) (Arena(T)) arena_new_(sizeof(T), (C))
 _circa_ Arena arena_new_(size_t siz, size_t cap);
 
+#define arena_rsz(T, A, C) (A) = (Arena(T)) arena_rsz_(sizeof(T), (A), (C))
+_circa_ Arena arena_rsz_(size_t siz, Arena a, size_t cap);
+
 #define arena_del(T, A) arena_del_(sizeof(T), (A))
 _circa_ Arena arena_del_(size_t siz, Arena a);
 
@@ -171,8 +174,8 @@ _circa_ Seq seq_rqr_(size_t siz, Seq s, size_t cap);
 #define seq_shr(T, S) (S) = (Seq(T)) seq_shr_(sizeof(T), (S))
 _circa_ Seq seq_shr_(size_t siz, Seq s);
 
-#define seq_del(T, S) seq_del_(sizeof(T), (S))
-_circa_ void seq_del_(size_t siz, Seq s);
+#define seq_del(T, S) (S) = seq_del_(sizeof(T), (S))
+_circa_ Seq seq_del_(size_t siz, Seq s);
 
   //
  // Sequence Ops
