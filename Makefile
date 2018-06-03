@@ -1,20 +1,21 @@
-#################################################################
+#                                         #######################
 # Makefile | The Circa Core Library for C #######################
-# Author: David Garland (https://github.com/davidgarland/circa) #
-#################################################################
+# https://github.com/davidgarland/circa   #######################
+#                                         #######################
 
 CC=clang
 CFLAGS=-Og
 LDFLAGS=
 
-CLEANUP=test odd sum
+CLEANUP=test odd sum read
 
 MUTE=>/dev/null 2>/dev/null || true
 
-default: build
+default: test
 
 build:
 	-@$(CC) $(CFLAGS) ex/odd.c -o odd $(CFLAGS)
+	-@$(CC) $(CFLAGS) ex/read.c -o read $(CFLAGS)
 	-@$(CC) $(CFLAGS) ex/sum.c -o sum $(CFLAGS)
 
 test:

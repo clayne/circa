@@ -1,6 +1,6 @@
    //                                                                ///////////
   // test.c | Circa's test suite, using the Snow testing framework. ///////////
- // Source: https://github.com/davidgarland/circa                  ///////////
+ // https://github.com/davidgarland/circa                          ///////////
 //                                                                ///////////
 
 #include "../lib/snow/snow/snow.h"
@@ -88,6 +88,16 @@ describe(Str,
       str_del(st);
       str_del(st);
       assert(st == NULL);
+    });
+  });
+  subdesc(IO, {
+    it("str_readfile", {
+      str_del(st);
+      st = str_readfile("tests/assets/test.txt");
+      assert(st != NULL);
+      assert(str(st)->cap > 0);
+      assert(str(st)->len > 0);
+      str_del(st);
     });
   });
 );

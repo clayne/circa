@@ -249,6 +249,55 @@ Str str_rvs_(Str s) {
   return s;
 }
 
+  //                ////////////////////////////////////////////////////////////
+ // Evaluation Ops ////////////////////////////////////////////////////////////
+//                ////////////////////////////////////////////////////////////
+
+/// str_eq ///
+// Description
+//   Checks two strings for equality.
+// Arguments
+//   a: String (Str)
+//   b: String (Str)
+// Returns
+//   Equality (bool)
+
+_circa_
+bool str_eq_(Str a, Str b) {
+  {
+    circa_assert(a != NULL);
+    circa_assert(b != NULL);
+  }
+  const size_t a_len = str(a)->len;
+  const size_t b_len = str(b)->len;
+  if (a_len != b_len) return false;
+  for (size_t i = 0; i < a_len; i++) if (a[i] != b[i]) return false;
+  return true;
+}
+
+/// str_eq_len ///
+// Description
+//   Checks two strings for equality in a given length.
+// Arguments
+//   a: String (Str)
+//   b: String (Str)
+//   len: Length (size_t)
+// Returns
+//   Equality (bool)
+
+_circa_
+bool str_eq_len_(Str a, Str b, size_t len) {
+  {
+    circa_assert(a != NULL);
+    circa_assert(b != NULL);
+    circa_assert(len > 0);
+    circa_assert(len < str(a)->len);
+    circa_assert(len < str(b)->len);
+  }
+  for (size_t i = 0; i < len; i++) if (a[i] != b[i]) return false;
+  return true;
+}
+
   //           /////////////////////////////////////////////////////////////////
  // Array Ops /////////////////////////////////////////////////////////////////
 //           /////////////////////////////////////////////////////////////////
@@ -346,6 +395,37 @@ char str_pop_(Str s) {
     circa_assert(str(s)->len > 0);
   }
   return str_get_(s, --str(s)->len);
+}
+
+  //              //////////////////////////////////////////////////////////////
+ // IO Functions //////////////////////////////////////////////////////////////
+//              //////////////////////////////////////////////////////////////
+
+/// str_readfile ///
+// Description
+//   Creates a new string from a file.
+// Arguments
+//   s: String (Str)
+//   filename: File Name (char*)
+// Returns
+//   String (Str)
+
+_circa_
+Str str_readfile_(char *filename) {
+  {
+    circa_assert(filename != NULL);
+  }
+  FILE *fp = fopen(filename, "r");
+  circa_assert(fp != NULL);
+  fseek(fp, 0, SEEK_END);
+  size_t cap = ftell(fp);
+  rewind(fp);
+  Str s = str_new(cap + 1);
+  str(s)->len = cap;
+  fread(s, cap, 1, fp);
+  fclose(fp);
+  s[cap] = '\0';
+  return s;
 }
 
 #endif // CIRCA_STR_H

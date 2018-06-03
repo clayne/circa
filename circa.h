@@ -22,7 +22,7 @@
 //        ////////////////////////////////////////////////////////////////////
 
 #define CIRCA_SECURE_D true // Enable security. (Memset freed memory to 0, etc.)
-#define CIRCA_ALLOC_D 0 // How much "extra" memory to allocate for Seq and Str.
+#define CIRCA_ALLOC_D 0     // How much "extra" memory to allocate.
 
 #define CIRCA_DBG_D true // Enable debugging features (Assertions, errors, etc.)
 
@@ -313,6 +313,16 @@ _circa_ Str str_cat_(Str dst, Str src);
 _circa_ Str str_rvs_(Str s);
 
   //
+ // Evaluation Ops
+//
+
+#define str_eq(A, B) str_eq_((A), (B))
+_circa_ bool str_eq_(Str a, Str b);
+
+#define str_eq_len(A, B, L) str_eq_len_((A), (B), (L))
+_circa_ bool str_eq_len_(Str a, Str b, size_t len);
+
+  //
  // Array Ops
 //
 
@@ -334,6 +344,13 @@ _circa_ char str_tos_(Str s);
 
 #define str_pop(S) str_pop_((S))
 _circa_ char str_pop_(Str s);
+
+  //
+ // IO Ops
+//
+
+#define str_readfile(F) str_readfile_((F))
+_circa_ Str str_readfile_(char *filename);
 
 #include "src/arena.h"
 #include "src/seq.h"
