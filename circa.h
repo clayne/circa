@@ -322,6 +322,9 @@ _circa_ bool str_eq_(Str a, Str b);
 #define str_eq_len(A, B, L) str_eq_len_((A), (B), (L))
 _circa_ bool str_eq_len_(Str a, Str b, size_t len);
 
+#define str_eq_lit(S, C) str_eq_lit_((S), (C))
+_circa_ bool str_eq_lit_(Str s, const char *restrict c);
+
   //
  // Array Ops
 //

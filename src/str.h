@@ -298,6 +298,28 @@ bool str_eq_len_(Str a, Str b, size_t len) {
   return true;
 }
 
+/// str_eq_lit ///
+// Description
+//   Checks if a string is equal to a C string literal.
+// Arguments
+//   s: String (Str)
+//   c: C String Literal (const char* restrict)
+// Returns
+//   Equality (Bool)
+
+_circa_
+bool str_eq_lit_(Str s, const char *restrict c) {
+  {
+    circa_assert(s != NULL);
+    circa_assert(c != NULL);
+  }
+  const size_t s_len = str(s)->len;
+  const size_t c_len = strlen(c);
+  if (s_len != c_len) return false;
+  for (size_t i = 0; i < s_len; i++) if (s[i] != c[i]) return false;
+  return true;
+}
+
   //           /////////////////////////////////////////////////////////////////
  // Array Ops /////////////////////////////////////////////////////////////////
 //           /////////////////////////////////////////////////////////////////

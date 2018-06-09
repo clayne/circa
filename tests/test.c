@@ -98,6 +98,7 @@ describe(Str,
       assert(st != NULL);
       assert(str(st)->cap > 0);
       assert(str(st)->len > 0);
+      assert(str_eq_lit(st, "Hello!\n"));
       str_del(st);
     });
   });
