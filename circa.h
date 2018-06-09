@@ -349,8 +349,8 @@ _circa_ char str_pop_(Str s);
  // IO Ops
 //
 
-#define str_readfile(F) str_readfile_((F))
-_circa_ Str str_readfile_(char *filename);
+#define str_readfile(S, F) (S) = str_readfile_((S), (F))
+_circa_ Str str_readfile_(Str s, char *filename);
 
 #include "src/arena.h"
 #include "src/seq.h"

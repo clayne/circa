@@ -403,7 +403,7 @@ char str_pop_(Str s) {
 
 /// str_readfile ///
 // Description
-//   Creates a new string from a file.
+//   Reads a file into a string, discarding any old contents.
 // Arguments
 //   s: String (Str)
 //   filename: File Name (char*)
@@ -411,7 +411,7 @@ char str_pop_(Str s) {
 //   String (Str)
 
 _circa_
-Str str_readfile_(char *filename) {
+Str str_readfile_(Str s, char *filename) {
   {
     circa_assert(filename != NULL);
   }
@@ -420,7 +420,7 @@ Str str_readfile_(char *filename) {
   fseek(fp, 0, SEEK_END);
   size_t cap = ftell(fp);
   rewind(fp);
-  Str s = str_new(cap + 1);
+  s = str_rqr_(s, cap + 1);
   str(s)->len = cap;
   fread(s, cap, 1, fp);
   fclose(fp);

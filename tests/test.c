@@ -93,7 +93,8 @@ describe(Str,
   subdesc(IO, {
     it("str_readfile", {
       str_del(st);
-      st = str_readfile("tests/assets/test.txt");
+      st = str_new(1);
+      str_readfile(st, "tests/assets/test.txt");
       assert(st != NULL);
       assert(str(st)->cap > 0);
       assert(str(st)->len > 0);
