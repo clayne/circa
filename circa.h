@@ -74,7 +74,7 @@
 
 #define circa_assert_(COND, DBG, CONDSTR, FNAME, LINE, FUNC) DBG({             \
   if (!(COND)) {                                                               \
-    circa_error_(CONDSTR, circa_dbg, FNAME, LINE, FUNC);                       \
+    circa_error_(CONDSTR, DBG, FNAME, LINE, FUNC);                             \
   }                                                                            \
 })
 
