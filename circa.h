@@ -62,19 +62,19 @@
   #define circa_dbg(...)
 #endif
 
-#define circa_error(...) circa_error_(__VA_ARGS__, __FILE__, __LINE__, __func__)
+#define circa_error(...) circa_error_(__VA_ARGS__, circa_dbg, __FILE__, __LINE__, __func__)
 
-#define circa_error_(MSG, FNAME, LINE, FUNC) circa_dbg({                       \
-  printf("\nError in file '%s', on line %i:\n", FNAME, LINE);                    \
+#define circa_error_(MSG, DBG, FNAME, LINE, FUNC) DBG({                        \
+  printf("\nError in file '%s', on line %i:\n", FNAME, LINE);                  \
   printf("  In function '%s': '%s'\n", FUNC, MSG);                             \
   exit(1);                                                                     \
 })
 
-#define circa_assert(...) circa_assert_(__VA_ARGS__, #__VA_ARGS__, __FILE__, __LINE__, __func__)
+#define circa_assert(...) circa_assert_(__VA_ARGS__, circa_dbg, #__VA_ARGS__, __FILE__, __LINE__, __func__)
 
-#define circa_assert_(COND, CONDSTR, FNAME, LINE, FUNC) circa_dbg({            \
+#define circa_assert_(COND, DBG, CONDSTR, FNAME, LINE, FUNC) DBG({             \
   if (!(COND)) {                                                               \
-    circa_error_(CONDSTR, FNAME, LINE, FUNC);                                  \
+    circa_error_(CONDSTR, circa_dbg, FNAME, LINE, FUNC);                       \
   }                                                                            \
 })
 
