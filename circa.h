@@ -21,8 +21,29 @@
  // Config ////////////////////////////////////////////////////////////////////
 //        ////////////////////////////////////////////////////////////////////
 
+  //            //
+ // Allocation //
+//            //
+
+#define CIRCA_ALLOC_D  0    // How much "extra" memory to allocate.
+
+  //                   //
+ // Security & Safety //
+//                   //
+
 #define CIRCA_SECURE_D true // Enable security. (Memset freed memory to 0, etc.)
-#define CIRCA_ALLOC_D 0     // How much "extra" memory to allocate.
+#define CIRCA_SAFE_D   true // Enable safety features. (Memset allocated memory to 0, etc.)
+
+  //             //
+ // Compilation //
+//             //
+
+#define CIRCA_STATIC_D true // Set Circa's functions to static linkage.
+#define CIRCA_GNU_D    true // Enable use of GNU C extensions.
+
+  //           //
+ // Debugging //
+//           //
 
 #define CIRCA_DBG_D true // Enable debugging features (Assertions, errors, etc.)
 
@@ -30,24 +51,61 @@
  // Config Handling ///////////////////////////////////////////////////////////
 //                 ///////////////////////////////////////////////////////////
 
-#if !defined(CIRCA_SECURE) && !defined (CIRCA_NO_SECURE)
-  #if CIRCA_SECURE_D
-    #define CIRCA_SECURE
+#if !defined(CIRCA_ALLOC)
+  #if CIRCA_ALLOC_D >= 0
+    #define CIRCA_ALLOC CIRCA_ALLOC_D
+  #else
+    #define CIRCA_ALLOC 0
   #endif
-#elif defined(CIRCA_SECURE) && !defined(CIRCA_NO_SECURE)
+#endif
+
+#if !defined(CIRCA_SECURE) && !defined (CIRCA_NO_SECURE) && CIRCA_SECURE_D
+  #define CIRCA_SECURE
+#elif defined(CIRCA_SECURE) && defined(CIRCA_NO_SECURE)
   #undef CIRCA_SECURE
 #endif
 
-#if !defined(CIRCA_ALLOC)
-  #define CIRCA_ALLOC CIRCA_ALLOC_D
+#if !defined(CIRCA_SAFE) && !defined(CIRCA_NO_SAFE) && CIRCA_SAFE_D
+  #define CIRCA_SAFE
+#elif defined(CIRCA_SAFE) && defined(CIRCA_NO_SAFE)
+  #undef CIRCA_SAFE
 #endif
 
-#if !defined(CIRCA_DBG) && !defined(CIRCA_NO_DBG)
-  #if CIRCA_DBG_D
-    #define CIRCA_DBG
-  #endif
+#if !defined(CIRCA_STATIC) && !defined(CIRCA_NO_STATIC) && CIRCA_STATIC_D
+  #define CIRCA_STATIC
+#elif defined(CIRCA_STATIC) && defined(CIRCA_NO_STATIC)
+  #undef CIRCA_STATIC
+#endif
+
+#if !defined(CIRCA_GNU) && !defined(CIRCA_NO_GNU) && CIRCA_GNU_D
+  #define CIRCA_GNU
+#elif defined(CIRCA_GNU) && defined(CIRCA_NO_GNU)
+  #undef CIRCA_GNU
+#endif
+
+#if !defined(CIRCA_DBG) && !defined(CIRCA_NO_DBG) && !defined(NDEBUG) && CIRCA_DBG_D
+  #define CIRCA_DBG
 #elif defined(CIRCA_DBG) && defined(CIRCA_NO_DBG)
   #undef CIRCA_DBG
+#endif
+
+  //                  //////////////////////////////////////////////////////////
+ // Attribute Macros //////////////////////////////////////////////////////////
+//                  //////////////////////////////////////////////////////////
+
+#ifdef CIRCA_GNU
+  #define _circa_attr_(...) __attribute__((__VA_ARGS__))
+#else
+  #define _circa_attr_(...)
+#endif
+
+#define _circa_rets_  _circa_attr_(warn_unused_result)
+#define _circa_alcs_ _circa_rets_ _circa_attr_(malloc)
+
+#ifdef CIRCA_STATIC
+  #define _circa_static_ static inline
+#else
+  #define _circa_static_
 #endif
 
 #define _circa_ static inline
@@ -82,62 +140,54 @@
  // Type Definitions //////////////////////////////////////////////////////////
 //                  //////////////////////////////////////////////////////////
 
-struct ArenaData {
-  size_t cap;
-  bool *in_use;
-  char data[];
-};
+  //        //
+ // Seq(T) //
+//        //
 
-#define Arena(T) T*
-typedef Arena(void) Arena;
+#define Seq(T) T*
+typedef Seq(void) Seq;
 
 struct SeqData {
   size_t cap, len;
   char data[];
 };
 
-#define Seq(T) T*
-typedef Seq(void) Seq;
+  //     //
+ // Str //
+//     //
+
+typedef char *Str;
 
 struct StrData {
   size_t cap, len;
   char data[];
 };
 
-typedef char *Str;
+  //         //
+ // Task(T) //
+//         //
 
-  //                           /////////////////////////////////////////////////
- // Arena Function Prototypes /////////////////////////////////////////////////
-//                           /////////////////////////////////////////////////
+#define Task(T) T*
+typedef Task(void) Task;
 
-  //
- // Accessors
-//
+struct TaskData {
+  Seq args;
+  Seq outs;
+  void (*fnptr)(Task);
+};
 
-_circa_ struct ArenaData *arena(Arena a);
+  //          //
+ // Arena(T) //
+//          //
 
-  //
- // Allocators
-//
+#define Arena(T) T*
+typedef Arena(void) Arena;
 
-#define arena_new(T, C) (Arena(T)) arena_new_(sizeof(T), (C))
-_circa_ Arena arena_new_(size_t siz, size_t cap);
-
-#define arena_rsz(T, A, C) (A) = (Arena(T)) arena_rsz_(sizeof(T), (A), (C))
-_circa_ Arena arena_rsz_(size_t siz, Arena a, size_t cap);
-
-#define arena_del(T, A) arena_del_(sizeof(T), (A))
-_circa_ Arena arena_del_(size_t siz, Arena a);
-
-  //
- // Array Ops
-//
-
-#define arena_take(T, A) ((T*) arena_take_(sizeof(T), &(A)))
-_circa_ void* arena_take_(size_t siz, Arena *a);
-
-#define arena_give(T, A, P) (A) = (Arena(T)) arena_give_(sizeof(T), (A), (P))
-_circa_ Arena arena_give_(size_t siz, Arena a, void *ptr);
+struct ArenaData {
+  size_t cap;
+  bool *in_use;
+  char data[];
+};
 
   //                              //////////////////////////////////////////////
  // Sequence Function Prototypes //////////////////////////////////////////////
@@ -154,70 +204,70 @@ _circa_ struct SeqData *seq(Seq s);
 //
 
 #define seq_new(T, C) (Seq(T)) seq_new_(sizeof(T), (C));
-_circa_ Seq seq_new_(size_t siz, size_t cap);
+_circa_ _circa_alcs_ Seq seq_new_(size_t siz, size_t cap);
 
 #define seq_lit(T, ...) (Seq(T)) seq_lit_(sizeof(T), sizeof((T[]){__VA_ARGS__}) / sizeof(T), &(T[]){__VA_ARGS__})
-_circa_ Seq seq_lit_(size_t siz, size_t len, void *lits);
+_circa_ _circa_alcs_ Seq seq_lit_(size_t siz, size_t len, void *lits);
 
 #define seq_from(T, S) (Seq(T)) seq_from_(sizeof(T), (S));
-_circa_ Seq seq_from_(size_t siz, Seq s);
+_circa_ _circa_alcs_ Seq seq_from_(size_t siz, Seq s);
 
 #define seq_wrap(T, P, L) (Seq(T)) seq_wrap_(sizeof(T), (P), (L))
-_circa_ Seq seq_wrap_(size_t siz, void *ptr, size_t len);
+_circa_ _circa_alcs_ Seq seq_wrap_(size_t siz, void *ptr, size_t len);
 
 #define seq_rsz(T, S, C) (S) = (Seq(T)) seq_rsz_(sizeof(T), (S), (C))
-_circa_ Seq seq_rsz_(size_t siz, Seq s, size_t cap);
+_circa_ _circa_rets_ Seq seq_rsz_(size_t siz, Seq s, size_t cap);
 
 #define seq_rqr(T, S, C) (S) = (Seq(T)) seq_rqr_(sizeof(T), (S), (C))
-_circa_ Seq seq_rqr_(size_t siz, Seq s, size_t cap);
+_circa_ _circa_rets_ Seq seq_rqr_(size_t siz, Seq s, size_t cap);
 
 #define seq_shr(T, S) (S) = (Seq(T)) seq_shr_(sizeof(T), (S))
-_circa_ Seq seq_shr_(size_t siz, Seq s);
+_circa_ _circa_rets_ Seq seq_shr_(size_t siz, Seq s);
 
 #define seq_del(T, S) (S) = seq_del_(sizeof(T), (S))
-_circa_ Seq seq_del_(size_t siz, Seq s);
+_circa_ _circa_rets_ Seq seq_del_(size_t siz, Seq s);
 
   //
  // Sequence Ops
 //
 
 #define seq_cpy(T, DST, SRC) (DST) = seq_cpy_(sizeof(T), (DST), (SRC))
-_circa_ Seq seq_cpy_(size_t siz, Seq dst, Seq src);
+_circa_ _circa_rets_ Seq seq_cpy_(size_t siz, Seq dst, Seq src);
 
 #define seq_cat(T, DST, SRC) (DST) = seq_cat_(sizeof(T), (DST), (SRC))
-_circa_ Seq seq_cat_(size_t siz, Seq dst, Seq src);
+_circa_ _circa_rets_ Seq seq_cat_(size_t siz, Seq dst, Seq src);
 
 #define seq_rvs(T, S) (S) = seq_rvs_(sizeof(T), (S))
-_circa_ Seq seq_rvs_(size_t siz, Seq s);
+_circa_ _circa_rets_ Seq seq_rvs_(size_t siz, Seq s);
 
   //
  // Array Ops
 //
 
 #define seq_set(T, S, A, V) (S) = seq_set_(sizeof(T), (S), (A), &(T){V})
-_circa_ Seq seq_set_(size_t siz, Seq s, size_t addr, void *val);
+_circa_ _circa_rets_ Seq seq_set_(size_t siz, Seq s, size_t addr, void *val);
 
 #define seq_get(T, S, A) *((Seq(T)) seq_get_(sizeof(T), S, A))
-_circa_ void *seq_get_(size_t siz, Seq s, size_t addr);
+_circa_ _circa_rets_ void *seq_get_(size_t siz, Seq s, size_t addr);
 
   //
  // Stack Ops
 //
 
 #define seq_push(T, S, V) (S) = (Seq(T)) seq_push_(sizeof(T), (S), &(T){V})
-_circa_ Seq  seq_push_(size_t siz, Seq s, void *val);
+_circa_ _circa_rets_ Seq  seq_push_(size_t siz, Seq s, void *val);
 
 #define seq_push_ext(T, S, V, P) (S) = (Seq(T)) seq_push_ext_(sizeof(T), (S), &(T){V}, (P))
-_circa_ Seq seq_push_ext_(size_t siz, Seq s, void *val, size_t pre);
+_circa_ _circa_rets_ Seq seq_push_ext_(size_t siz, Seq s, void *val, size_t pre);
 
 #define seq_tos(T, S) *((Seq(T)) seq_tos_(sizeof(T), S))
-_circa_ void *seq_tos_(size_t siz, Seq s);
+_circa_ _circa_rets_ void *seq_tos_(size_t siz, Seq s);
 
 #define seq_pop(T, S) *((Seq(T)) seq_pop_(sizeof(T), (S)))
-_circa_ void *seq_pop_(size_t siz, Seq s);
+_circa_ _circa_rets_ void *seq_pop_(size_t siz, Seq s);
 
 #define seq_dup(T, S) (S) = (Seq(T)) seq_dup_(sizeof(T), (S))
-_circa_ Seq seq_dup_(size_t siz, Seq s);
+_circa_ _circa_rets_ Seq seq_dup_(size_t siz, Seq s);
 
   //
  // Processing
@@ -279,38 +329,38 @@ _circa_ struct StrData *str(Str s);
 //
 
 #define str_new(C) str_new_((C))
-_circa_ Str str_new_(size_t cap);
+_circa_ _circa_alcs_ Str str_new_(size_t cap);
 
 #define str_lit(CS) str_lit_((CS))
-_circa_ Str str_lit_(const char *restrict cs);
+_circa_ _circa_alcs_ Str str_lit_(const char *restrict cs);
 
 #define str_from(S) str_from_((S))
-_circa_ Str str_from_(Str s);
+_circa_ _circa_alcs_ Str str_from_(Str s);
 
 #define str_rsz(S, C) (S) = str_rsz_((S), (C))
-_circa_ Str str_rsz_(Str s, size_t cap);
+_circa_ _circa_rets_ Str str_rsz_(Str s, size_t cap);
 
 #define str_rqr(S, C) (S) = str_rqr_((S), (C))
-_circa_ Str str_rqr_(Str s, size_t cap);
+_circa_ _circa_rets_ Str str_rqr_(Str s, size_t cap);
 
 #define str_shr(S) (S) = str_shr_((S))
-_circa_ Str str_shr_(Str s);
+_circa_ _circa_rets_ Str str_shr_(Str s);
 
 #define str_del(S) (S) = str_del_((S))
-_circa_ Str str_del_(Str s);
+_circa_ _circa_rets_ Str str_del_(Str s);
 
   //
  // String Ops
 //
 
 #define str_cpy(DST, SRC) (DST) = str_cpy_((DST), (SRC))
-_circa_ Str str_cpy_(Str dst, Str src);
+_circa_ _circa_rets_ Str str_cpy_(Str dst, Str src);
 
 #define str_cat(DST, SRC) (DST) = str_cat_((DST), (SRC))
-_circa_ Str str_cat_(Str dst, Str src);
+_circa_ _circa_rets_ Str str_cat_(Str dst, Str src);
 
 #define str_rvs(S) (S) = str_rvs_((S))
-_circa_ Str str_rvs_(Str s);
+_circa_ _circa_rets_ Str str_rvs_(Str s);
 
   //
  // Evaluation Ops
@@ -330,7 +380,7 @@ _circa_ bool str_eq_lit_(Str s, const char *restrict c);
 //
 
 #define str_set(S, A, CH) (S) = str_set_((S), (A), (CH))
-_circa_ Str str_set_(Str s, size_t addr, char ch);
+_circa_ _circa_rets_ Str str_set_(Str s, size_t addr, char ch);
 
 #define str_get(S, A) str_get_((S), (A))
 _circa_ char str_get_(Str s, size_t addr);
@@ -340,7 +390,7 @@ _circa_ char str_get_(Str s, size_t addr);
 //
 
 #define str_push(S, CH) (S) = str_push((S), (CH))
-_circa_ Str str_push_(Str s, char ch);
+_circa_ _circa_rets_ Str str_push_(Str s, char ch);
 
 #define str_tos(S) str_tos_((S))
 _circa_ char str_tos_(Str s);
@@ -353,10 +403,43 @@ _circa_ char str_pop_(Str s);
 //
 
 #define str_readfile(S, F) (S) = str_readfile_((S), (F))
-_circa_ Str str_readfile_(Str s, char *filename);
+_circa_ _circa_rets_ Str str_readfile_(Str s, char *filename);
 
-#include "src/arena.h"
+  //                           /////////////////////////////////////////////////
+ // Arena Function Prototypes /////////////////////////////////////////////////
+//                           /////////////////////////////////////////////////
+
+  //
+ // Accessors
+//
+
+_circa_ struct ArenaData *arena(Arena a);
+
+  //
+ // Allocators
+//
+
+#define arena_new(T, C) (Arena(T)) arena_new_(sizeof(T), (C))
+_circa_ _circa_alcs_ Arena arena_new_(size_t siz, size_t cap);
+
+#define arena_rsz(T, A, C) (A) = (Arena(T)) arena_rsz_(sizeof(T), (A), (C))
+_circa_ _circa_rets_ Arena arena_rsz_(size_t siz, Arena a, size_t cap);
+
+#define arena_del(T, A) (A) = arena_del_(sizeof(T), (A))
+_circa_ _circa_rets_ Arena arena_del_(size_t siz, Arena a);
+
+  //
+ // Array Ops
+//
+
+#define arena_take(T, A) ((T*) arena_take_(sizeof(T), &(A)))
+_circa_ _circa_rets_ void* arena_take_(size_t siz, Arena *a);
+
+#define arena_give(T, A, P) (A) = (Arena(T)) arena_give_(sizeof(T), (A), (P))
+_circa_ _circa_rets_ Arena arena_give_(size_t siz, Arena a, void *ptr);
+
 #include "src/seq.h"
 #include "src/str.h"
+#include "src/arena.h"
 
 #endif

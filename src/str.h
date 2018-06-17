@@ -6,10 +6,6 @@
 #ifndef CIRCA_STR_H
 #define CIRCA_STR_H
 
-  //              //////////////////////////////////////////////////////////////
- // Dependencies //////////////////////////////////////////////////////////////
-//              //////////////////////////////////////////////////////////////
-
 #include "../circa.h"
 
   //           /////////////////////////////////////////////////////////////////
@@ -44,7 +40,7 @@ struct StrData *str(Str s) {
 // Returns
 //   String (Str)
 
-_circa_
+_circa_ _circa_alcs_
 Str str_new_(size_t cap) {
   {
     circa_assert(cap > 0);
@@ -64,7 +60,7 @@ Str str_new_(size_t cap) {
 // Returns
 //   String (Str)
 
-_circa_
+_circa_ _circa_alcs_
 Str str_lit_(const char *restrict cs) {
   {
     circa_assert(cs != NULL);
@@ -85,7 +81,7 @@ Str str_lit_(const char *restrict cs) {
 // Returns
 //   String (Str)
 
-_circa_
+_circa_ _circa_alcs_
 Str str_from_(Str s) {
   {
     circa_assert(s != NULL);
@@ -97,6 +93,8 @@ Str str_from_(Str s) {
   return s2;
 }
 
+// TODO: str_wrap
+
 /// str_rsz ///
 // Description
 //   Resizes a string to a given capacity.
@@ -106,7 +104,7 @@ Str str_from_(Str s) {
 // Returns
 //   String (Str)
 
-_circa_
+_circa_ _circa_rets_
 Str str_rsz_(Str s, size_t cap) {
   {
     circa_assert(s != NULL);
@@ -134,7 +132,7 @@ Str str_rsz_(Str s, size_t cap) {
 // Returns
 //   String (Str)
 
-_circa_
+_circa_ _circa_rets_
 Str str_rqr_(Str s, size_t cap) {
   {
     circa_assert(s != NULL);
@@ -151,7 +149,7 @@ Str str_rqr_(Str s, size_t cap) {
 // Returns
 //   String (Str)
 
-_circa_
+_circa_ _circa_rets_
 Str str_shr_(Str s) {
   {
     circa_assert(s != NULL);
@@ -167,7 +165,7 @@ Str str_shr_(Str s) {
 // Returns
 //   Null String (Str)
 
-_circa_
+_circa_ _circa_rets_
 Str str_del_(Str s) {
   if (s != NULL) {
     #ifdef CIRCA_SECURE
@@ -192,7 +190,7 @@ Str str_del_(Str s) {
 // Returns
 //   String (Str)
 
-_circa_
+_circa_ _circa_rets_
 Str str_cpy_(Str dst, Str src) {
   {
     circa_assert(dst != NULL);
@@ -214,7 +212,7 @@ Str str_cpy_(Str dst, Str src) {
 // Returns
 //   String (Str)
 
-_circa_
+_circa_ _circa_rets_
 Str str_cat_(Str dst, Str src) {
   {
     circa_assert(dst != NULL);
@@ -234,7 +232,7 @@ Str str_cat_(Str dst, Str src) {
 // Returns
 //   String (Str)
 
-_circa_
+_circa_ _circa_rets_
 Str str_rvs_(Str s) {
   {
     circa_assert(s != NULL);
@@ -334,7 +332,7 @@ bool str_eq_lit_(Str s, const char *restrict c) {
 // Returns
 //   String (Str)
 
-_circa_
+_circa_ _circa_rets_
 Str str_set_(Str s, size_t addr, char ch) {
   {
     circa_assert(s != NULL);
@@ -377,7 +375,7 @@ char str_get_(Str s, size_t addr) {
 // Returns
 //   String (Str)
 
-_circa_
+_circa_ _circa_rets_
 Str str_push_(Str s, char ch) {
   {
     circa_assert(s != NULL);
@@ -432,11 +430,12 @@ char str_pop_(Str s) {
 // Returns
 //   String (Str)
 
-_circa_
+_circa_ _circa_rets_
 Str str_readfile_(Str s, char *filename) {
   {
     circa_assert(filename != NULL);
   }
+  // TODO: Memset freed memory to 0 if CIRCA_SECURE.
   FILE *fp = fopen(filename, "r");
   circa_assert(fp != NULL);
   fseek(fp, 0, SEEK_END);

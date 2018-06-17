@@ -33,7 +33,7 @@ struct ArenaData *arena(Arena a) {
 // Returns
 //   Arena (Arena)
 
-_circa_
+_circa_ _circa_alcs_
 Arena arena_new_(size_t siz, size_t cap) {
   {
     circa_assert(siz > 0);
@@ -59,7 +59,7 @@ Arena arena_new_(size_t siz, size_t cap) {
 // Returns
 //   Arena (Arena)
 
-_circa_
+_circa_ _circa_rets_
 Arena arena_rsz_(size_t siz, Arena a, size_t cap) {
   {
     circa_assert(siz > 0);
@@ -85,12 +85,15 @@ Arena arena_rsz_(size_t siz, Arena a, size_t cap) {
 // Returns
 //   Null Arena (Arena)
 
-_circa_
+_circa_ _circa_rets_
 Arena arena_del_(size_t siz, Arena a) {
   {
     circa_assert(siz > 0);
   }
   if (a != NULL) {
+    #ifdef CIRCA_SECURE
+      memset(arena(a), 0, siz * arena(a)->cap);
+    #endif
     free(arena(a));
   }
   return NULL;
@@ -109,7 +112,7 @@ Arena arena_del_(size_t siz, Arena a) {
 // Returns
 //   Pointer (void*)
 
-_circa_
+_circa_ _circa_rets_
 void *arena_take_(size_t siz, Arena *a) {
   {
     circa_assert(siz > 0);
@@ -138,7 +141,7 @@ void *arena_take_(size_t siz, Arena *a) {
 // Returns
 //   Arena (Arena)
 
-_circa_
+_circa_ _circa_rets_
 void *arena_give_(size_t siz, Arena a, void *ptr) {
   {
     circa_assert(siz > 0);
@@ -147,6 +150,9 @@ void *arena_give_(size_t siz, Arena a, void *ptr) {
   }
   const ptrdiff_t diff = ((char*) ptr) - ((char*) a);
   const size_t addr = diff / siz;
+  #ifdef CIRCA_SECURE
+    memset((char*) a + diff, 0, siz);
+  #endif
   arena(a)->in_use[addr] = false;
   return a;
 }

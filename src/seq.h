@@ -6,10 +6,6 @@
 #ifndef CIRCA_SEQ_H
 #define CIRCA_SEQ_H
 
-  //              //////////////////////////////////////////////////////////////
- // Dependencies //////////////////////////////////////////////////////////////
-//              //////////////////////////////////////////////////////////////
-
 #include "../circa.h"
 
   //           /////////////////////////////////////////////////////////////////
@@ -45,7 +41,7 @@ struct SeqData *seq(Seq s) {
 // Returns
 //   Sequence (Seq)
 
-_circa_
+_circa_ _circa_alcs_
 Seq seq_new_(size_t siz, size_t cap) {
   {
     circa_assert(siz > 0);
@@ -53,6 +49,9 @@ Seq seq_new_(size_t siz, size_t cap) {
   }
   struct SeqData *s = NULL;
   while (s == NULL) s = malloc(sizeof(*s) + (cap * siz));
+  #ifdef CIRCA_SAFE
+    memset(s, 0, siz * cap);
+  #endif
   s->cap = cap;
   s->len = 0;
   return s->data;
@@ -68,7 +67,7 @@ Seq seq_new_(size_t siz, size_t cap) {
 // Returns
 //   Sequence (Seq)
 
-_circa_
+_circa_ _circa_alcs_
 Seq seq_lit_(size_t siz, size_t len, void *lits) {
   {
     circa_assert(siz > 0);
@@ -90,7 +89,7 @@ Seq seq_lit_(size_t siz, size_t len, void *lits) {
 // Returns
 //   Sequence (Seq)
 
-_circa_
+_circa_ _circa_alcs_
 Seq seq_from_(size_t siz, Seq s){
   {
     circa_assert(siz > 0);
@@ -113,7 +112,7 @@ Seq seq_from_(size_t siz, Seq s){
 // Returns
 //   Sequence (Seq)
 
-_circa_
+_circa_ _circa_alcs_
 Seq seq_wrap_(size_t siz, void *ptr, size_t len) {
   {
     circa_assert(siz > 0);
@@ -136,7 +135,7 @@ Seq seq_wrap_(size_t siz, void *ptr, size_t len) {
 // Returns
 //   Sequence (Seq)
 
-_circa_
+_circa_ _circa_rets_
 Seq seq_rsz_(size_t siz, Seq s, size_t cap) {
   {
     circa_assert(siz > 0);
@@ -165,7 +164,7 @@ Seq seq_rsz_(size_t siz, Seq s, size_t cap) {
 // Returns
 //   Sequence (Seq)
 
-_circa_
+_circa_ _circa_rets_
 Seq seq_rqr_(size_t siz, Seq s, size_t cap) {
   {
     circa_assert(siz > 0);
@@ -184,7 +183,7 @@ Seq seq_rqr_(size_t siz, Seq s, size_t cap) {
 // Returns
 //   Sequence (Seq)
 
-_circa_
+_circa_ _circa_rets_
 Seq seq_shr_(size_t siz, Seq s) {
   {
     circa_assert(siz > 0);
@@ -202,7 +201,7 @@ Seq seq_shr_(size_t siz, Seq s) {
 // Returns
 //   void
 
-_circa_
+_circa_ _circa_rets_
 Seq seq_del_(size_t siz, Seq s) {
   {
     circa_assert(siz > 0);
@@ -231,7 +230,7 @@ Seq seq_del_(size_t siz, Seq s) {
 // Returns
 //   Sequence (Seq)
 
-_circa_
+_circa_ _circa_rets_
 Seq seq_cpy_(size_t siz, Seq dst, Seq src) {
   {
     circa_assert(siz > 0);
@@ -255,7 +254,7 @@ Seq seq_cpy_(size_t siz, Seq dst, Seq src) {
 // Returns
 //   Sequence (Seq)
 
-_circa_
+_circa_ _circa_rets_
 Seq seq_cat_(size_t siz, Seq dst, Seq src) {
   {
     circa_assert(siz > 0);
@@ -277,7 +276,7 @@ Seq seq_cat_(size_t siz, Seq dst, Seq src) {
 // Returns
 //   Sequence (Seq)
 
-_circa_
+_circa_ _circa_rets_
 Seq seq_rvs_(size_t siz, Seq s) {
   {
     circa_assert(siz > 0);
@@ -309,7 +308,7 @@ Seq seq_rvs_(size_t siz, Seq s) {
 // Returns
 //   Sequence (Seq)
 
-_circa_
+_circa_ _circa_rets_
 Seq seq_set_(size_t siz, Seq s, size_t addr, void *val) {
   {
     circa_assert(siz > 0);
@@ -332,7 +331,7 @@ Seq seq_set_(size_t siz, Seq s, size_t addr, void *val) {
 // Returns
 //   Value (T)
 
-_circa_
+_circa_ _circa_rets_
 void *seq_get_(size_t siz, Seq s, size_t addr) {
   {
     circa_assert(siz > 0);
@@ -357,7 +356,7 @@ void *seq_get_(size_t siz, Seq s, size_t addr) {
 // Returns
 //   Sequence (Seq)
 
-_circa_
+_circa_ _circa_rets_
 Seq seq_push_(size_t siz, Seq s, void *val) {
   {
     circa_assert(siz > 0);
@@ -379,7 +378,7 @@ Seq seq_push_(size_t siz, Seq s, void *val) {
 // Returns
 //   Sequence (Seq)
 
-_circa_
+_circa_ _circa_rets_
 Seq seq_push_ext_(size_t siz, Seq s, void *val, size_t pre) {
   {
     circa_assert(siz > 0);
@@ -401,7 +400,7 @@ Seq seq_push_ext_(size_t siz, Seq s, void *val, size_t pre) {
 // Returns
 //   Value (T)
 
-_circa_
+_circa_ _circa_rets_
 void *seq_tos_(size_t siz, Seq s) {
   {
     circa_assert(siz > 0);
@@ -420,7 +419,7 @@ void *seq_tos_(size_t siz, Seq s) {
 // Returns
 //   Value (T)
 
-_circa_
+_circa_ _circa_rets_
 void *seq_pop_(size_t siz, Seq s) {
   {
     circa_assert(siz > 0);
@@ -441,7 +440,7 @@ void *seq_pop_(size_t siz, Seq s) {
 // Returns
 //   Sequence (Seq)
 
-_circa_
+_circa_ _circa_rets_
 Seq seq_dup_(size_t siz, Seq s) {
   {
     circa_assert(siz > 0);
