@@ -8,11 +8,11 @@ int add(int a, int b) { return a + b; }
 
 int main() {
   Seq(int) ns = seq_lit(int, 1, 2, 3, 4);
-  seq_do(int, ns, puti);
+  seq_do(ns, puti);
   int n = 0;
-  seq_reduce(int, ns, add, n);
+  seq_reduce(ns, add, n);
   puts("Sum:");
   puti(n);
-  seq_del(int, ns);
+  seq_del(ns);
   return 0;
 }

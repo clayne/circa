@@ -19,13 +19,13 @@ describe(Arena, {
     });
 
     it("arena_rsz", {
-      arena_rsz(int, ar, 10);
+      arena_rsz(ar, 10);
       assert(ar != NULL);
       assert(arena(ar)->cap == 10);
     });
 
     it("arena_del", {
-      arena_del(int, ar);
+      arena_del(ar);
     });
   });
 });
@@ -39,23 +39,23 @@ describe(Seq,
     });
 
     it("seq_rsz", {
-      seq_rsz(int, sq, 10);
+      seq_rsz(sq, 10);
       assert(sq != NULL);
       assert(seq(sq)->cap == 10);
     });
 
     it("seq_rqr", {
-      seq_rqr(int, sq, 5);
+      seq_rqr(sq, 5);
       assert(sq != NULL);
       assert(seq(sq)->cap == 10);
-      seq_rqr(int, sq, 15);
+      seq_rqr(sq, 15);
       assert(sq != NULL);
       assert(seq(sq)->cap == 15);
     });
 
     it("seq_del", {
-      seq_del(int, sq);
-      seq_del(int, sq);
+      seq_del(sq);
+      seq_del(sq);
       assert(sq == NULL);
     });
   });

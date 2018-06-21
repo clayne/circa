@@ -10,12 +10,24 @@
  // Dependencies //////////////////////////////////////////////////////////////
 //              //////////////////////////////////////////////////////////////
 
+  //     //
+ // STL //
+//     //
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+  //    //
+ // OS //
+//    //
+
+#ifdef _WIN32
+  #include <windows.h>
+#endif
 
   //        ////////////////////////////////////////////////////////////////////
  // Config ////////////////////////////////////////////////////////////////////
@@ -163,18 +175,20 @@ struct StrData {
   char data[];
 };
 
-  //         //
- // Task(T) //
-//         //
+  //        //
+ // Ctx(T) //
+//        //
 
-#define Task(T) T*
-typedef Task(void) Task;
+#ifdef _WIN32
+  typedef DWORD WINAPI (*TaskPtr)(void*);
+#else
+  typedef void*(*TaskPtr)(void*);
+#endif
 
-struct TaskData {
+typedef struct {
   Seq args;
-  Seq outs;
-  void (*fnptr)(Task);
-};
+  Seq rets;
+} *Ctx;
 
   //          //
  // Arena(T) //
@@ -203,116 +217,116 @@ _circa_ struct SeqData *seq(Seq s);
  // Allocators
 //
 
-#define seq_new(T, C) (Seq(T)) seq_new_(sizeof(T), (C));
+#define seq_new(T, C) seq_new_(sizeof(T), (C));
 _circa_ _circa_alcs_ Seq seq_new_(size_t siz, size_t cap);
 
-#define seq_lit(T, ...) (Seq(T)) seq_lit_(sizeof(T), sizeof((T[]){__VA_ARGS__}) / sizeof(T), &(T[]){__VA_ARGS__})
+#define seq_lit(T, ...) seq_lit_(sizeof(T), sizeof((T[]){__VA_ARGS__}) / sizeof(T), &(T[]){__VA_ARGS__})
 _circa_ _circa_alcs_ Seq seq_lit_(size_t siz, size_t len, void *lits);
 
-#define seq_from(T, S) (Seq(T)) seq_from_(sizeof(T), (S));
+#define seq_from(S) seq_from_(sizeof(*(S)), (S));
 _circa_ _circa_alcs_ Seq seq_from_(size_t siz, Seq s);
 
-#define seq_wrap(T, P, L) (Seq(T)) seq_wrap_(sizeof(T), (P), (L))
+#define seq_wrap(P, L) seq_wrap_(sizeof(*(P)), (P), (L))
 _circa_ _circa_alcs_ Seq seq_wrap_(size_t siz, void *ptr, size_t len);
 
-#define seq_rsz(T, S, C) (S) = (Seq(T)) seq_rsz_(sizeof(T), (S), (C))
+#define seq_rsz(S, C) ((S) = seq_rsz_(sizeof(*(S)), (S), (C)), (S))
 _circa_ _circa_rets_ Seq seq_rsz_(size_t siz, Seq s, size_t cap);
 
-#define seq_rqr(T, S, C) (S) = (Seq(T)) seq_rqr_(sizeof(T), (S), (C))
+#define seq_rqr(S, C) ((S) = seq_rqr_(sizeof(*(S)), (S), (C)), (S))
 _circa_ _circa_rets_ Seq seq_rqr_(size_t siz, Seq s, size_t cap);
 
-#define seq_shr(T, S) (S) = (Seq(T)) seq_shr_(sizeof(T), (S))
+#define seq_shr(S) ((S) = seq_shr_(sizeof(*(S)), (S)), (S))
 _circa_ _circa_rets_ Seq seq_shr_(size_t siz, Seq s);
 
-#define seq_del(T, S) (S) = seq_del_(sizeof(T), (S))
+#define seq_del(S) (S) = seq_del_(sizeof(*(S)), (S))
 _circa_ _circa_rets_ Seq seq_del_(size_t siz, Seq s);
 
   //
  // Sequence Ops
 //
 
-#define seq_cpy(T, DST, SRC) (DST) = seq_cpy_(sizeof(T), (DST), (SRC))
+#define seq_cpy(DST, SRC) ((DST) = seq_cpy_(sizeof(*(DST)), (DST), (SRC)), (DST))
 _circa_ _circa_rets_ Seq seq_cpy_(size_t siz, Seq dst, Seq src);
 
-#define seq_cat(T, DST, SRC) (DST) = seq_cat_(sizeof(T), (DST), (SRC))
+#define seq_cat(DST, SRC) ((DST) = seq_cat_(sizeof(*(DST)), (DST), (SRC)), (DST))
 _circa_ _circa_rets_ Seq seq_cat_(size_t siz, Seq dst, Seq src);
 
-#define seq_rvs(T, S) (S) = seq_rvs_(sizeof(T), (S))
+#define seq_rvs(S) ((S) = seq_rvs_(sizeof(*(S)), (S)), (S))
 _circa_ _circa_rets_ Seq seq_rvs_(size_t siz, Seq s);
 
   //
  // Array Ops
 //
 
-#define seq_set(T, S, A, V) (S) = seq_set_(sizeof(T), (S), (A), &(T){V})
+#define seq_set(S, A, V) ((S) = seq_set_(sizeof(*(S)), (S), (A), &(typeof(*(S))){V}), (S))
 _circa_ _circa_rets_ Seq seq_set_(size_t siz, Seq s, size_t addr, void *val);
 
-#define seq_get(T, S, A) *((Seq(T)) seq_get_(sizeof(T), S, A))
+#define seq_get(S, A) (*((Seq(typeof(*(S)))) seq_get_(sizeof(*(S)), (S), (A))))
 _circa_ _circa_rets_ void *seq_get_(size_t siz, Seq s, size_t addr);
 
   //
  // Stack Ops
 //
 
-#define seq_push(T, S, V) (S) = (Seq(T)) seq_push_(sizeof(T), (S), &(T){V})
+#define seq_push(S, V) ((S) = seq_push_(sizeof(*(S)), (S), &(typeof(*(S))){V}), (S))
 _circa_ _circa_rets_ Seq  seq_push_(size_t siz, Seq s, void *val);
 
-#define seq_push_ext(T, S, V, P) (S) = (Seq(T)) seq_push_ext_(sizeof(T), (S), &(T){V}, (P))
+#define seq_push_ext(S, V, P) ((S) = seq_push_ext_(sizeof(*S), (S), &(typeof(*(S)){V}, (P))), (S))
 _circa_ _circa_rets_ Seq seq_push_ext_(size_t siz, Seq s, void *val, size_t pre);
 
-#define seq_tos(T, S) *((Seq(T)) seq_tos_(sizeof(T), S))
+#define seq_tos(S) (*((Seq(typeof(*(S)))) seq_tos_(sizeof(*(S)), (S))))
 _circa_ _circa_rets_ void *seq_tos_(size_t siz, Seq s);
 
-#define seq_pop(T, S) *((Seq(T)) seq_pop_(sizeof(T), (S)))
+#define seq_pop(S) (*((Seq(typeof(*(S)))) seq_pop_(sizeof(*S), (S))))
 _circa_ _circa_rets_ void *seq_pop_(size_t siz, Seq s);
 
-#define seq_dup(T, S) (S) = (Seq(T)) seq_dup_(sizeof(T), (S))
+#define seq_dup(S) ((S) = seq_dup_(sizeof(*(S)), (S)), (S))
 _circa_ _circa_rets_ Seq seq_dup_(size_t siz, Seq s);
 
   //
  // Processing
 //
 
-#define seq_do(T, S, F) \
-{ \
+#define seq_do(S, F) \
+do { \
   for (int I = 0; I < seq(S)->len; I++) { \
-    F(seq_get(T, S, I)); \
+    F(seq_get(S, I)); \
   } \
-}
+} while(0)
 
-#define seq_apply(T, S, F) \
-{ \
+#define seq_apply(S, F) \
+do { \
   for (int I = 0; I < seq(S)->len; I++) { \
-    seq_set(T, S, I, F(seq_get(T, S, I))); \
+    seq_set(S, I, F(seq_get(S, I))); \
   } \
-}
+} while(0)
 
-#define seq_map(T, A, F, B) \
-{ \
-  seq_rqr(T, B, seq(A)->len); \
+#define seq_map(A, F, B) \
+do { \
+  seq_rqr(B, seq(A)->len); \
   seq(B)->len = seq(A)->len; \
   for (int I = 0; I < seq(A)->len; I++) { \
-    seq_set(T, B, I, F(seq_get(T, A, I))); \
+    seq_set(B, I, F(seq_get(A, I))); \
   } \
-}
+} while(0)
 
-#define seq_filter(T, A, F, B) \
-{ \
-  seq_rqr(T, B, seq(A)->len); \
+#define seq_filter(A, F, B) \
+do { \
+  seq_rqr(B, seq(A)->len); \
   seq(B)->len = 0; \
   for (int I = 0; I < seq(A)->len; I++) { \
-    if (F(seq_get(T, A, I))) { \
-      seq_push(T, B, seq_get(T, A, I)); \
+    if (F(seq_get(A, I))) { \
+      seq_push(B, seq_get(A, I)); \
     } \
   } \
-}
+} while(0)
 
-#define seq_reduce(T, A, F, B) \
-{ \
+#define seq_reduce(A, F, B) \
+do { \
   for (int I = 0; I < seq(A)->len; I++) { \
-    B = F(B, seq_get(T, A, I)); \
+    B = F(B, seq_get(A, I)); \
   } \
-}
+} while(0)
 
   //                            ////////////////////////////////////////////////
  // String Function Prototypes ////////////////////////////////////////////////
@@ -405,6 +419,22 @@ _circa_ char str_pop_(Str s);
 #define str_readfile(S, F) (S) = str_readfile_((S), (F))
 _circa_ _circa_rets_ Str str_readfile_(Str s, char *filename);
 
+
+  //                             ///////////////////////////////////////////////
+ // Context Function Prototypes ///////////////////////////////////////////////
+//                             ///////////////////////////////////////////////
+
+  //
+ // Allocators
+//
+
+#define ctx_new(A, B) ctx_new_(sizeof(*(A)), sizeof(*(B)), (A), (B))
+_circa_ _circa_alcs_ Ctx ctx_new_(size_t sarg, size_t sret, Seq args, Seq rets);
+
+  //
+ // Launching
+//
+
   //                           /////////////////////////////////////////////////
  // Arena Function Prototypes /////////////////////////////////////////////////
 //                           /////////////////////////////////////////////////
@@ -422,24 +452,25 @@ _circa_ struct ArenaData *arena(Arena a);
 #define arena_new(T, C) (Arena(T)) arena_new_(sizeof(T), (C))
 _circa_ _circa_alcs_ Arena arena_new_(size_t siz, size_t cap);
 
-#define arena_rsz(T, A, C) (A) = (Arena(T)) arena_rsz_(sizeof(T), (A), (C))
+#define arena_rsz(A, C) ((A) = arena_rsz_(sizeof(*(A)), (A), (C)), (A))
 _circa_ _circa_rets_ Arena arena_rsz_(size_t siz, Arena a, size_t cap);
 
-#define arena_del(T, A) (A) = arena_del_(sizeof(T), (A))
+#define arena_del(A) (A) = arena_del_(sizeof(*(A)), (A))
 _circa_ _circa_rets_ Arena arena_del_(size_t siz, Arena a);
 
   //
  // Array Ops
 //
 
-#define arena_take(T, A) ((T*) arena_take_(sizeof(T), &(A)))
+#define arena_take(A) ((typeof(*(A))*) arena_take_(sizeof(*(A)), &(A)))
 _circa_ _circa_rets_ void* arena_take_(size_t siz, Arena *a);
 
-#define arena_give(T, A, P) (A) = (Arena(T)) arena_give_(sizeof(T), (A), (P))
+#define arena_give(A, P) (A) = arena_give_(sizeof(*(A)), (A), (P))
 _circa_ _circa_rets_ Arena arena_give_(size_t siz, Arena a, void *ptr);
 
 #include "src/seq.h"
 #include "src/str.h"
+#include "src/ctx.h"
 #include "src/arena.h"
 
 #endif

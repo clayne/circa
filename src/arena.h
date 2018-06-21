@@ -13,7 +13,8 @@
 //           /////////////////////////////////////////////////////////////////
 
 _circa_
-struct ArenaData *arena(Arena a) {
+struct ArenaData *arena(Arena a)
+{
   {
     circa_assert(a != NULL);
   }
@@ -34,7 +35,8 @@ struct ArenaData *arena(Arena a) {
 //   Arena (Arena)
 
 _circa_ _circa_alcs_
-Arena arena_new_(size_t siz, size_t cap) {
+Arena arena_new_(size_t siz, size_t cap)
+{
   {
     circa_assert(siz > 0);
     circa_assert(cap > 0);
@@ -60,7 +62,8 @@ Arena arena_new_(size_t siz, size_t cap) {
 //   Arena (Arena)
 
 _circa_ _circa_rets_
-Arena arena_rsz_(size_t siz, Arena a, size_t cap) {
+Arena arena_rsz_(size_t siz, Arena a, size_t cap)
+{
   {
     circa_assert(siz > 0);
     circa_assert(a != NULL);
@@ -86,7 +89,8 @@ Arena arena_rsz_(size_t siz, Arena a, size_t cap) {
 //   Null Arena (Arena)
 
 _circa_ _circa_rets_
-Arena arena_del_(size_t siz, Arena a) {
+Arena arena_del_(size_t siz, Arena a)
+{
   {
     circa_assert(siz > 0);
   }
@@ -113,7 +117,8 @@ Arena arena_del_(size_t siz, Arena a) {
 //   Pointer (void*)
 
 _circa_ _circa_rets_
-void *arena_take_(size_t siz, Arena *a) {
+void *arena_take_(size_t siz, Arena *a)
+{
   {
     circa_assert(siz > 0);
     circa_assert(a != NULL);
@@ -142,7 +147,8 @@ void *arena_take_(size_t siz, Arena *a) {
 //   Arena (Arena)
 
 _circa_ _circa_rets_
-void *arena_give_(size_t siz, Arena a, void *ptr) {
+void *arena_give_(size_t siz, Arena a, void *ptr)
+{
   {
     circa_assert(siz > 0);
     circa_assert(a != NULL);

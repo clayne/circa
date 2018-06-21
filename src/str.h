@@ -21,7 +21,8 @@
 //   Sequence Structure (struct StrData*)
 
 _circa_
-struct StrData *str(Str s) {
+struct StrData *str(Str s)
+{
   {
     circa_assert(s != NULL);
   }
@@ -41,7 +42,8 @@ struct StrData *str(Str s) {
 //   String (Str)
 
 _circa_ _circa_alcs_
-Str str_new_(size_t cap) {
+Str str_new_(size_t cap)
+{
   {
     circa_assert(cap > 0);
   }
@@ -61,7 +63,8 @@ Str str_new_(size_t cap) {
 //   String (Str)
 
 _circa_ _circa_alcs_
-Str str_lit_(const char *restrict cs) {
+Str str_lit_(const char *restrict cs)
+{
   {
     circa_assert(cs != NULL);
   }
@@ -82,7 +85,8 @@ Str str_lit_(const char *restrict cs) {
 //   String (Str)
 
 _circa_ _circa_alcs_
-Str str_from_(Str s) {
+Str str_from_(Str s)
+{
   {
     circa_assert(s != NULL);
   }
@@ -105,7 +109,8 @@ Str str_from_(Str s) {
 //   String (Str)
 
 _circa_ _circa_rets_
-Str str_rsz_(Str s, size_t cap) {
+Str str_rsz_(Str s, size_t cap)
+{
   {
     circa_assert(s != NULL);
     circa_assert(cap > 0);
@@ -133,7 +138,8 @@ Str str_rsz_(Str s, size_t cap) {
 //   String (Str)
 
 _circa_ _circa_rets_
-Str str_rqr_(Str s, size_t cap) {
+Str str_rqr_(Str s, size_t cap)
+{
   {
     circa_assert(s != NULL);
     circa_assert(cap > 0);
@@ -150,7 +156,8 @@ Str str_rqr_(Str s, size_t cap) {
 //   String (Str)
 
 _circa_ _circa_rets_
-Str str_shr_(Str s) {
+Str str_shr_(Str s)
+{
   {
     circa_assert(s != NULL);
   }
@@ -166,11 +173,12 @@ Str str_shr_(Str s) {
 //   Null String (Str)
 
 _circa_ _circa_rets_
-Str str_del_(Str s) {
+Str str_del_(Str s)
+{
   if (s != NULL) {
     #ifdef CIRCA_SECURE
       // Zero out the memory to be freed.
-      memset(str(s), 0, str(s)->cap);
+      memset(str(s), 0, sizeof(struct StrData) + str(s)->cap);
     #endif
     free(seq(s));
   }
@@ -191,7 +199,8 @@ Str str_del_(Str s) {
 //   String (Str)
 
 _circa_ _circa_rets_
-Str str_cpy_(Str dst, Str src) {
+Str str_cpy_(Str dst, Str src)
+{
   {
     circa_assert(dst != NULL);
     circa_assert(src != NULL);
@@ -213,7 +222,8 @@ Str str_cpy_(Str dst, Str src) {
 //   String (Str)
 
 _circa_ _circa_rets_
-Str str_cat_(Str dst, Str src) {
+Str str_cat_(Str dst, Str src)
+{
   {
     circa_assert(dst != NULL);
     circa_assert(src != NULL);
@@ -233,7 +243,8 @@ Str str_cat_(Str dst, Str src) {
 //   String (Str)
 
 _circa_ _circa_rets_
-Str str_rvs_(Str s) {
+Str str_rvs_(Str s)
+{
   {
     circa_assert(s != NULL);
   }
@@ -261,7 +272,8 @@ Str str_rvs_(Str s) {
 //   Equality (bool)
 
 _circa_
-bool str_eq_(Str a, Str b) {
+bool str_eq_(Str a, Str b)
+{
   {
     circa_assert(a != NULL);
     circa_assert(b != NULL);
@@ -284,7 +296,8 @@ bool str_eq_(Str a, Str b) {
 //   Equality (bool)
 
 _circa_
-bool str_eq_len_(Str a, Str b, size_t len) {
+bool str_eq_len_(Str a, Str b, size_t len)
+{
   {
     circa_assert(a != NULL);
     circa_assert(b != NULL);
@@ -306,7 +319,8 @@ bool str_eq_len_(Str a, Str b, size_t len) {
 //   Equality (Bool)
 
 _circa_
-bool str_eq_lit_(Str s, const char *restrict c) {
+bool str_eq_lit_(Str s, const char *restrict c)
+{
   {
     circa_assert(s != NULL);
     circa_assert(c != NULL);
@@ -333,7 +347,8 @@ bool str_eq_lit_(Str s, const char *restrict c) {
 //   String (Str)
 
 _circa_ _circa_rets_
-Str str_set_(Str s, size_t addr, char ch) {
+Str str_set_(Str s, size_t addr, char ch)
+{
   {
     circa_assert(s != NULL);
   }
@@ -353,7 +368,8 @@ Str str_set_(Str s, size_t addr, char ch) {
 //   Character (char)
 
 _circa_
-char str_get_(Str s, size_t addr) {
+char str_get_(Str s, size_t addr)
+{
   {
     circa_assert(s != NULL);
     circa_assert(str(s)->len > 0);
@@ -376,7 +392,8 @@ char str_get_(Str s, size_t addr) {
 //   String (Str)
 
 _circa_ _circa_rets_
-Str str_push_(Str s, char ch) {
+Str str_push_(Str s, char ch)
+{
   {
     circa_assert(s != NULL);
   }
@@ -392,7 +409,8 @@ Str str_push_(Str s, char ch) {
 //   Character (char)
 
 _circa_
-char str_tos_(Str s) {
+char str_tos_(Str s)
+{
   {
     circa_assert(s != NULL);
     circa_assert(str(s)->len > 0);
@@ -409,7 +427,8 @@ char str_tos_(Str s) {
 //   Character (char)
 
 _circa_
-char str_pop_(Str s) {
+char str_pop_(Str s)
+{
   {
     circa_assert(s != NULL);
     circa_assert(str(s)->len > 0);
@@ -431,7 +450,8 @@ char str_pop_(Str s) {
 //   String (Str)
 
 _circa_ _circa_rets_
-Str str_readfile_(Str s, char *filename) {
+Str str_readfile_(Str s, char *filename)
+{
   {
     circa_assert(filename != NULL);
   }
