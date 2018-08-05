@@ -64,7 +64,7 @@ struct SeqData {
 _circa_ struct SeqData *seq_(Seq s, CircaMsg fname, CircaMsg line);
 
 #define seq_set_iso(T, S, A, V) (S) = seq_set_(sizeof(T), (S), (A), &(T){V}, __FILE__, _circa_str_(__LINE__))
-#define seq_set(S, A, V) seq_set_iso(typeof(*S), (A), (V))
+#define seq_set(S, A, V) seq_set_iso(typeof(*S), (S), (A), (V))
 _circa_ _circa_rets_ Seq seq_set_(size_t siz, Seq s, size_t addr, void *val, CircaMsg fname, CircaMsg line);
 
 #define seq_set_ext_iso(T, S, A, V, E) (*((T*) seq_set_ext_(sizeof(T), (S), (A), &(T){V}, (E), __FILE__, _circa_str_(__LINE__))))
@@ -72,7 +72,7 @@ _circa_ _circa_rets_ Seq seq_set_(size_t siz, Seq s, size_t addr, void *val, Cir
 _circa_ _circa_rets_ void *seq_set_ext_(size_t siz, Seq s, size_t addr, void *val, size_t pre, CircaMsg fname, CircaMsg line);
 
 #define seq_get_iso(T, S, A) (*((T*) seq_get_(sizeof(T), (S), (A), __FILE__, _circa_str_(__LINE__))))
-#define seq_get(S, A) seq_get_iso(typeof(*S), (A))
+#define seq_get(S, A) seq_get_iso(typeof(*S), (S), (A))
 _circa_ _circa_rets_ void *seq_get_(size_t siz, Seq s, size_t addr, CircaMsg fname, CircaMsg line);
 
 /* Allocators */
