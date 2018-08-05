@@ -1,25 +1,36 @@
-#                                         #######################
-# Makefile | The Circa Core Library for C #######################
-# https://github.com/davidgarland/circa   #######################
-#                                         #######################
+#
+# circa/Makefile | Circa's Makefile.
+# https://github.com/davidgarland/circa
+#
 
 CC=clang
-CFLAGS=-Og
+CFLAGS=-Weverything
 LDFLAGS=
 
-CLEANUP=test odd sum read
+#
+# Env Handling
+#
 
-MUTE=>/dev/null 2>/dev/null || true
+CFLAGS+=$(shell printenv CFLAGS)
+LDFLAGS+=$(shell printenv LDFLAGS)
 
-default: test
+#
+# Variables
+#
+
+MUTE=>/dev/null 2>/dev/null 
+
+#
+# Build Options
+#
+
+default: build
 
 build:
-	-@$(CC) $(CFLAGS) ex/odd.c -o odd $(CFLAGS)
-	-@$(CC) $(CFLAGS) ex/read.c -o read $(CFLAGS)
-	-@$(CC) $(CFLAGS) ex/sum.c -o sum $(CFLAGS)
+	-@$(CC) -c $(CFLAGS) *.h $(LDFLAGS)
 
-test:
-	-@$(CC) $(CFLAGS) tests/test.c -Ilib/snow -DSNOW_ENABLED -g -o test
+ex: ex/seq/odd.c 
+	-@$(CC) $(CFLAGS) ex/seq/odd.c -o odd.o $(LDFLAGS)
 
 clean:
-	-@rm -rf $(CLEANUP) *.o *.out *.a *.so *.gch src/*.gch src/core/*.gch $(MUTE)
+	-@rm -rf *.o *.gch $(MUTE)
