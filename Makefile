@@ -4,7 +4,7 @@
 #
 
 CC=clang
-CFLAGS=-Weverything
+CFLAGS=
 LDFLAGS=
 
 #
@@ -26,11 +26,18 @@ MUTE=>/dev/null 2>/dev/null
 
 default: build
 
+update:
+	-@git fetch snow master
+	-@git subtree pull --prefix lib/snow snow master --squash
+
 build:
 	-@$(CC) -c $(CFLAGS) *.h $(LDFLAGS)
 
-ex: ex/seq/odd.c 
-	-@$(CC) $(CFLAGS) ex/seq/odd.c -o odd.o $(LDFLAGS)
+test: tests/test.c
+	-@$(CC) $(CFLAGS) tests/test.c -Ilib/snow -DSNOW_ENABLED -g -o test.o
+
+examples: examples/seq/odd.c
+	-@$(CC) $(CFLAGS) examples/seq/odd.c -o odd.o $(LDFLAGS)
 
 clean:
 	-@rm -rf *.o *.gch $(MUTE)

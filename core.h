@@ -3,8 +3,8 @@
 ** https://github.com/davidgarland/circa
 */
 
-#ifndef CIRCA_CFG_H
-#define CIRCA_CFG_H
+#ifndef CIRCA_CORE_H
+#define CIRCA_CORE_H
 
 /*
 ** Compatibility Checks
@@ -220,4 +220,4 @@
 
 typedef const char *const restrict CircaMsg;
 
-#endif /* CIRCA_CFG_H */
+#endif /* CIRCA_CORE_H */

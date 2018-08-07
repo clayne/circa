@@ -235,7 +235,7 @@ Str str_new_(size_t cap, CircaMsg fname, CircaMsg line)
     circa_assert(cap > 0, fname, line);
   }
   struct StrData *s = NULL;
-  while(s == NULL) s = malloc(sizeof(*s) + cap + 1);
+  while (s == NULL) s = malloc(sizeof(*s) + cap + 1);
   s->cap = cap;
   s->len = 0;
   return s->data;

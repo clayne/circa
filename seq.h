@@ -106,7 +106,7 @@ _circa_ _circa_rets_ Seq seq_rqr_(size_t siz, Seq s, size_t cap, CircaMsg fname,
 _circa_ _circa_rets_ Seq seq_shr_(size_t siz, Seq s, CircaMsg fname, CircaMsg line);
 
 #define seq_del_iso(T, S) (S) = seq_del_(sizeof(T), (S), __FILE__, _circa_str_(__LINE__))
-#define seq_del(S) seq_del_iso(sizeof(*(S)), (S))
+#define seq_del(S) seq_del_iso(typeof(*S), (S))
 _circa_ _circa_rets_ Seq seq_del_(size_t siz, Seq s, CircaMsg fname, CircaMsg line);
 
 /* Stack Operations */
@@ -378,6 +378,7 @@ Seq seq_rsz_(size_t siz, Seq s, size_t cap, CircaMsg fname, CircaMsg line)
   #endif
   struct SeqData *s2 = NULL;
   while (s2 == NULL) s2 = realloc(seq(s), sizeof(*s2) + (cap * siz));
+  s2->cap = cap;
   return s2->data;
 }
 
@@ -444,7 +445,9 @@ Seq seq_del_(size_t siz, Seq s, CircaMsg fname, CircaMsg line)
   }
   if (s != NULL) {
     #ifdef CIRCA_SECURE
-      memset(seq(s), 0, sizeof(*seq(s)) + (siz * seq(s)->cap));
+      memset(s, 0, siz * seq(s)->cap);
+      seq(s)->cap = 0;
+      seq(s)->len = 0;
     #endif
     free(seq(s));
   }
