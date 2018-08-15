@@ -6,15 +6,18 @@ language with the intent of making C less painful to use for common tasks.
 
 # Library Set
 
-| Library       | Description          | Standard | Revision | Dependencies |
-| ------------- | ------------------   | -------- | -------- | ------------ |
-| circa/core.h  | Core utils & config. | ISO      | C89      | n/a          |
-| circa/types.h | Terse type names.    | ISO      | C99      | core         |
-| circa/simd.h  | Portable SIMD.       | GNU      | C99      | core, types  |
-| circa/seq.h   | Dynamic sequences.   | ISO*     | C99      | core         |
-| circa/str.h   | Dynamic strings.     | ISO      | C99      | core         |
+| Library         | Description           | Standard | Revision | Dependencies           |
+| --------------- | --------------------- | -------- | -------- | ---------------------- |
+| circa/core.h    | Core utils & config.  | ISO      | C89      | n/a                    |
+| circa/types.h   | Terse type names.     | ISO      | C99      | core                   |
+| circa/hash.h    | FNV1a hashing.        | ISO      | C99      | core, types            |
+| circa/simd.h**  | Portable SIMD.        | GNU      | C99      | core, types            |
+| circa/seq.h     | Dynamic sequences.    | ISO*     | C99      | core                   |
+| circa/str.h     | Dynamic strings.      | ISO      | C99      | core, types, hash      |
+| circa/dict.h**  | Dynamic dictionaries. | ISO      | C99      | core, types, hash, str |
 
 `* Some features may not be available in ISO C.`
+`** Not implemented fully yet. Some features may be usable.`
 
 # Examples
 
@@ -35,10 +38,6 @@ int main()
   return 0;
 }
 ```
-
-## SIMD
-
-To be written.
 
 ## Sequences
 

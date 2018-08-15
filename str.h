@@ -31,6 +31,7 @@
 /* Internal */
 
 #include "core.h"
+#include "hash.h"
 
 /*
 ** Type Definitions
@@ -98,6 +99,9 @@ _circa_ bool str_eq_lit_(Str s, const char *restrict c, CircaMsg fname, CircaMsg
 
 #define str_eq_lit_len(S, C, T, P) str_eq_lit_len_((S), (C), (T), (P), __FILE__, _circa_str_(__LINE__))
 _circa_ bool str_eq_lit_len_(Str s, const char *restrict c, size_t start, size_t stop, CircaMsg fname, CircaMsg line);
+
+#define str_hash(S) str_hash_((S), __FILE__, _circa_str_(__LINE__))
+_circa_ size_t str_hash_(Str s, CircaMsg fname, CircaMsg line);
 
 /* Stack Operations */
 
@@ -591,6 +595,19 @@ bool str_eq_lit_(Str s, const char *const restrict cs, CircaMsg fname,
   for (size_t i = 0; i < s_len; i++)
     if (s[i] != cs[i]) return false;
   return true;
+}
+
+_circa_
+size_t str_hash_(Str s, CircaMsg fname, CircaMsg line)
+{
+  {
+    circa_assert(s != NULL, fname, line);
+    circa_assert(str(s)->len > 0, fname, line);
+  }
+  const size_t len = str(s)->len;
+  size_t hash = fnv1a_seed();
+  for (int i = 0; i < len; i++) hash = fnv1a(s[i], hash);
+  return hash;
 }
 
 /*
