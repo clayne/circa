@@ -7,11 +7,24 @@
 #define CIRCA_HASH_H
 
 /*
+** Compatibiltity Checks
+*/
+
+#if !defined(__STDC_VERSION__)
+  #error "[circa/hash.h]: C99 is required."
+#endif
+
+#if __STDC_VERSION__ < 199901L
+  #error "[circa/hash.h]: C99 is required."
+#endif
+
+/*
 ** Dependencies
 */
 
 /* Internal */
 
+#include "core.h"
 #include "types.h"
 
 /*
