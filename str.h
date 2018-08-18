@@ -28,10 +28,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+/* Vendored */
+
+#ifndef XXH_INLINE_ALL
+  #define XXH_INLINE_ALL
+#endif
+
+#include "lib/xxHash/xxhash.h"
+
 /* Internal */
 
 #include "core.h"
-#include "hash.h"
+#include "types.h"
 
 /*
 ** Type Definitions
@@ -605,9 +613,8 @@ size_t str_hash_(Str s, CircaMsg fname, CircaMsg line)
     circa_assert(str(s)->len > 0, fname, line);
   }
   const size_t len = str(s)->len;
-  size_t hash = fnv1a_seed();
-  for (int i = 0; i < len; i++) hash = fnv1a(s[i], hash);
-  return hash;
+  if (sizeof(size_t) == 8) return XXH64(s, len, 0);
+  else return XXH32(s, len, 0);
 }
 
 /*

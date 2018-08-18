@@ -18,17 +18,24 @@
   #error "[circa/dict.h]: C99 is required."
 #endif
 
-#error "[circa/dict.h]: This module is not implemented yet."
+#error "[circa/dict.h]: This library is not implemented yet."
 
 /*
 ** Dependencies
 */
 
+/* Vendored */
+
+#ifndef XXH_INLINE_ALL
+  #define XXH_INLINE_ALL
+#endif
+
+#include "lib/xxHash/xxhash.h"
+
 /* Internal */
 
 #include "core.h"
 #include "types.h"
-#include "hash.h"
 #include "str.h"
 
 /*
