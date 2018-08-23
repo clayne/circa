@@ -270,9 +270,6 @@ Seq seq_new_(size_t siz, size_t cap, CircaMsg fname, CircaMsg line)
   const size_t blk = cap * siz;
   struct SeqData *s = NULL;
   while (s == NULL) s = malloc(sizeof(*s) + blk);
-  #ifdef CIRCA_SAFE
-    memset(s->data, 0, blk);
-  #endif
   s->cap = cap;
   s->len = 0;
   return s->data;

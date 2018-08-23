@@ -28,14 +28,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-/* Vendored */
-
-#ifndef XXH_INLINE_ALL
-  #define XXH_INLINE_ALL
-#endif
-
-#include "lib/xxHash/xxhash.h"
-
 /* Internal */
 
 #include "core.h"
@@ -603,18 +595,6 @@ bool str_eq_lit_(Str s, const char *const restrict cs, CircaMsg fname,
   for (size_t i = 0; i < s_len; i++)
     if (s[i] != cs[i]) return false;
   return true;
-}
-
-_circa_
-size_t str_hash_(Str s, CircaMsg fname, CircaMsg line)
-{
-  {
-    circa_assert(s != NULL, fname, line);
-    circa_assert(str(s)->len > 0, fname, line);
-  }
-  const size_t len = str(s)->len;
-  if (sizeof(size_t) == 8) return XXH64(s, len, 0);
-  else return XXH32(s, len, 0);
 }
 
 /*

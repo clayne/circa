@@ -13,8 +13,12 @@
 
 /* Internal */
 
+#include "../core.h"
+#include "../types.h"
+#include "../bits.h"
 #include "../seq.h"
 #include "../str.h"
+#include "../dict.h"
 
 /*
 ** Tests
@@ -92,6 +96,44 @@ describe(Str,
       assert(st == NULL);
       str_del(st);
       assert(st == NULL);
+    });
+  });
+);
+
+Dict(int) d;
+
+describe(Dict,
+  subdesc(Allocators, {
+    it("dict_new", {
+      d = dict_new(int, 5);
+      assert(d != NULL);
+      assert(dict(d)->cap == u32_primegt(5));
+      assert(dict(d)->len == 0);
+    });
+    
+    it("dict_rsz", {
+      dict_rsz(d, 10);
+      assert(d != NULL);
+      assert(dict(d)->cap == u32_primegt(10));
+      assert(dict(d)->len == 0);
+    });
+
+    it("dict_rqr", {
+      dict_rqr(d, 5);
+      assert(d != NULL); 
+      assert(dict(d)->cap == u32_primegt(10));
+      assert(dict(d)->len == 0);
+      dict_rqr(d, 15);
+      assert(d != NULL);
+      assert(dict(d)->cap == u32_primegt(15));
+      assert(dict(d)->len == 0);
+    });
+
+    it("dict_del", {
+      dict_del(d);
+      assert(d == NULL);
+      dict_del(d);
+      assert(d == NULL);
     });
   });
 );

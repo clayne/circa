@@ -6,18 +6,18 @@ language with the intent of making C less painful to use for common tasks.
 
 # Library Set
 
-| Library         | Description           | Standard | Revision | Dependencies                 |
-| --------------- | --------------------- | -------- | -------- | ---------------------------- |
-| circa/core.h    | Core utils & config.  | ISO      | C89      | n/a                          |
-| circa/types.h   | Terse type names.     | ISO      | C99      | core                         |
-| circa/bits.h    | Portable bit hacks.   | ISO      | C99      | core, types                  |
-| circa/simd.h**  | Portable SIMD.        | GNU      | C99      | core, types                  |
-| circa/seq.h     | Dynamic sequences.    | ISO*     | C99      | core                         |
-| circa/str.h     | Dynamic strings.      | ISO      | C99      | core, types, hash            |
-| circa/dict.h**  | Dynamic dictionaries. | ISO      | C99      | core, types, bits, hash, str |
+| Library        | Description           | Standard | Revision | Internal Deps     | Vendored Deps |
+| -------------- | --------------------- | -------- | -------- | ----------------- | ------------- |
+| circa/core.h   | Core utils & config.  | ISO      | C89      | n/a               | n/a           |
+| circa/types.h  | Terse type names.     | ISO      | C99      | core              | n/a           |
+| circa/bits.h   | Portable bit hacks.   | ISO      | C99      | core, types       | n/a           |
+| circa/simd.h** | Portable SIMD.        | GNU      | C99      | core, types       | n/a           |
+| circa/seq.h    | Dynamic sequences.    | ISO*     | C99      | core              | n/a           |
+| circa/str.h    | Dynamic strings.      | ISO      | C99      | core, types       | n/a           |
+| circa/dict.h   | Dynamic dictionaries. | ISO      | C99      | core, types, bits | xxHash        |
 
 `* Some features may not be available in ISO C.`
-`** Not implemented fully yet. Some features may be usable.`
+`** Not implemented fully yet. Some features may be unusable.`
 
 # Examples
 
