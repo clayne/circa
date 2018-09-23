@@ -10,7 +10,7 @@
 ** Compatibility Checks
 */
 
-#if !defined(__STDC_VERSION__)
+#ifndef __STDC_VERSION__
   #error "[circa/seq.h]: C99 is required."
 #endif
 
@@ -18,13 +18,8 @@
   #error "[circa/seq.h]: C99 is required."
 #endif
 
-#if !defined(__GNUC__)
+#ifndef __GNUC__
   #pragma message "[circa/seq.h] GNU C is missing. Use the _iso versions of functions."  
-#endif
-
-#if defined(__clang__)
-  #pragma clang diagnostic push
-  #pragma clang diagnostic ignored "-Wlanguage-extension-token"
 #endif
 
 /*
@@ -48,7 +43,7 @@
 
 typedef Seq(void) Seq;
 
-struct SeqData {
+struct seq_data {
   size_t cap;   // The capacity of the sequence.
   size_t len;   // The length of the sequence.
   char data[];  // The sequence's data storage.
@@ -61,85 +56,85 @@ struct SeqData {
 /* Accessors */
 
 #define seq(S) seq_((S), __FILE__, _circa_str_(__LINE__))
-_circa_ struct SeqData *seq_(Seq s, CircaMsg fname, CircaMsg line);
+_circa_ struct seq_data *seq_(Seq s, circa_msg fname, circa_msg line);
 
 #define seq_set_iso(T, S, A, V) (S) = seq_set_(sizeof(T), (S), (A), &(T){V}, __FILE__, _circa_str_(__LINE__))
 #define seq_set(S, A, V) seq_set_iso(typeof(*S), (S), (A), (V))
-_circa_ _circa_rets_ Seq seq_set_(size_t siz, Seq s, size_t addr, void *val, CircaMsg fname, CircaMsg line);
+_circa_ _circa_rets_ Seq seq_set_(size_t siz, Seq s, size_t addr, void *val, circa_msg fname, circa_msg line);
 
 #define seq_set_ext_iso(T, S, A, V, E) (*((T*) seq_set_ext_(sizeof(T), (S), (A), &(T){V}, (E), __FILE__, _circa_str_(__LINE__))))
 #define seq_set_ext(S, A, V, E) seq_set_ext_(typeof(*S), S, A, V, E)
-_circa_ _circa_rets_ void *seq_set_ext_(size_t siz, Seq s, size_t addr, void *val, size_t pre, CircaMsg fname, CircaMsg line);
+_circa_ _circa_rets_ void *seq_set_ext_(size_t siz, Seq s, size_t addr, void *val, size_t pre, circa_msg fname, circa_msg line);
 
 #define seq_get_iso(T, S, A) (*((T*) seq_get_(sizeof(T), (S), (A), __FILE__, _circa_str_(__LINE__))))
 #define seq_get(S, A) seq_get_iso(typeof(*S), (S), (A))
-_circa_ _circa_rets_ void *seq_get_(size_t siz, Seq s, size_t addr, CircaMsg fname, CircaMsg line);
+_circa_ _circa_rets_ void *seq_get_(size_t siz, Seq s, size_t addr, circa_msg fname, circa_msg line);
 
 /* Allocators */
 
 #define seq_new_iso(T, C) seq_new_(sizeof(T), (C), __FILE__, _circa_str_(__LINE__))
 #define seq_new(T, C) seq_new_iso(T, C)
-_circa_ _circa_alcs_ Seq seq_new_(size_t siz, size_t cap, CircaMsg fname, CircaMsg line);
+_circa_ _circa_alcs_ Seq seq_new_(size_t siz, size_t cap, circa_msg fname, circa_msg line);
 
 #define seq_lit_iso(T, ...) seq_lit_(sizeof(T), sizeof((T[]){__VA_ARGS__}) / sizeof(T), &(T[]){__VA_ARGS__}, __FILE__, _circa_str_(__LINE__))
 #define seq_lit(T, ...) seq_lit_iso(T, __VA_ARGS__)
-_circa_ _circa_alcs_ Seq seq_lit_(size_t siz, size_t len, void *lits, CircaMsg fname, CircaMsg line);
+_circa_ _circa_alcs_ Seq seq_lit_(size_t siz, size_t len, void *lits, circa_msg fname, circa_msg line);
 
 #define seq_from_iso(T, S) seq_from_(sizeof(T), (S), __FILE__, _circa_str_(__LINE__))
 #define seq_from(S) seq_from_iso(typeof(*S), (S))
-_circa_ _circa_alcs_ Seq seq_from_(size_t siz, Seq s, CircaMsg fname, CircaMsg line);
+_circa_ _circa_alcs_ Seq seq_from_(size_t siz, Seq s, circa_msg fname, circa_msg line);
 
 #define seq_wrap_iso(T, P, L) seq_wrap_(sizeof(T), (P), (L), __FILE__, _circa_str_(__LINE__))
 #define seq_wrap(P, L) seq_wrap_iso(typeof(*P), (P), (L))
-_circa_ _circa_alcs_ Seq seq_wrap_(size_t siz, void *ptr, size_t len, CircaMsg fname, CircaMsg line);
+_circa_ _circa_alcs_ Seq seq_wrap_(size_t siz, void *ptr, size_t len, circa_msg fname, circa_msg line);
 
 #define seq_rsz_iso(T, S, C) (S) = seq_rsz_(sizeof(T), (S), (C), __FILE__, _circa_str_(__LINE__))
 #define seq_rsz(S, C) seq_rsz_iso(typeof(*S), (S), (C))
-_circa_ _circa_rets_ Seq seq_rsz_(size_t siz, Seq s, size_t cap, CircaMsg fname, CircaMsg line);
+_circa_ _circa_rets_ Seq seq_rsz_(size_t siz, Seq s, size_t cap, circa_msg fname, circa_msg line);
 
 #define seq_rqr_iso(T, S, C) (S) = seq_rqr_(sizeof(T), (S), (C), __FILE__, _circa_str_(__LINE__))
 #define seq_rqr(S, C) seq_rqr_iso(typeof(*S), (S), (C))
-_circa_ _circa_rets_ Seq seq_rqr_(size_t siz, Seq s, size_t cap, CircaMsg fname, CircaMsg line);
+_circa_ _circa_rets_ Seq seq_rqr_(size_t siz, Seq s, size_t cap, circa_msg fname, circa_msg line);
 
 #define seq_shr_iso(T, S) (S) = seq_shr_(sizeof(T), (S), __FILE__, _circa_str_(__LINE__))
 #define seq_shr(S) seq_shr_iso(typeof(*S), (S))
-_circa_ _circa_rets_ Seq seq_shr_(size_t siz, Seq s, CircaMsg fname, CircaMsg line);
+_circa_ _circa_rets_ Seq seq_shr_(size_t siz, Seq s, circa_msg fname, circa_msg line);
 
 #define seq_del_iso(T, S) (S) = seq_del_(sizeof(T), (S), __FILE__, _circa_str_(__LINE__))
 #define seq_del(S) seq_del_iso(typeof(*S), (S))
-_circa_ _circa_rets_ Seq seq_del_(size_t siz, Seq s, CircaMsg fname, CircaMsg line);
+_circa_ _circa_rets_ Seq seq_del_(size_t siz, Seq s, circa_msg fname, circa_msg line);
 
 /* Stack Operations */
 
 #define seq_push_iso(T, S, V) (S) = seq_push_(sizeof(T), (S), &(T){V}, __FILE__, _circa_str_(__LINE__))
 #define seq_push(S, V) seq_push_iso(typeof(*S), (S), (V))
-_circa_ _circa_rets_ Seq  seq_push_(size_t siz, Seq s, void *val, CircaMsg fname, CircaMsg line);
+_circa_ _circa_rets_ Seq  seq_push_(size_t siz, Seq s, void *val, circa_msg fname, circa_msg line);
 
-#define seq_tos_iso(T, S) (*((Seq(T)) seq_tos_(sizeof(T), (S), __FILE__, _circa_str_(__LINE__))))
+#define seq_tos_iso(T, S) (*((seq(T)) seq_tos_(sizeof(T), (S), __FILE__, _circa_str_(__LINE__))))
 #define seq_tos(S) seq_tos_iso(typeof(*S), (S))
-_circa_ _circa_rets_ void *seq_tos_(size_t siz, Seq s, CircaMsg fname, CircaMsg line);
+_circa_ _circa_rets_ void *seq_tos_(size_t siz, Seq s, circa_msg fname, circa_msg line);
 
-#define seq_pop_iso(T, S) (*((Seq(T)) seq_pop_(sizeof(T), (S), __FILE__, _circa_str_(__LINE__))))
+#define seq_pop_iso(T, S) (*((seq(T)) seq_pop_(sizeof(T), (S), __FILE__, _circa_str_(__LINE__))))
 #define seq_pop(S) seq_pop_iso(typeof(*S), (S))
-_circa_ _circa_rets_ void *seq_pop_(size_t siz, Seq s, CircaMsg fname, CircaMsg line);
+_circa_ _circa_rets_ void *seq_pop_(size_t siz, Seq s, circa_msg fname, circa_msg line);
 
 #define seq_dup_iso(T, S) (S) = seq_dup_(sizeof(T), (S), __FILE__, _circa_str_(__LINE__))
 #define seq_dup(S) seq_dup_iso(typeof(*S), (S))
-_circa_ _circa_rets_ Seq seq_dup_(size_t siz, Seq s, CircaMsg fname, CircaMsg line);
+_circa_ _circa_rets_ Seq seq_dup_(size_t siz, Seq s, circa_msg fname, circa_msg line);
 
 /* Sequence Operations */
 
 #define seq_cpy_iso(T, D, S) (D) = seq_cpy_(sizeof(T), (D), (S), __FILE__, _circa_str_(__LINE__))
 #define seq_cpy(D, S) seq_cpy_iso(typeof(*D), (S))
-_circa_ _circa_rets_ Seq seq_cpy_(size_t siz, Seq dst, Seq src, CircaMsg fname, CircaMsg line);
+_circa_ _circa_rets_ Seq seq_cpy_(size_t siz, Seq dst, Seq src, circa_msg fname, circa_msg line);
 
 #define seq_cat_iso(T, D, S) (D) = seq_cat_(sizeof(T), (D), (S), __FILE__, _circa_str_(__LINE__))
 #define seq_cat(D, S) seq_cat_iso(typeof(*D), (D), (S))
-_circa_ _circa_rets_ Seq seq_cat_(size_t siz, Seq dst, Seq src, CircaMsg fname, CircaMsg line);
+_circa_ _circa_rets_ Seq seq_cat_(size_t siz, Seq dst, Seq src, circa_msg fname, circa_msg line);
 
 #define seq_rvs_iso(T, S) (S) = seq_rvs_(sizeof(T), (S), __FILE__, _circa_str_(__LINE__))
 #define seq_rvs(S) seq_rvs_iso(typeof(*S), (S))
-_circa_ _circa_rets_ Seq seq_rvs_(size_t siz, Seq s, CircaMsg fname, CircaMsg line);
+_circa_ _circa_rets_ Seq seq_rvs_(size_t siz, Seq s, circa_msg fname, circa_msg line);
 
 /*
 ** Accessors
@@ -150,14 +145,14 @@ _circa_ _circa_rets_ Seq seq_rvs_(size_t siz, Seq s, CircaMsg fname, CircaMsg li
 ** Description
 **   Returns a pointer to the structure of a sequence.
 ** Arguments
-**   s: Sequence (Seq)
+**   s: Sequence (seq)
+
 ** Returns
-**   Sequence Structure Pointer (struct SeqData*)
+**   Sequence Structure Pointer (struct seq_data*)
 */
 
 _circa_
-struct SeqData *seq_(Seq s, CircaMsg fname, CircaMsg line)
-{
+struct seq_data *seq_(Seq s, circa_msg fname, circa_msg line) {
   {
     circa_assert(s != NULL, fname, line);
   }
@@ -165,7 +160,7 @@ struct SeqData *seq_(Seq s, CircaMsg fname, CircaMsg line)
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wcast-align"
   #endif
-  return ((struct SeqData*) s) - 1;
+  return ((struct seq_data*) s) - 1;
   #if defined(__GNUC__)
     #pragma GCC diagnostic pop
   #endif
@@ -180,13 +175,15 @@ struct SeqData *seq_(Seq s, CircaMsg fname, CircaMsg line)
 **   s: Sequence (Seq)
 **   addr: Address (size_t)
 **   val: Value (void*)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
 **   Feedback Sequence (Seq)
 */
 
 _circa_ _circa_rets_
-Seq seq_set_(size_t siz, Seq s, size_t addr, void *val, CircaMsg fname, CircaMsg line)
-{
+Seq seq_set_(size_t siz, Seq s, size_t addr, void *val, circa_msg fname,
+circa_msg line) {
   {
     circa_assert(siz > 0, fname, line);
     circa_assert(s != NULL, fname, line);
@@ -206,13 +203,15 @@ Seq seq_set_(size_t siz, Seq s, size_t addr, void *val, CircaMsg fname, CircaMsg
 **   addr: Address (size_t)
 **   val: Value (void*)
 **   pre: Preallocation (size_t)
-** Returns
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
+ ** Returns
 **   Feedback Sequence (Seq)
 */
 
 _circa_ _circa_rets_
-Seq seq_set_ext_(size_t siz, Seq s, size_t addr, void *val, size_t pre, CircaMsg fname, CircaMsg line)
-{
+Seq seq_set_ext_(size_t siz, Seq s, size_t addr, void *val, size_t pre,
+circa_msg fname, circa_msg line) {
   {
     circa_assert(siz > 0, fname, line);
     circa_assert(s != NULL, fname, line);
@@ -230,12 +229,17 @@ Seq seq_set_ext_(size_t siz, Seq s, size_t addr, void *val, size_t pre, CircaMsg
 **   Gets a sequence's value at a given address.
 ** Arguments
 **   siz: Type Size (size_t)
-**   
+**   s: Sequence (Seq)
+**   addr: Address (size_t)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
+** Returns
+**   Value (void*)
 */
 
 _circa_ _circa_rets_
-void *seq_get_(size_t siz, Seq s, size_t addr, CircaMsg fname, CircaMsg line)
-{
+void *seq_get_(size_t siz, Seq s, size_t addr, circa_msg fname,
+circa_msg line) {
   {
     circa_assert(siz > 0, fname, line);
     circa_assert(s != NULL, fname, line);
@@ -256,19 +260,20 @@ void *seq_get_(size_t siz, Seq s, size_t addr, CircaMsg fname, CircaMsg line)
 ** Arguments
 **   siz: Type Size (size_t)
 **   cap: Capacity (size_t)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
 **   New Sequence (Seq)
 */
 
 _circa_ _circa_alcs_
-Seq seq_new_(size_t siz, size_t cap, CircaMsg fname, CircaMsg line)
-{
+Seq seq_new_(size_t siz, size_t cap, circa_msg fname, circa_msg line) {
   {
     circa_assert(siz > 0, fname, line);
     circa_assert(cap > 0, fname, line);
   }
   const size_t blk = cap * siz;
-  struct SeqData *s = NULL;
+  struct seq_data *s = NULL;
   while (s == NULL) s = malloc(sizeof(*s) + blk);
   s->cap = cap;
   s->len = 0;
@@ -284,13 +289,15 @@ Seq seq_new_(size_t siz, size_t cap, CircaMsg fname, CircaMsg line)
 **   siz:  Type Size (size_t)
 **   len:  Length (size_t)
 **   lits: Literals (void*)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
 **   New Sequence (Seq)
 */
 
 _circa_ _circa_alcs_
-Seq seq_lit_(size_t siz, size_t len, void *lits, CircaMsg fname, CircaMsg line)
-{
+Seq seq_lit_(size_t siz, size_t len, void *lits, circa_msg fname,
+circa_msg line) {
   {
     circa_assert(siz > 0, fname, line);
     circa_assert(len > 0, fname, line);
@@ -309,13 +316,14 @@ Seq seq_lit_(size_t siz, size_t len, void *lits, CircaMsg fname, CircaMsg line)
 ** Arguments
 **   siz: Type Size (size_t)
 **   s: Sequence (Seq)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
 **   New Sequence (Seq)
 */
 
 _circa_ _circa_alcs_
-Seq seq_from_(size_t siz, Seq s, CircaMsg fname, CircaMsg line)
-{
+Seq seq_from_(size_t siz, Seq s, circa_msg fname, circa_msg line) {
   {
     circa_assert(siz > 0, fname, line);
     circa_assert(s != NULL, fname, line);
@@ -331,12 +339,15 @@ Seq seq_from_(size_t siz, Seq s, CircaMsg fname, CircaMsg line)
 **   siz: Type Size (size_t)
 **   ptr: Pointer (void*)
 **   len: Length (size_t)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
 **   New Sequence (Seq)
 */
 
 _circa_ _circa_alcs_
-Seq seq_wrap_(size_t siz, void *ptr, size_t len, CircaMsg fname, CircaMsg line) {
+Seq seq_wrap_(size_t siz, void *ptr, size_t len, circa_msg fname,
+circa_msg line) {
   {
     circa_assert(siz > 0, fname, line);
     circa_assert(ptr != NULL, fname, line);
@@ -356,13 +367,14 @@ Seq seq_wrap_(size_t siz, void *ptr, size_t len, CircaMsg fname, CircaMsg line) 
 **   siz: Type Size (size_t)
 **   s: Sequence (Seq)
 **   cap: Capacity (size_t)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
 **   Feedback Sequence (Seq)
 */
 
 _circa_ _circa_rets_
-Seq seq_rsz_(size_t siz, Seq s, size_t cap, CircaMsg fname, CircaMsg line)
-{
+Seq seq_rsz_(size_t siz, Seq s, size_t cap, circa_msg fname, circa_msg line) {
   {
     circa_assert(siz > 0, fname, line);
     circa_assert(s != NULL, fname, line);
@@ -373,7 +385,7 @@ Seq seq_rsz_(size_t siz, Seq s, size_t cap, CircaMsg fname, CircaMsg line)
     if (cap < seq(s)->cap)
       memset(((char*) s) + cap, 0, (seq(s)->cap - cap) * siz);
   #endif
-  struct SeqData *s2 = NULL;
+  struct seq_data *s2 = NULL;
   while (s2 == NULL) s2 = realloc(seq(s), sizeof(*s2) + (cap * siz));
   s2->cap = cap;
   return s2->data;
@@ -387,13 +399,14 @@ Seq seq_rsz_(size_t siz, Seq s, size_t cap, CircaMsg fname, CircaMsg line)
 **   siz: Type Size (size_t)
 **   s: Sequence (Seq)
 **   cap: Capacity (size_t)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
 **   Feedback Sequence (Seq)
 */
 
 _circa_ _circa_rets_
-Seq seq_rqr_(size_t siz, Seq s, size_t cap, CircaMsg fname, CircaMsg line)
-{
+Seq seq_rqr_(size_t siz, Seq s, size_t cap, circa_msg fname, circa_msg line) {
   {
     circa_assert(siz > 0, fname, line);
     circa_assert(s != NULL, fname, line);
@@ -409,18 +422,23 @@ Seq seq_rqr_(size_t siz, Seq s, size_t cap, CircaMsg fname, CircaMsg line)
 ** Arguments
 **   siz: Type Size (size_t)
 **   s: Sequence (Seq)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
 **   Feedback Sequence (Seq)
 */
 
 _circa_ _circa_rets_
-Seq seq_shr_(size_t siz, Seq s, CircaMsg fname, CircaMsg line)
-{
+Seq seq_shr_(size_t siz, Seq s, circa_msg fname, circa_msg line) {
   {
     circa_assert(siz > 0, fname, line);
     circa_assert(s != NULL, fname, line);
   }
-  return (seq(s)->cap > seq(s)->len) ? seq_rsz_(siz, s, seq(s)->len, fname, line) : s;
+  const size_t len = seq(s)->len;
+  if (seq(s)->cap > len)
+    return seq_rsz_(siz, s, len, fname, line);
+  else
+    return s;
 }
 
 /*
@@ -430,13 +448,14 @@ Seq seq_shr_(size_t siz, Seq s, CircaMsg fname, CircaMsg line)
 ** Arguments
 **   siz: Type Size (size_t)
 **   s: Sequence (Seq)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
 **   Feedback Sequence (Seq)
 */
 
 _circa_ _circa_rets_
-Seq seq_del_(size_t siz, Seq s, CircaMsg fname, CircaMsg line)
-{
+Seq seq_del_(size_t siz, Seq s, circa_msg fname, circa_msg line) {
   {
     circa_assert(siz > 0, fname, line);
   }
@@ -463,13 +482,14 @@ Seq seq_del_(size_t siz, Seq s, CircaMsg fname, CircaMsg line)
 **   siz: Type Size (size_t)
 **   s: Sequence (Seq)
 **   val: Value (void*)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
 **   Feedback Sequence (Seq)
 */
 
 _circa_ _circa_rets_
-Seq seq_push_(size_t siz, Seq s, void *val, CircaMsg fname, CircaMsg line)
-{
+Seq seq_push_(size_t siz, Seq s, void *val, circa_msg fname, circa_msg line) {
   {
     circa_assert(siz > 0, fname, line);
     circa_assert(s != NULL, fname, line);
@@ -487,13 +507,15 @@ Seq seq_push_(size_t siz, Seq s, void *val, CircaMsg fname, CircaMsg line)
 **   s: Sequence (Seq)
 **   val: Value (void*)
 **   pre: Preallocation (size_t)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
-**   Feedback Sequence (Seq)
+**   Feedback Sequence (seq)
 */
 
 _circa_ _circa_rets_
-Seq seq_push_ext_(size_t siz, Seq s, void *val, size_t pre, CircaMsg fname, CircaMsg line)
-{
+Seq seq_push_ext_(size_t siz, Seq s, void *val, size_t pre, circa_msg fname,
+circa_msg line) {
   {
     circa_assert(siz > 0, fname, line);
     circa_assert(s != NULL, fname, line);
@@ -503,7 +525,7 @@ Seq seq_push_ext_(size_t siz, Seq s, void *val, size_t pre, CircaMsg fname, Circ
 }
 
 /*
-** Sequence Ops
+** sequence Ops
 */
 
 /*
@@ -514,13 +536,14 @@ Seq seq_push_ext_(size_t siz, Seq s, void *val, size_t pre, CircaMsg fname, Circ
 **   siz: Type Size (size_t)
 **   dst: Destination (Seq)
 **   src: Source (Seq)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
 **   Feedback Sequence (Seq)
 */
 
 _circa_ _circa_rets_
-Seq seq_cpy_(size_t siz, Seq dst, Seq src, CircaMsg fname, CircaMsg line)
-{
+Seq seq_cpy_(size_t siz, Seq dst, Seq src, circa_msg fname, circa_msg line) {
   {
     circa_assert(siz > 0, fname, line);
     circa_assert(dst != NULL, fname, line);
@@ -542,13 +565,14 @@ Seq seq_cpy_(size_t siz, Seq dst, Seq src, CircaMsg fname, CircaMsg line)
 **   siz: Type Size (size_t)
 **   dst: Destination (Seq)
 **   src: Source (Seq)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
 **   Feedback Sequence (Seq)
 */
 
 _circa_ _circa_rets_
-Seq seq_cat_(size_t siz, Seq dst, Seq src, CircaMsg fname, CircaMsg line)
-{
+Seq seq_cat_(size_t siz, Seq dst, Seq src, circa_msg fname, circa_msg line) {
   {
     circa_assert(siz > 0, fname, line);
     circa_assert(dst != NULL, fname, line);
@@ -568,13 +592,14 @@ Seq seq_cat_(size_t siz, Seq dst, Seq src, CircaMsg fname, CircaMsg line)
 ** Arguments
 **   siz: Type Size (size_t)
 **   s: Sequence (Seq)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
 **   Feedback Sequence (Seq)
 */
 
 _circa_ _circa_rets_
-Seq seq_rvs_(size_t siz, Seq s, CircaMsg fname, CircaMsg line)
-{
+Seq seq_rvs_(size_t siz, Seq s, circa_msg fname, circa_msg line) {
   {
     circa_assert(siz > 0, fname, line);
     circa_assert(s != NULL, fname, line);

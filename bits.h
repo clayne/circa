@@ -114,10 +114,9 @@ _circa_ u64 u64_primegt(u64 n);
 */
 
 _circa_
-u8 u64_pop(u64 n)
-{
+u8 u64_pop(u64 n) {
   #if defined(__GNUC__)
-    return __builtin_popcountll(n);
+    return (u8) __builtin_popcountll(n);
   #else
     n -= ((n >> 1) & 0x5555555555555555ULL);
     n = (n & 0x3333333333333333ULL) + ((n >> 2) & 0x3333333333333333ULL);
@@ -137,10 +136,9 @@ u8 u64_pop(u64 n)
 */
 
 _circa_
-u8 u32_pop(u32 n)
-{
+u8 u32_pop(u32 n) {
   #if defined(__GNUC__)
-    return __builtin_popcount(n);
+    return (u8) __builtin_popcount(n);
   #else
     n -= ((n >> 1) & 0x55555555);
     n = (n & 0x33333333) + ((n >> 2) & 0x33333333);
@@ -159,8 +157,7 @@ u8 u32_pop(u32 n)
 */
 
 _circa_
-u8 u16_pop(u16 n)
-{
+u8 u16_pop(u16 n) {
   return u32_pop(n);
 }
 
@@ -175,8 +172,7 @@ u8 u16_pop(u16 n)
 */
 
 _circa_
-u8 u8_pop(u8 n)
-{
+u8 u8_pop(u8 n) {
   return u32_pop(n);
 }
 
@@ -195,10 +191,12 @@ u8 u8_pop(u8 n)
 */
 
 _circa_
-u8 u64_clz(u64 n)
-{
+u8 u64_clz(u64 n) {
+  {
+    circa_assert(n != 0, "?", "?");
+  }
   #if defined(__GNUC__)
-    return __builtin_clzll(n);
+    return (u8) __builtin_clzll(n);
   #else
     n |= (n >> 1);
     n |= (n >> 2);
@@ -221,10 +219,12 @@ u8 u64_clz(u64 n)
 */
 
 _circa_
-u8 u32_clz(u32 n)
-{
+u8 u32_clz(u32 n) {
+  {
+    circa_assert(n != 0, "?", "?");
+  }
   #if defined(__GNUC__)
-    return __builtin_clz(n);
+    return (u8) __builtin_clz(n);
   #else
     n |= (n >> 1);
     n |= (n >> 2);
@@ -246,10 +246,12 @@ u8 u32_clz(u32 n)
 */
 
 _circa_
-u8 u16_clz(u16 n)
-{
+u8 u16_clz(u16 n) {
+  {
+    circa_assert(n != 0, "?", "?");
+  }
   #if defined(__GNUC__)
-    return __builtin_clz(n);
+    return (u8) __builtin_clz(n);
   #else
     n |= (n >> 1);
     n |= (n >> 2);
@@ -270,10 +272,12 @@ u8 u16_clz(u16 n)
 */
 
 _circa_
-u8 u8_clz(u8 n)
-{
+u8 u8_clz(u8 n) {
+  {
+    circa_assert(n != 0, "?", "?");
+  }
   #if defined(__GNUC__)
-    return __builtin_clz(n);
+    return (u8) __builtin_clz(n);
   #else
     n |= (n >> 1);
     n |= (n >> 2);
@@ -282,7 +286,7 @@ u8 u8_clz(u8 n)
   #endif
 }
 
-/* 
+/*
 ** Count Trailing Zeros
 */
 
@@ -297,10 +301,9 @@ u8 u8_clz(u8 n)
 */
 
 _circa_
-u8 u64_ctz(u64 n)
-{
+u8 u64_ctz(u64 n) {
   #if defined(__GNUC__)
-    return __builtin_ctzll(n);
+    return (u8) __builtin_ctzll(n);
   #else
     n--;
     n |= (n >>  1);
@@ -325,10 +328,9 @@ u8 u64_ctz(u64 n)
 */
 
 _circa_
-u8 u32_ctz(u32 n)
-{
+u8 u32_ctz(u32 n) {
   #if defined(__GNUC__)
-    return __builtin_ctz(n);
+    return (u8) __builtin_ctz(n);
   #else
     n--;
     n |= (n >>  1);
@@ -352,10 +354,9 @@ u8 u32_ctz(u32 n)
 */
 
 _circa_
-u8 u16_ctz(u16 n)
-{
+u8 u16_ctz(u16 n) {
   #if defined(__GNUC__)
-    return __builtin_ctz(n);
+    return (u8) __builtin_ctz(n);
   #else
     n--;
     n |= (n >> 1);
@@ -378,10 +379,9 @@ u8 u16_ctz(u16 n)
 */
 
 _circa_
-u8 u8_ctz(u8 n)
-{
+u8 u8_ctz(u8 n) {
   #if defined(__GNUC__)
-    return __builtin_ctz(n);
+    return (u8) __builtin_ctz(n);
   #else
     n--;
     n |= (n >> 1);
@@ -407,9 +407,8 @@ u8 u8_ctz(u8 n)
 */
 
 _circa_
-u8 u64_log2(u64 n)
-{
-  return (8 * sizeof(u64)) - u64_clz(n) - 1;
+u8 u64_log2(u64 n) {
+  return (n > 0) ? ((8 * sizeof(u64)) - u64_clz(n) - 1) : 0;
 }
 
 /*
@@ -423,9 +422,8 @@ u8 u64_log2(u64 n)
 */
 
 _circa_
-u8 u32_log2(u32 n)
-{
-  return (8 * sizeof(u32)) - u32_clz(n) - 1;
+u8 u32_log2(u32 n) {
+  return (n > 0) ? ((8 * sizeof(u32)) - u32_clz(n) - 1) : 0;
 }
 
 /*
@@ -439,9 +437,8 @@ u8 u32_log2(u32 n)
 */
 
 _circa_
-u8 u16_log2(u16 n)
-{
-  return (8 * sizeof(u16)) - u16_clz(n) - 1;
+u8 u16_log2(u16 n) {
+  return (n > 0) ? ((8 * sizeof(u16)) - u16_clz(n) - 1) : 0;
 }
 
 /*
@@ -455,9 +452,8 @@ u8 u16_log2(u16 n)
 */
 
 _circa_
-u8 u8_log2(u8 n)
-{
-  return (8 * sizeof(u8)) - u8_clz(n) - 1;
+u8 u8_log2(u8 n) {
+  return (n > 0) ? ((8 * sizeof(u8)) - u8_clz(n) - 1) : 0;
 }
 
 /*
@@ -475,9 +471,8 @@ u8 u8_log2(u8 n)
 */
 
 _circa_
-u64 u64_np2(u64 n)
-{
-  return 1 << (u64_log2(n - 1) + 1);
+u64 u64_np2(u64 n) {
+  return (u64) (1 << (u64_log2(n - 1) + 1));
 }
 
 /*
@@ -491,9 +486,8 @@ u64 u64_np2(u64 n)
 */
 
 _circa_
-u32 u32_np2(u32 n)
-{
-  return 1 << (u32_log2(n - 1) + 1);
+u32 u32_np2(u32 n) {
+  return (u32) (1 << (u32_log2(n - 1) + 1));
 }
 
 /*
@@ -507,9 +501,8 @@ u32 u32_np2(u32 n)
 */
 
 _circa_
-u16 u16_np2(u16 n)
-{
-  return 1 << (u16_log2(n - 1) + 1);
+u16 u16_np2(u16 n) {
+  return (u16) (1 << (u16_log2(n - 1) + 1));
 }
 
 /*
@@ -523,9 +516,8 @@ u16 u16_np2(u16 n)
 */
 
 _circa_
-u8 u8_np2(u8 n)
-{
-  return 1 << (u8_log2(n - 1) + 1);
+u8 u8_np2(u8 n) {
+  return (u8) (1 << (u8_log2(n - 1) + 1));
 }
 
 /*
@@ -543,8 +535,7 @@ u8 u8_np2(u8 n)
 */
 
 _circa_
-u64 u64_div10(u64 n)
-{
+u64 u64_div10(u64 n) {
   return n / 10; /* TODO: Find optimization for 64 bit div10. */
 }
 
@@ -559,8 +550,7 @@ u64 u64_div10(u64 n)
 */
 
 _circa_
-u32 u32_div10(u32 n)
-{
+u32 u32_div10(u32 n) {
   const u64 inv = 0x199999A;
   return (u32) ((inv * n) >> 32);
 }
@@ -576,9 +566,8 @@ u32 u32_div10(u32 n)
 */
 
 _circa_
-u16 u16_div10(u16 n)
-{
-  return u32_div10(n);
+u16 u16_div10(u16 n) {
+  return (u16) u32_div10(n);
 }
 
 /*
@@ -592,9 +581,8 @@ u16 u16_div10(u16 n)
 */
 
 _circa_
-u8 u8_div10(u8 n)
-{
-  return u32_div10(n);
+u8 u8_div10(u8 n) {
+  return (u8) u32_div10(n);
 }
 
 /*
@@ -612,8 +600,7 @@ u8 u8_div10(u8 n)
 */
 
 _circa_
-u64 u64_ceil10(u64 n)
-{
+u64 u64_ceil10(u64 n) {
   return 10 * u64_div10(n + 9);
 }
 
@@ -628,8 +615,7 @@ u64 u64_ceil10(u64 n)
 */
 
 _circa_
-u32 u32_ceil10(u32 n)
-{
+u32 u32_ceil10(u32 n) {
   return 10 * u32_div10(n + 9);
 }
 
@@ -644,8 +630,7 @@ u32 u32_ceil10(u32 n)
 */
 
 _circa_
-u16 u16_ceil10(u16 n)
-{
+u16 u16_ceil10(u16 n) {
   return 10 * u16_div10(n + 9);
 }
 
@@ -660,8 +645,7 @@ u16 u16_ceil10(u16 n)
 */
 
 _circa_
-u8 u8_ceil10(u8 n)
-{
+u8 u8_ceil10(u8 n) {
   return 10 * u8_div10(n + 9);
 }
 
@@ -680,9 +664,8 @@ u8 u8_ceil10(u8 n)
 */
 
 _circa_
-u64 u64_primegt(u64 n)
-{
-  return circa_primes[u64_ctz(u64_np2(n))];
+u64 u64_primegt(u64 n) {
+  return (u64) circa_primes[u64_ctz(u64_np2(n))];
 }
 
 /*
@@ -696,9 +679,8 @@ u64 u64_primegt(u64 n)
 */
 
 _circa_
-u32 u32_primegt(u32 n)
-{
-  return circa_primes[u32_ctz(u32_np2(n))];
+u32 u32_primegt(u32 n) {
+  return (u32) circa_primes[u32_ctz(u32_np2(n))];
 }
 
 /*
@@ -712,9 +694,8 @@ u32 u32_primegt(u32 n)
 */
 
 _circa_
-u16 u16_primegt(u16 n)
-{
-  return circa_primes[u16_ctz(u16_np2(n))];
+u16 u16_primegt(u16 n) {
+  return (u16) circa_primes[u16_ctz(u16_np2(n))];
 }
 
 /*
@@ -728,9 +709,8 @@ u16 u16_primegt(u16 n)
 */
 
 _circa_
-u8 u8_primegt(u8 n)
-{
-  return circa_primes[u8_ctz(u8_np2(n))];
+u8 u8_primegt(u8 n) {
+  return (u8) circa_primes[u8_ctz(u8_np2(n))];
 }
 
 #endif /* CIRCA_BITS_H */

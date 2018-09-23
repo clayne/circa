@@ -1,5 +1,5 @@
 /*
-** str.h | Dynamically allocated strings.
+** str.h | Dynamically allocated Strings.
 ** https://github.com/davidgarland/circa
 */
 
@@ -10,12 +10,17 @@
 ** Compatibility Checks
 */
 
-#if !defined(__STDC_VERSION__)
+#ifndef __STDC_VERSION__
   #error "[circa/str.h]: C99 is required."
 #endif
 
 #if __STDC_VERSION__ < 199901L
   #error "[circa/str.h]: C99 is required."
+#endif
+
+#ifdef __GNUC__
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wunused-parameter"
 #endif
 
 /*
@@ -31,7 +36,6 @@
 /* Internal */
 
 #include "core.h"
-#include "types.h"
 
 /*
 ** Type Definitions
@@ -39,7 +43,7 @@
 
 typedef char *Str;
 
-struct StrData {
+struct str_data {
   size_t cap;
   size_t len;
   char data[];
@@ -52,86 +56,86 @@ struct StrData {
 /* Accessors */
 
 #define str(S) str_((S), __FILE__, _circa_str_(__LINE__))
-_circa_ struct StrData *str_(Str s, CircaMsg fname, CircaMsg line);
+_circa_ struct str_data *str_(Str s, circa_msg fname, circa_msg line);
 
 /* Allocators */
 
 #define str_new(C) str_new_((C), __FILE__, _circa_str_(__LINE__))
-_circa_ _circa_alcs_ Str str_new_(size_t cap, CircaMsg fname, CircaMsg line);
+_circa_ _circa_alcs_ Str str_new_(size_t cap, circa_msg fname, circa_msg line);
 
 #define str_lit(CS) str_lit_((CS), __FILE__, _circa_str_(__LINE__))
-_circa_ _circa_alcs_ Str str_lit_(const char *restrict cs, CircaMsg fname, CircaMsg line);
+_circa_ _circa_alcs_ Str str_lit_(const char *restrict cs, circa_msg fname, circa_msg line);
 
 #define str_from(S) str_from_((S), __FILE__, _circa_str_(__LINE__))
-_circa_ _circa_alcs_ Str str_from_(Str s, CircaMsg fname, CircaMsg line);
+_circa_ _circa_alcs_ Str str_from_(Str s, circa_msg fname, circa_msg line);
 
 #define str_wrap(S) str_wrap_((S), __FILE__, _circa_str_(__LINE__))
-_circa_ _circa_alcs_ Str str_wrap_(char *cs, CircaMsg fname, CircaMsg line);
+_circa_ _circa_alcs_ Str str_wrap_(char *cs, circa_msg fname, circa_msg line);
 
 #define str_wrap_len(S, L) str_wrap_len_((S), (L), __FILE__, _circa_str_(__LINE__))
-_circa_ _circa_alcs_ Str str_wrap_len_(char *cs, size_t len, CircaMsg fname, CircaMsg line);
+_circa_ _circa_alcs_ Str str_wrap_len_(char *cs, size_t len, circa_msg fname, circa_msg line);
 
 #define str_rsz(S, C) (S) = str_rsz_((S), (C), __FILE__, _circa_str_(__LINE__))
-_circa_ _circa_rets_ Str str_rsz_(Str s, size_t cap, CircaMsg fname, CircaMsg line);
+_circa_ _circa_rets_ Str str_rsz_(Str s, size_t cap, circa_msg fname, circa_msg line);
 
 #define str_rqr(S, C) (S) = str_rqr_((S), (C), __FILE__, _circa_str_(__LINE__))
-_circa_ _circa_rets_ Str str_rqr_(Str s, size_t cap, CircaMsg fname, CircaMsg line);
+_circa_ _circa_rets_ Str str_rqr_(Str s, size_t cap, circa_msg fname, circa_msg line);
 
 #define str_rqr_ext(S, C, P) (S) = str_rqr_ext_((S), (C), (P), __FILE__, _circa_str_(__LINE__))
-_circa_ _circa_rets_ Str str_rqr_ext_(Str s, size_t cap, size_t pre, CircaMsg fname, CircaMsg line);
+_circa_ _circa_rets_ Str str_rqr_ext_(Str s, size_t cap, size_t pre, circa_msg fname, circa_msg line);
 
 #define str_shr(S) (S) = str_shr_((S), __FILE__, _circa_str_(__LINE__))
-_circa_ _circa_rets_ Str str_shr_(Str s, CircaMsg fname, CircaMsg line);
+_circa_ _circa_rets_ Str str_shr_(Str s, circa_msg fname, circa_msg line);
 
 #define str_del(S) (S) = str_del_((S), __FILE__, _circa_str_(__LINE__))
-_circa_ _circa_rets_ Str str_del_(Str s, CircaMsg fname, CircaMsg line);
+_circa_ _circa_rets_ Str str_del_(Str s, circa_msg fname, circa_msg line);
 
 /* Evaluators */
 
 #define str_eq(A, B) str_eq_((A), (B), __FILE__, _circa_str_(__LINE__))
-_circa_ bool str_eq_(Str a, Str b, CircaMsg fname, CircaMsg line);
+_circa_ bool str_eq_(Str a, Str b, circa_msg fname, circa_msg line);
 
 #define str_eq_len(A, B, T, P) str_eq_len_((A), (B), (T), (P), __FILE__, _circa_str_(__LINE__))
-_circa_ bool str_eq_len_(Str a, Str b, size_t start, size_t stop, CircaMsg fname, CircaMsg line);
+_circa_ bool str_eq_len_(Str a, Str b, size_t start, size_t stop, circa_msg fname, circa_msg line);
 
 #define str_eq_lit(S, C) str_eq_lit_((S), (C), __FILE__, _circa_str_(__LINE__))
-_circa_ bool str_eq_lit_(Str s, const char *restrict c, CircaMsg fname, CircaMsg line);
+_circa_ bool str_eq_lit_(Str s, const char *restrict c, circa_msg fname, circa_msg line);
 
 #define str_eq_lit_len(S, C, T, P) str_eq_lit_len_((S), (C), (T), (P), __FILE__, _circa_str_(__LINE__))
-_circa_ bool str_eq_lit_len_(Str s, const char *restrict c, size_t start, size_t stop, CircaMsg fname, CircaMsg line);
+_circa_ bool str_eq_lit_len_(Str s, const char *restrict c, size_t start, size_t stop, circa_msg fname, circa_msg line);
 
 #define str_hash(S) str_hash_((S), __FILE__, _circa_str_(__LINE__))
-_circa_ size_t str_hash_(Str s, CircaMsg fname, CircaMsg line);
+_circa_ size_t str_hash_(Str s, circa_msg fname, circa_msg line);
 
 /* Stack Operations */
 
 #define str_push(S, C) (S) = str_push_((S), (C), __FILE__, _circa_str_(__LINE__))
-_circa_ Str str_push_(Str s, char ch, CircaMsg fname, CircaMsg line);
+_circa_ Str str_push_(Str s, char ch, circa_msg fname, circa_msg line);
 
 #define str_tos(S) str_tos_((S), __FILE__, _circa_str_(__LINE__))
-_circa_ char str_tos_(Str s, CircaMsg fname, CircaMsg line);
+_circa_ char str_tos_(Str s, circa_msg fname, circa_msg line);
 
 #define str_pop(S) str_pop_((S), __FILE__, _circa_str_(__LINE__))
-_circa_ char str_pop_(Str s, CircaMsg fname, CircaMsg line);
+_circa_ char str_pop_(Str s, circa_msg fname, circa_msg line);
 
 /* String Operations */
 
 #define str_cpy(DST, SRC) (DST) = str_cpy_((DST), (SRC), __FILE__, _circa_str_(__LINE__))
-_circa_ _circa_rets_ Str str_cpy_(Str dst, Str src, CircaMsg fname, CircaMsg line);
+_circa_ _circa_rets_ Str str_cpy_(Str dst, Str src, circa_msg fname, circa_msg line);
 
 #define str_cat(DST, SRC) (DST) = str_cat_((DST), (SRC), __FILE__, _circa_str_(__LINE__))
-_circa_ _circa_rets_ Str str_cat_(Str dst, Str src, CircaMsg fname, CircaMsg line);
+_circa_ _circa_rets_ Str str_cat_(Str dst, Str src, circa_msg fname, circa_msg line);
 
 #define str_rvs(S) str_rvs_((S))
-_circa_ void str_rvs_(Str s, CircaMsg fname, CircaMsg line);
+_circa_ void str_rvs_(Str s, circa_msg fname, circa_msg line);
 
 /* IO Operations */
 
 #define str_read(S, F) (S) = str_readfile_((S), (F), __FILE__, _circa_str_(__LINE__))
-_circa_ Str str_read_(Str s, FILE *fp, CircaMsg fname, CircaMsg line);
+_circa_ Str str_read_(Str s, FILE *fp, circa_msg fname, circa_msg line);
 
 #define str_write(S, F) str_writefile((S), (F), __FILE__, _circa_str_(__LINE__))
-_circa_ void str_write_(Str s, FILE *fp, CircaMsg fname, CircaMsg line);
+_circa_ void str_write_(Str s, FILE *fp, circa_msg fname, circa_msg line);
 
 /*
 ** Accessors
@@ -143,15 +147,14 @@ _circa_ void str_write_(Str s, FILE *fp, CircaMsg fname, CircaMsg line);
 **   Returns a pointer to the structure of a sequence.
 ** Arguments
 **   s: String (Str)
-**   fname: Filename (CircaMsg)
-**   line: Line Number (CircaMsg)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
-**   String Structure Pointer (struct StrData *)
+**  String Structure Pointer (struct StrData *)
 */
 
 _circa_
-struct StrData *str_(Str s, CircaMsg fname, CircaMsg line)
-{
+struct str_data *str_(Str s, circa_msg fname, circa_msg line) {
   {
     circa_assert(s != NULL, fname, line);
   }
@@ -159,7 +162,7 @@ struct StrData *str_(Str s, CircaMsg fname, CircaMsg line)
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wcast-align"
   #endif
-  return ((struct StrData*) s) - 1;
+  return ((struct str_data*) s) - 1;
   #if defined(__GNUC__)
     #pragma GCC diagnostic pop
   #endif
@@ -173,15 +176,14 @@ struct StrData *str_(Str s, CircaMsg fname, CircaMsg line)
 **   s: String (Str)
 **   addr: Address (size_t)
 **   ch: Character (char)
-**   fname: Filename (CircaMsg)
-**   line: Line Number (CircaMsg)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
-**   Feedback String (Str)
+**   Feedback String(Str)
 */
 
 _circa_ _circa_rets_
-Str str_set_(Str s, size_t addr, char ch, CircaMsg fname, CircaMsg line)
-{
+Str str_set_(Str s, size_t addr, char ch, circa_msg fname, circa_msg line) {
   {
     circa_assert(s != NULL, fname, line);
     circa_assert(ch != '\0', fname, line);
@@ -200,15 +202,14 @@ Str str_set_(Str s, size_t addr, char ch, CircaMsg fname, CircaMsg line)
 ** Arguments
 **   s: String (Str)
 **   addr: Address (size_t)
-**   fname: Filename (CircaMsg)
-**   line: Line Number (CircaMsg)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
 **   Character (char)
 */
 
 _circa_
-char str_get_(Str s, size_t addr, CircaMsg fname, CircaMsg line)
-{
+char str_get_(Str s, size_t addr, circa_msg fname, circa_msg line) {
   {
     circa_assert(s != NULL, fname, line);
     circa_assert(str(s)->len < 0, fname, line);
@@ -226,19 +227,18 @@ char str_get_(Str s, size_t addr, CircaMsg fname, CircaMsg line)
 **   Allocates a string of a given capacity.
 ** Arguments
 **   cap: Capacity (size_t)
-**   fname: Filename (CircaMsg)
-**   line: Line Number (CircaMsg)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
-**   String (Str)
+**  String (Str)
 */
 
 _circa_ _circa_alcs_
-Str str_new_(size_t cap, CircaMsg fname, CircaMsg line)
-{
+Str str_new_(size_t cap, circa_msg fname, circa_msg line) {
   {
     circa_assert(cap > 0, fname, line);
   }
-  struct StrData *s = NULL;
+  struct str_data *s = NULL;
   while (s == NULL) s = malloc(sizeof(*s) + cap + 1);
   s->cap = cap;
   s->len = 0;
@@ -252,16 +252,15 @@ Str str_new_(size_t cap, CircaMsg fname, CircaMsg line)
 ** Arguments
 **   cs: C String Literal (const char *restrict)
 **   len: Length (size_t)
-**   fname: Filename (CircaMsg)
-**   line: Line Number (CircaMsg)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
-**   String (Str)
+**  String (Str)
 */
 
 _circa_ _circa_alcs_
-Str str_lit_len_(const char *restrict cs, size_t len, CircaMsg fname,
-                 CircaMsg line)
-{
+Str str_lit_len_(const char *restrict cs, size_t len, circa_msg fname,
+circa_msg line) {
   {
     circa_assert(cs != NULL, fname, line);
     circa_assert(len > 0, fname, line);
@@ -280,15 +279,14 @@ Str str_lit_len_(const char *restrict cs, size_t len, CircaMsg fname,
 **   Creates a string from a C string literal.
 ** Arguments
 **   cs: C String Literal (const char *restrict)
-**   fname: Filename (CircaMsg)
-**   line: Line Number (CircaMsg)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
-**   String (Str)
+**  String (Str)
 */
 
 _circa_ _circa_alcs_
-Str str_lit_(const char *restrict cs, CircaMsg fname, CircaMsg line)
-{
+Str str_lit_(const char *restrict cs, circa_msg fname, circa_msg line) {
   {
     circa_assert(cs != NULL, fname, line);
   }
@@ -305,15 +303,14 @@ Str str_lit_(const char *restrict cs, CircaMsg fname, CircaMsg line)
 **   Creates a string from another.
 ** Arguments
 **   s: String (Str)
-**   fname: Filename (CircaMsg)
-**   line: Line Number (CircaMsg)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
-**   String (Str)
+**  String (Str)
 */
 
 _circa_ _circa_alcs_
-Str str_from_(Str s, CircaMsg fname, CircaMsg line)
-{
+Str str_from_(Str s, circa_msg fname, circa_msg line) {
   {
     circa_assert(s != NULL, fname, line);
   }
@@ -330,15 +327,14 @@ Str str_from_(Str s, CircaMsg fname, CircaMsg line)
 **   Creates a new string from a C string.
 ** Arguments
 **   cs: C String (char*)
-**   fname: Filename (CircaMsg)
-**   line: Line Number (CircaMsg)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
-**   String (Str)
+**  String (Str)
 */
 
 _circa_ _circa_alcs_
-Str str_wrap_(char *cs, CircaMsg fname, CircaMsg line)
-{
+Str str_wrap_(char *cs, circa_msg fname, circa_msg line) {
   {
     circa_assert(cs != NULL, fname, line);
   }
@@ -356,15 +352,14 @@ Str str_wrap_(char *cs, CircaMsg fname, CircaMsg line)
 ** Arguments
 **   cs: C String (char*)
 **   len: Length (size_t)
-**   fname: Filename (CircaMsg)
-**   line: Line Number (CircaMsg)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
-**   String (Str)
+**  String (Str)
 */
 
 _circa_ _circa_alcs_
-Str str_wrap_len_(char *cs, size_t len, CircaMsg fname, CircaMsg line)
-{
+Str str_wrap_len_(char *cs, size_t len, circa_msg fname, circa_msg line) {
   {
     circa_assert(cs != NULL, fname, line);
     circa_assert(len > 0, fname, line);
@@ -383,15 +378,14 @@ Str str_wrap_len_(char *cs, size_t len, CircaMsg fname, CircaMsg line)
 ** Arguments
 **   s: String (Str)
 **   cap: Capacity (size_t)
-**   fname: Filename (CircaMsg)
-**   line: Line Number (CircaMsg)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
 **   Feedback String (Str)
 */
 
 _circa_ _circa_rets_
-Str str_rsz_(Str s, size_t cap, CircaMsg fname, CircaMsg line)
-{
+Str str_rsz_(Str s, size_t cap, circa_msg fname, circa_msg line) {
   {
     circa_assert(s != NULL, fname, line);
     circa_assert(cap > 0, fname, line);
@@ -402,12 +396,9 @@ Str str_rsz_(Str s, size_t cap, CircaMsg fname, CircaMsg line)
       memset(s + cap, 0, (str(s)->cap - cap));
     }
   #endif
-  struct StrData *s2 = NULL;
+  struct str_data *s2 = NULL;
   while (s2 == NULL) s2 = realloc(str(s), sizeof(*s2) + cap + 1);
   s2->cap = cap;
-  #ifdef CIRCA_SAFE
-    s2->data[cap] = '\0';
-  #endif
   return s2->data;
 }
 
@@ -418,15 +409,14 @@ Str str_rsz_(Str s, size_t cap, CircaMsg fname, CircaMsg line)
 ** Arguments
 **   s: String (Str)
 **   cap: Capacity (size_t)
-**   fname: Filename (CircaMsg)
-**   line: Line Number (CircaMsg)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
 **   Feedback String (Str)
 */
 
 _circa_ _circa_rets_
-Str str_rqr_(Str s, size_t cap, CircaMsg fname, CircaMsg line)
-{
+Str str_rqr_(Str s, size_t cap, circa_msg fname, circa_msg line) {
   {
     circa_assert(s != NULL, fname, line);
   }
@@ -441,15 +431,15 @@ Str str_rqr_(Str s, size_t cap, CircaMsg fname, CircaMsg line)
 **   s: String (Str)
 **   cap: Capacity (size_t)
 **   pre: Preallocation (size_t)
-**   fname: Filename (CircaMsg)
-**   line: Line Number (CircaMsg)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
-**   Feedback String (Str)
+**   Feedback String(Str)
 */
 
 _circa_ _circa_rets_
-Str str_rqr_ext_(Str s, size_t cap, size_t pre, CircaMsg fname, CircaMsg line)
-{
+Str str_rqr_ext_(Str s, size_t cap, size_t pre, circa_msg fname,
+circa_msg line) {
   {
     circa_assert(s != NULL, fname, line);
   }
@@ -462,15 +452,14 @@ Str str_rqr_ext_(Str s, size_t cap, size_t pre, CircaMsg fname, CircaMsg line)
 **   Shrinks a string's capacity to its length plus a null terminator.
 ** Arguments
 **   s: String (Str)
-**   fname: Filename (CircaMsg)
-**   line: Line Number (CircaMsg)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
 **   Feedback String (Str)
 */
 
 _circa_ _circa_rets_
-Str str_shr_(Str s, CircaMsg fname, CircaMsg line)
-{
+Str str_shr_(Str s, circa_msg fname, circa_msg line) {
   {
     circa_assert(s != NULL, fname, line);
     circa_assert(s[str(s)->len] == '\0', fname, line);
@@ -491,11 +480,10 @@ Str str_shr_(Str s, CircaMsg fname, CircaMsg line)
 */
 
 _circa_ _circa_rets_
-Str str_del_(Str s, CircaMsg fname, CircaMsg line)
-{
+Str str_del_(Str s, circa_msg fname, circa_msg line) {
   if (s != NULL) {
     #ifdef CIRCA_SECURE
-      memset(str(s), 0, sizeof(struct StrData) + str(s)->cap);
+      memset(str(s), 0, sizeof(struct str_data) + str(s)->cap);
     #endif
     free(str(s));
   }
@@ -513,15 +501,14 @@ Str str_del_(Str s, CircaMsg fname, CircaMsg line)
 ** Arguments
 **   a: String (Str)
 **   b: String (Str)
-**   fname: Filename (CircaMsg)
-**   line: Line Number (CircaMsg)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
 **   Equality (bool)
 */
 
 _circa_
-bool str_eq_(Str a, Str b, CircaMsg fname, CircaMsg line)
-{
+bool str_eq_(Str a, Str b, circa_msg fname, circa_msg line) {
   {
     circa_assert(a != NULL, fname, line);
     circa_assert(b != NULL, fname, line);
@@ -543,17 +530,16 @@ bool str_eq_(Str a, Str b, CircaMsg fname, CircaMsg line)
 **   a: String (Str)
 **   b: String (Str)
 **   start: Length Start (size_t)
-**   stop: Length Stop (size_t
-**   fname: Filename (CircaMsg)
-**   line: Line Number (CircaMsg)
+**   stop: Length Stop (size_t)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
 **   Equality (bool)
 */
 
 _circa_
-bool str_eq_len_(Str a, Str b, size_t start, size_t stop, CircaMsg fname,
-                 CircaMsg line)
-{
+bool str_eq_len_(Str a, Str b, size_t start, size_t stop, circa_msg fname,
+circa_msg line) {
   {
     circa_assert(a != NULL, fname, line);
     circa_assert(b != NULL, fname, line);
@@ -574,16 +560,15 @@ bool str_eq_len_(Str a, Str b, size_t start, size_t stop, CircaMsg fname,
 ** Arguments
 **   s: String (Str)
 **   cs: C String Literal (const char *const restrict)
-**   fname: Filename (CircaMsg)
-**   line: Line Number (CircaMsg)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
 **   Equality (Bool)
 */
 
 _circa_
-bool str_eq_lit_(Str s, const char *const restrict cs, CircaMsg fname,
-                 CircaMsg line)
-{
+bool str_eq_lit_(Str s, const char *const restrict cs, circa_msg fname,
+circa_msg line) {
   {
     circa_assert(s != NULL, fname, line);
     circa_assert(cs != NULL, fname, line);
@@ -609,15 +594,14 @@ bool str_eq_lit_(Str s, const char *const restrict cs, CircaMsg fname,
 ** Arguments
 **   s: String (Str)
 **   ch: Character (char)
-**   fname: Filename (CircaMsg)
-**   line: Line Number (CircaMsg)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
 **   Feedback String (Str)
 */
 
 _circa_ _circa_rets_
-Str str_push_(Str s, char ch, CircaMsg fname, CircaMsg line)
-{
+Str str_push_(Str s, char ch, circa_msg fname, circa_msg line) {
   {
     circa_assert(s != NULL, fname, line);
     circa_assert(ch != '\0', fname, line);
@@ -631,15 +615,14 @@ Str str_push_(Str s, char ch, CircaMsg fname, CircaMsg line)
 **   Returns the top of a string non-destructively.
 ** Arguments
 **   s: String (Str)
-**   fname: Filename (CircaMsg)
-**   line: Line Number (CircaMsg)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
 **   Character (char)
 */
 
 _circa_
-char str_tos_(Str s, CircaMsg fname, CircaMsg line)
-{
+char str_tos_(Str s, circa_msg fname, circa_msg line) {
   {
     circa_assert(s != NULL, fname, line);
   }
@@ -652,15 +635,14 @@ char str_tos_(Str s, CircaMsg fname, CircaMsg line)
 **   Pops the top character of a string.
 ** Arguments
 **   s: String (Str)
-**   fname: Filename (CircaMsg)
-**   line: Line Number (CircaMsg)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
 **   Character (char)
 */
 
 _circa_
-char str_pop_(Str s, CircaMsg fname, CircaMsg line)
-{
+char str_pop_(Str s, circa_msg fname, circa_msg line) {
   {
     circa_assert(s != NULL, fname, line);
   }
@@ -680,15 +662,14 @@ char str_pop_(Str s, CircaMsg fname, CircaMsg line)
 ** Arguments
 **   dst: Destination (Str)
 **   src: Source (Str)
-**   fname: Filename (CircaMsg)
-**   line: Line Number (CircaMsg)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
 **   Feedback String (Str)
 */
 
 _circa_ _circa_rets_
-Str str_cpy_(Str dst, Str src, CircaMsg fname, CircaMsg line)
-{
+Str str_cpy_(Str dst, Str src, circa_msg fname, circa_msg line) {
   {
     circa_assert(dst != NULL, fname, line);
     circa_assert(src != NULL, fname, line);
@@ -708,15 +689,14 @@ Str str_cpy_(Str dst, Str src, CircaMsg fname, CircaMsg line)
 ** Arguments
 **   dst: Destination (Str)
 **   src: Source (Str)
-**   fname: Filename (CircaMsg)
-**   line: Line Number (CircaMsg)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
 **   Feedback String (Str)
 */
 
 _circa_ _circa_rets_
-Str str_cat_(Str dst, Str src, CircaMsg fname, CircaMsg line)
-{
+Str str_cat_(Str dst, Str src, circa_msg fname, circa_msg line) {
   {
     circa_assert(dst != NULL, fname, line);
     circa_assert(src != NULL, fname, line);
@@ -738,15 +718,14 @@ Str str_cat_(Str dst, Str src, CircaMsg fname, CircaMsg line)
 **   Reverses a string.
 ** Arguments
 **   s: String (Str)
-**   fname: Filename (CircaMsg)
-**   line: Line Number (CircaMsg)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
 **   void
 */
 
 _circa_
-void str_rvs_(Str s, CircaMsg fname, CircaMsg line)
-{
+void str_rvs_(Str s, circa_msg fname, circa_msg line) {
   {
     circa_assert(s != NULL, fname, line);
   }
@@ -770,15 +749,14 @@ void str_rvs_(Str s, CircaMsg fname, CircaMsg line)
 ** Arguments
 **   s: String (Str)
 **   fp: File Pointer (FILE*)
-**   fname: Filename (CircaMsg)
-**   line: Line Number (CircaMsg)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
 **   Feedback String (Str)
 */
 
 _circa_ _circa_rets_
-Str str_read_(Str s, FILE *fp, CircaMsg fname, CircaMsg line)
-{
+Str str_read_(Str s, FILE *fp, circa_msg fname, circa_msg line) {
   {
     circa_assert(s != NULL, fname, line);
     circa_assert(fp != NULL, fname, line);
@@ -801,21 +779,28 @@ Str str_read_(Str s, FILE *fp, CircaMsg fname, CircaMsg line)
 ** Arguments
 **   s: String (Str)
 **   fp: File Pointer (FILE*)
-**   fname: Filename (CircaMsg)
-**   line: Line Number (CircaMsg)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
 ** Returns
 **   void
 */
 
 _circa_
-void str_write_(Str s, FILE *fp, CircaMsg fname, CircaMsg line)
-{
+void str_write_(Str s, FILE *fp, circa_msg fname, circa_msg line) {
   {
     circa_assert(s != NULL, fname, line);
     circa_assert(fp != NULL, fname, line);
   }
   fputs(s, fp); // TODO: See if there's a more optimal length based variation.
-  rewind(fp); // TODO: Consider using fseek to error handle.
+  rewind(fp);   // TODO: Consider using fseek to error handle.
 }
+
+/*
+** Diagnostics Clean-Up
+*/
+
+#if defined(__GNUC__)
+  #pragma GCC diagnostic pop
+#endif
 
 #endif /* CIRCA_STR_H */

@@ -15,27 +15,41 @@
 #endif
 
 /*
+** Diagnostics
+*/
+
+#ifdef __clang__
+  #pragma clang diagnostic push
+  #pragma clang diagnostic ignored "-Wlanguage-extension-token"
+#endif
+
+/*
 ** Dependencies
 */
 
 /* Standard */
 
+#include <stdlib.h>
 #include <stdio.h>
 
 /*
 ** Boolean Definition
 */
 
-#ifndef __bool_true_false_are_defined
-  #ifndef true
-    #define true 1
+#if defined(__STDC_VERSION__)
+  #if __STDC_VERSION__ >= 199901L
+    #include <stdbool.h>
+  #else
+    #define CIRCA_BOOL
   #endif
-  #ifndef false
-    #define false 0
-  #endif
-  #ifndef bool
-    #define bool char
-  #endif
+#else
+  #define CIRCA_BOOL
+#endif
+
+#ifdef CIRCA_BOOL
+  typedef char bool;
+  const bool true = 1;
+  const bool false = 0;
 #endif
 
 /*
@@ -49,16 +63,15 @@
 
 /* Safety & Security */
 
-#define CIRCA_D_SAFE   true // Zero-initialize memory upon allocation.
 #define CIRCA_D_SECURE true // Zero memory before freeing to hide data.
 
 /* Debugging */
 
-#define CIRCA_D_DBG true // Enable assertions.
+#define CIRCA_D_DBG true  // Enable assertions.
 
 /*
 ** Config Handling
-*/
+*/ 
 
 /* Environment */
 
@@ -76,12 +89,6 @@
 
 /* Safety & Security */
 
-#if !defined(CIRCA_SAFE) && !defined(CIRCA_N_SAFE) && CIRCA_D_SAFE
-  #define CIRCA_SAFE
-#elif defined(CIRCA_SAFE) && defined(CIRCA_N_SAFE)
-  #undef CIRCA_SAFE
-#endif
-
 #if !defined(CIRCA_SECURE) && !defined(CIRCA_N_SECURE) && CIRCA_D_SECURE
   #define CIRCA_SECURE
 #elif defined(CIRCA_SECURE) && defined(CIRCA_N_SECURE)
@@ -94,16 +101,6 @@
   #define CIRCA_DBG
 #elif defined(CIRCA_DBG) && defined(CIRCA_N_DBG)
   #undef CIRCA_DBG
-#endif
-
-/* Automatic */
-
-#if defined(__GNUC__)
-  #define CIRCA_GNU
-#elif defined(__MSC_VER) && !defined(__INTEL_COMPILER)
-  #define CIRCA_MSVC
-#else
-  #pragma message ("Your compiler is not supported. Use a GNU C compiler.")
 #endif
 
 /*
@@ -148,35 +145,15 @@
 
 /* Automatic */
 
-#if defined(CIRCA_GNU)
+#ifdef __GNUC__
   #define _circa_gnu_(...) __VA_ARGS__
 #else
   #define _circa_gnu_(...)
 #endif
 
-#if defined(CIRCA_MSVC)
-  #define _circa_msvc_(...) __VA_ARGS__
-#else
-  #define _circa_msvc_(...)
-#endif
-
 /*
 ** Config Application
 */
-
-/* Macros */
-
-#if defined(CIRCA_GNU)
-  #define _circa_typeof_(...) __typeof__(__VA_ARGS__)
-#elif defined(CIRCA_MSVC)
-  #define _circa_typeof_(...) decltype(__VA_ARGS__)
-#elif defined(__cplusplus__)
-  #define _circa_typeof_(...) decltype(__VA_ARGS__)
-#else
-  #pragma message ("Your compiler is not supported. Use GCC, Clang, or MSVC.")
-  #pragma message ("Defaulting _circa_typeof_ to __typeof__.")
-  #define _circa_typeof_(...) __typeof__(__VA_ARGS__)
-#endif
 
 /* Attributes */
 
@@ -218,6 +195,6 @@
 ** Type Definitions
 */
 
-typedef const char *const restrict CircaMsg;
+typedef const char *const restrict circa_msg;
 
 #endif /* CIRCA_CORE_H */

@@ -4,7 +4,9 @@
 #
 
 CC=cc
-CFLAGS=
+CDBG=-fsanitize=undefined -Og -DCIRCA_DBG
+CFAST=-Os -DNDEBUG
+CFLAGS=-pipe
 LDFLAGS=
 
 #
@@ -34,10 +36,11 @@ build:
 	-@$(CC) -c $(CFLAGS) *.h $(LDFLAGS)
 
 test: tests/test.c
-	-@$(CC) $(CFLAGS) -Og tests/test.c -Ilib/snow -DSNOW_ENABLED -g -o test.o
+	-@$(CC) $(CFLAGS) $(CDBG) tests/test.c -Ilib/snow -DSNOW_ENABLED -g -o test.o
 
-examples: examples/seq/odd.c
-	-@$(CC) $(CFLAGS) examples/seq/odd.c -o odd.o $(LDFLAGS)
+examples:
+	-@$(CC) $(CFLAGS) $(CFAST) ex/seq/odd.c     -o odd.o    $(LDFLAGS)
+	-@$(CC) $(CFLAGS) $(CFAST) ex/dict/fruits.c -o fruits.o $(LDFLAGS)
 
 clean:
 	-@rm -rf *.o *.gch $(MUTE)
