@@ -131,10 +131,10 @@ _circa_ void str_rvs_(Str s, circa_msg fname, circa_msg line);
 
 /* IO Operations */
 
-#define str_read(S, F) (S) = str_readfile_((S), (F), __FILE__, _circa_str_(__LINE__))
+#define str_read(S, F) (S) = str_read_((S), (F), __FILE__, _circa_str_(__LINE__))
 _circa_ Str str_read_(Str s, FILE *fp, circa_msg fname, circa_msg line);
 
-#define str_write(S, F) str_writefile((S), (F), __FILE__, _circa_str_(__LINE__))
+#define str_write(S, F) str_write_((S), (F), __FILE__, _circa_str_(__LINE__))
 _circa_ void str_write_(Str s, FILE *fp, circa_msg fname, circa_msg line);
 
 /*
