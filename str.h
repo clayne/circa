@@ -58,6 +58,12 @@ struct str_data {
 #define str(S) str_((S), __FILE__, _circa_str_(__LINE__))
 _circa_ struct str_data *str_(Str s, circa_msg fname, circa_msg line);
 
+#define str_set(S, A, V) (S) = str_set_((S), (A), (V), __FILE__, _circa_str_(__LINE__))
+_circa_ Str str_set_(Str s, size_t a, char c, circa_msg fname, circa_msg line);
+
+#define str_get(S, A) str_get_((S), (A), __FILE__, _circa_str_(__LINE__))
+_circa_ char str_get_(Str s, size_t a, circa_msg fname, circa_msg line);
+
 /* Allocators */
 
 #define str_new(C) str_new_((C), __FILE__, _circa_str_(__LINE__))

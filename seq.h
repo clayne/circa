@@ -58,16 +58,20 @@ struct seq_data {
 #define seq(S) seq_((S), __FILE__, _circa_str_(__LINE__))
 _circa_ struct seq_data *seq_(Seq s, circa_msg fname, circa_msg line);
 
-#define seq_set_iso(T, S, A, V) (S) = seq_set_(sizeof(T), (S), (A), &(T){V}, __FILE__, _circa_str_(__LINE__))
-#define seq_set(S, A, V) seq_set_iso(typeof(*S), (S), (A), (V))
+#define seq_set_iso(T, S, A, V) (S) = seq_set_(sizeof(T), (S), (A), (&V), __FILE__, _circa_str_(__LINE__))
+#define seq_set(S, A, V) seq_set_iso(typeof(*S), S, A, V)
+#define seq_set_lit_iso(T, S, A, V) (S) = seq_set_(sizeof(T), (S), (A), &(T){V}, __FILE__, _circa_str_(__LINE__))
+#define seq_set_lit(S, A, V) seq_set_lit_iso(typeof(*S), S, A, V)
 _circa_ _circa_rets_ Seq seq_set_(size_t siz, Seq s, size_t addr, void *val, circa_msg fname, circa_msg line);
 
-#define seq_set_ext_iso(T, S, A, V, E) (*((T*) seq_set_ext_(sizeof(T), (S), (A), &(T){V}, (E), __FILE__, _circa_str_(__LINE__))))
+#define seq_set_ext_iso(T, S, A, V, E) (S) = seq_set_ext_(sizeof(T), (S), (A), (&V), (E), __FILE__, _circa_str_(__LINE__))))
 #define seq_set_ext(S, A, V, E) seq_set_ext_(typeof(*S), S, A, V, E)
-_circa_ _circa_rets_ void *seq_set_ext_(size_t siz, Seq s, size_t addr, void *val, size_t pre, circa_msg fname, circa_msg line);
+#define seq_set_lit_ext_iso(T, S, A, V, E) (S) = seq_set_ext_(sizeof(T), (S), (A), &(T){V}, (E), __FILE__, _circa_str_(__LINE__))
+#define seq_set_lit_ext(S, A, V, E) seq_set_lit_ext_iso(typeof(*S), S, A, V, E)
+_circa_ _circa_rets_ Seq seq_set_ext_(size_t siz, Seq s, size_t addr, void *val, size_t pre, circa_msg fname, circa_msg line);
 
 #define seq_get_iso(T, S, A) (*((T*) seq_get_(sizeof(T), (S), (A), __FILE__, _circa_str_(__LINE__))))
-#define seq_get(S, A) seq_get_iso(typeof(*S), (S), (A))
+#define seq_get(S, A) seq_get_iso(typeof(*S), S, A)
 _circa_ _circa_rets_ void *seq_get_(size_t siz, Seq s, size_t addr, circa_msg fname, circa_msg line);
 
 /* Allocators */
@@ -106,8 +110,10 @@ _circa_ _circa_rets_ Seq seq_del_(size_t siz, Seq s, circa_msg fname, circa_msg 
 
 /* Stack Operations */
 
-#define seq_push_iso(T, S, V) (S) = seq_push_(sizeof(T), (S), &(T){V}, __FILE__, _circa_str_(__LINE__))
+#define seq_push_iso(T, S, V) (S) = seq_push_(sizeof(T), (S), (&V), __FILE__, _circa_str_(__LINE__))
 #define seq_push(S, V) seq_push_iso(typeof(*S), (S), (V))
+#define seq_push_lit_iso(T, S, V) (S) = seq_push_(sizeof(T), (S), &(T){V}, __FILE__, _circa_str_(__LINE__))
+#define seq_push_lit(S, V) seq_push_lit_iso(typeof(*S), S, V)
 _circa_ _circa_rets_ Seq  seq_push_(size_t siz, Seq s, void *val, circa_msg fname, circa_msg line);
 
 #define seq_tos_iso(T, S) (*((seq(T)) seq_tos_(sizeof(T), (S), __FILE__, _circa_str_(__LINE__))))
