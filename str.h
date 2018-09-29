@@ -195,7 +195,7 @@ Str str_set_(Str s, size_t addr, char ch, circa_msg fname, circa_msg line) {
     circa_assert(ch != '\0', fname, line);
   }
   s = str_rqr_(s, addr + 2, fname, line);
-  if (addr >= str(s)->len) str(s)->len = addr + 2;
+  if (addr >= str(s)->len) str(s)->len = addr + 1;
   s[addr] = ch;
   s[addr + 1] = '\0';
   return s;
