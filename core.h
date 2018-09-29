@@ -61,10 +61,6 @@
 #define CIRCA_D_STATIC true // Enable static linkage. Desirable in most cases.
 #define CIRCA_D_INLINE true // Enable inlining. Desireable in most cases.
 
-/* Safety & Security */
-
-#define CIRCA_D_SECURE true // Zero memory before freeing to hide data.
-
 /* Debugging */
 
 #define CIRCA_D_DBG true  // Enable assertions.
@@ -119,20 +115,6 @@
   #define _circa_inline_(...) __VA_ARGS__
 #else
   #define _circa_inline_(...)
-#endif
-
-/* Safety & Security */
-
-#if defined(CIRCA_SAFE)
-  #define _circa_safe_(...) __VA_ARGS__
-#else
-  #define _circa_safe_(...)
-#endif
-
-#if defined(CIRCA_SECURE)
-  #define _circa_secure_(...) __VA_ARGS__
-#else
-  #define _circa_secure_(...)
 #endif
 
 /* Debugging */

@@ -44,9 +44,9 @@
 typedef char *Str;
 
 struct str_data {
-  size_t cap;
-  size_t len;
-  char data[];
+  size_t cap;  // The capacity of the string.
+  size_t len;  // The string's length.
+  char data[]; // The string's data.
 };
 
 /*
@@ -245,9 +245,9 @@ Str str_new_(size_t cap, circa_msg fname, circa_msg line) {
     circa_assert(cap > 0, fname, line);
   }
   struct str_data *s = NULL;
-  while (s == NULL) s = malloc(sizeof(*s) + cap + 1);
+  while (s == NULL)
+    s = calloc(sizeof(*s) + cap + 1, 1);
   s->cap = cap;
-  s->len = 0;
   return s->data;
 }
 
@@ -397,13 +397,13 @@ Str str_rsz_(Str s, size_t cap, circa_msg fname, circa_msg line) {
     circa_assert(cap > 0, fname, line);
     circa_assert(cap > str(s)->len, fname, line);
   }
-  #ifdef CIRCA_SECURE
-    if (cap < str(s)->cap) {
-      memset(s + cap, 0, (str(s)->cap - cap));
-    }
-  #endif
+  if (cap < str(s)->cap)
+    memset(s + cap, 0, str(s)->cap - cap);
   struct str_data *s2 = NULL;
-  while (s2 == NULL) s2 = realloc(str(s), sizeof(*s2) + cap + 1);
+  while (s2 == NULL)
+    s2 = realloc(str(s), sizeof(*s2) + cap + 1);
+  if (cap > s2->cap)
+    memset(s2->data + s2->cap, 0, cap - s2->cap);
   s2->cap = cap;
   return s2->data;
 }
@@ -488,9 +488,7 @@ Str str_shr_(Str s, circa_msg fname, circa_msg line) {
 _circa_ _circa_rets_
 Str str_del_(Str s, circa_msg fname, circa_msg line) {
   if (s != NULL) {
-    #ifdef CIRCA_SECURE
-      memset(str(s), 0, sizeof(struct str_data) + str(s)->cap);
-    #endif
+    memset(str(s), 0, sizeof(struct str_data) + str(s)->cap);
     free(str(s));
   }
   return NULL;

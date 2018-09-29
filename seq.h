@@ -278,11 +278,10 @@ Seq seq_new_(size_t siz, size_t cap, circa_msg fname, circa_msg line) {
     circa_assert(siz > 0, fname, line);
     circa_assert(cap > 0, fname, line);
   }
-  const size_t blk = cap * siz;
   struct seq_data *s = NULL;
-  while (s == NULL) s = malloc(sizeof(*s) + blk);
+  while (s == NULL)
+    s = calloc(sizeof(*s) + (cap * siz), 1);
   s->cap = cap;
-  s->len = 0;
   return s->data;
 }
 
@@ -387,12 +386,13 @@ Seq seq_rsz_(size_t siz, Seq s, size_t cap, circa_msg fname, circa_msg line) {
     circa_assert(cap > 0, fname, line);
     circa_assert(cap >= seq(s)->len, fname, line);
   }
-  #ifdef CIRCA_SECURE
-    if (cap < seq(s)->cap)
-      memset(((char*) s) + cap, 0, (seq(s)->cap - cap) * siz);
-  #endif
+  if (cap < seq(s)->cap)
+    memset(((char*) s) + cap, 0, (seq(s)->cap - cap) * siz);
   struct seq_data *s2 = NULL;
-  while (s2 == NULL) s2 = realloc(seq(s), sizeof(*s2) + (cap * siz));
+  while (s2 == NULL)
+    s2 = realloc(seq(s), sizeof(*s2) + (cap * siz));
+  if (cap > s2->cap)
+    memset(((char*) s) + (s2->cap * siz), 0, (cap - s2->cap) * siz);
   s2->cap = cap;
   return s2->data;
 }
@@ -466,11 +466,7 @@ Seq seq_del_(size_t siz, Seq s, circa_msg fname, circa_msg line) {
     circa_assert(siz > 0, fname, line);
   }
   if (s != NULL) {
-    #ifdef CIRCA_SECURE
-      memset(s, 0, siz * seq(s)->cap);
-      seq(s)->cap = 0;
-      seq(s)->len = 0;
-    #endif
+    memset(seq(s), 0, sizeof(seq(s)) + (siz * seq(s)->cap));
     free(seq(s));
   }
   return NULL;
