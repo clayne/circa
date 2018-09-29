@@ -12,6 +12,7 @@ int main() {
     str_read(readme, fp);
     printf("%s", readme);
     str_del(readme);
+    fclose(fp);
   }
   return 0;
 }
