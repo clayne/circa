@@ -5,14 +5,6 @@
 
 #include "../../dict.h"
 
-void dump(Dict(int) fruits) {
-  for (size_t i = 0; i < dict(fruits)->cap; i++) {
-    char *key = dict(fruits)->buckets[i].key;
-    if (dict_has(fruits, key))
-      printf("%s: %i\n", key, dict_get(fruits, key));
-  }
-}
-
 int main() {
   Dict(int) fruits = dict_new(int, 2);
   dict_set(fruits, "orange", 5);
@@ -21,7 +13,9 @@ int main() {
   dict_set(fruits, "banana", 10);
   dict_set(fruits, "mango", 500);
   dict_set(fruits, "pear", 2);
-  dump(fruits);
+  dict_foreach(fruits, k, v, {
+    printf("%s: %i\n", k, v);
+  });
   dict_del(fruits);
   return 0;
 }

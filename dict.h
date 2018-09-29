@@ -401,4 +401,27 @@ Dict dict_del_(size_t siz, Dict d, circa_msg fname, circa_msg line) {
   return NULL;
 }
 
+/*
+** Functional Ops
+*/
+
+/*
+** Control Flow
+*/
+
+#define dict_foreach_iso(T, D, K, V, ...) \
+do { \
+  char *K; \
+  T V; \
+  for (size_t I = 0; I < dict(D)->cap; I++) { \
+    K = dict(D)->buckets[I].key; \
+    if (dict_has_iso(T, D, K)) { \
+      V = dict_get_iso(T, D, K); \
+      __VA_ARGS__ \
+    } \
+  } \
+} while(0)
+
+#define dict_foreach(D, K, V, ...) dict_foreach_iso(typeof(*D), D, K, V, __VA_ARGS__)
+
 #endif /* CIRCA_DICT_H */

@@ -32,7 +32,26 @@ To Be Done
 
 ## Dictionaries
 
-To Be Done
+A toy example storing and printing some fruit quantities:
+
+```
+#include "circa/dict.h"
+
+int main() {
+  Dict(int) fruits = dict_new(int, 2);
+  dict_set(fruits, "orange", 5);
+  dict_set(fruits, "apple", 100);
+  dict_set(fruits, "peach", 25);
+  dict_set(fruits, "banana", 10);
+  dict_set(fruits, "mango", 500);
+  dict_set(fruits, "pear", 2);
+  dict_foreach(fruits, k, v, {
+    printf("%s: %i\n", k, v);
+  });
+  dict_del(fruits);
+  return 0;
+}
+```
 
 ## Sequences
 
@@ -92,9 +111,9 @@ However, Circa doesn't use this approach-- instead, functions are written to be
 type-generic with only one declaration, taking a void pointer, and a type size
 argument, doing all data shuffling with memcpy, memset, etc.
 
-Additionally, Circa is designed to not be a huge "mono-library"-- rather, Circa
+Additionally, Circa is designed to not be a huge "mono-library." Rather, Circa
 tries to compartmentalize each library, with the main dependencies being the
-more generic modules, such as `core`, `types`, neither of which define any
+more generic modules, such as `core` and `types`, neither of which define any
 actual functions-- they're purely type definitions and macros.
 
 As a result, Circa actually compiles at a fine speed, and the benefits for ease

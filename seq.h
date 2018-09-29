@@ -672,7 +672,7 @@ do { \
   for (size_t I = 0; I < seq(A)->len; I++) { \
     B = F(B, seq_get_iso(T, A, I)); \
   } \
-} \
+} while (0)
 
 #define seq_reduce(A, F, B) seq_reduce_iso(typeof(*A), A, F, B)
 
