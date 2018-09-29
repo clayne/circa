@@ -1,5 +1,5 @@
 /*
-** simd.h | SIMD data types and functions.
+** simd.h | Circa | SIMD data types and functions.
 ** https://github.com/davidgarland/circa
 */
 

@@ -1,5 +1,5 @@
 /*
-** dict.h | A robin-hood-hashing dictionary using xxHash.
+** dict.h | Circa | A robin-hood-hashing dictionary using xxHash.
 ** https://github.com/davidgarland/circa
 */
 

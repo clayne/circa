@@ -1,5 +1,5 @@
 /*
-** types.h | Terse scalar type names as an alternative to stdint.
+** types.h | Circa | Rustic scalar typedefs.
 ** https://github.com/davidgarland/circa
 */
 

@@ -1,5 +1,5 @@
 /*
-** str.h | Dynamically allocated Strings.
+** str.h | Circa | Dynamically allocated Strings.
 ** https://github.com/davidgarland/circa
 */
 

@@ -1,5 +1,5 @@
 /*
-** seq.h | Dynamically allocated sequences.
+** seq.h | Circa | Dynamically allocated sequences.
 ** https://github.com/davidgarland/circa
 */
 

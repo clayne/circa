@@ -1,5 +1,5 @@
 /*
-** circa/core.h | Circa's core configuration and debugging macros.
+** core.h | Circa | Core configuration and debugging macros.
 ** https://github.com/davidgarland/circa
 */
 

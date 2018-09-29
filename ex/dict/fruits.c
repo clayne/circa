@@ -1,5 +1,5 @@
 /*
-** fruits.c | Intern fruits into a dictionary and print them out.
+** fruits.c | Insert fruits into a dictionary and print them out.
 ** https://github.com/davidgarland/circa
 */
 
