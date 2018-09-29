@@ -34,7 +34,7 @@ To Be Done
 
 A toy example storing and printing some fruit quantities:
 
-```
+```C
 #include "circa/dict.h"
 
 int main() {
@@ -150,5 +150,4 @@ compiler. Note that defining `NDEBUG` will also disable normal C assertions--
 `CIRCA_N_DBG` will disable only Circa's.
 
 Additionally, because you don't have to implement these structures yourself,
-you don't implement it yourself, saving you from the possibility of creating
-more bugs in doing so.
+you're saved from creating more bugs.
