@@ -168,3 +168,92 @@ compiler. Note that defining `NDEBUG` will also disable normal C assertions--
 
 Additionally, because you don't have to implement these structures yourself,
 you're saved from creating more bugs.
+
+# How Does It Work?
+
+Circa makes extensive use of macros for user convenience and debug info. Let's
+take a look at how that actually works.
+
+Consider the following code:
+
+```C
+#include "circa/seq.h"
+
+void puti(int n) {
+  printf("%i\n", n);
+}
+
+bool odd(int n) {
+  return n & 1;
+}
+
+int main() {
+  Seq(int) a = seq_lit(int, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+  Seq(int) b = seq_new(int, 1);
+  seq_filter(a, odd, b);
+  seq_do(b, puti);
+  seq_del(a);
+  seq_del(b);
+  return 0;
+}
+```
+
+Seems simple enough, but if you know much about C you'll know this shouldn't be
+possible normally-- C doesn't have generics or parametric types, so what does
+this translate to?
+
+Welllll...
+
+```C
+#include "circa/seq.h"
+
+void puti(int n) {
+  printf("%i\n", n);
+}
+
+_Bool odd(int n) {
+  return n & 1;
+}
+
+int main() {
+  int* a = seq_lit_(sizeof(int), sizeof((int[]){1, 2, 3, 4, 5, 6, 7, 8, 9, 10}) / sizeof(int), &(int[]){1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, "odd.c", "17");
+  int* b = seq_new_(sizeof(int), (1), "odd.c", "18");
+  do {
+    typeof(*a) V; 
+    (b) = seq_rqr_(sizeof(typeof(*a)), b, seq_(a, "odd.c", "19")->len, "odd.c", "19");
+    seq_(b, "odd.c", "19")->len = 0;
+    for (size_t I = 0; I < seq_(a, "odd.c", "19")->len; I++) {
+      (V) = (*((typeof(*a)*) seq_get_(sizeof(typeof(*a)), a, I, "odd.c", "19")));
+      if (odd(V)) {
+        (b) = seq_push_(sizeof(typeof(*a)), b, &V, "odd.c", "19"); 
+      } 
+    }
+  } while (0);
+  do {
+    for (size_t I = 0; I < seq_(b, "odd.c", "20")->len; I++) {
+      puti((*((typeof(*b)*) seq_get_(sizeof(typeof(*b)), b, I, "odd.c", "20"))));
+    }
+  } while (0);
+  ((a)) = seq_del_(sizeof(typeof(*a)), ((a)), "odd.c", "21");
+  ((b)) = seq_del_(sizeof(typeof(*b)), ((b)), "odd.c", "22");
+  return 0;
+}
+```
+
+So we see that `Seq(int)` is actually `int*` in reality, which shouldn't be
+suprising; but there's a lot more to it.
+
+Each function is boiled down to a form that has an underscore following it,
+which are how they're actually defined in the library itself. These take the raw
+size of the type, pointers to the inputs, and debug info.
+
+The control flow and functional operations, such as `filter` and `do`, instead
+compile down to multiple lines of code, encapsulated in a `do { ... } while(0);`
+which should be a familiar idiom to anyone who does macro programming as a way
+of safely requiring a semicolon after the block.
+
+The reason `int*` is used underneath isn't only for binary compatiblity, either.
+Even `Dict(T)`, which doesn't gurantee binary compatibility, does this. The main
+reason is because it allows for use of `typeof()` to get the type of the data
+structure, that way you don't have to pass the type explicitly like you do with
+the `_iso` versions of the functions.
