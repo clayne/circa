@@ -56,6 +56,7 @@ int main() {
 ## Sequences
 
 Printing the odd numbers in 1-10:
+
 ```C
 #include "circa/seq.h"
 
@@ -80,7 +81,22 @@ int main() {
 
 ## Strings
 
-To Be Done
+Printing out the README in the current directory:
+
+```C
+#include "circa/str.h"
+
+int main() {
+  FILE *fp = fopen("README.md", "r");
+  if (fp != NULL) {
+    Str readme = str_new(1);
+    str_read(readme, fp);
+    printf("%s", readme);
+    str_del(readme);
+  }
+  return 0;
+}
+```
 
 # Why Circa?
 
