@@ -1,5 +1,5 @@
 /*
-** ex/seq/odd.c | Print the odd numbers in 1-10.
+** odd.c | Circa | Print the odd numbers in 1-10.
 ** https://github.com/davidgarland/circa
 */
 
