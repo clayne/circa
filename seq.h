@@ -625,54 +625,70 @@ Seq seq_rvs_(size_t siz, Seq s, circa_msg fname, circa_msg line) {
 ** Functional Ops
 */
 
-#define seq_do_iso(T, S, F) \
+#define seq_do_(T, S, F, FNAME, LINE) \
 do { \
-  for (size_t I = 0; I < seq(S)->len; I++) { \
-    F(seq_get_iso(T, S, I)); \
+  for (size_t I = 0; I < seq_(S, FNAME, LINE)->len; I++) { \
+    F((*((T*) seq_get_(sizeof(T), S, I, FNAME, LINE)))); \
   } \
 } while (0)
+
+#define seq_do_iso(T, S, F) seq_do_(T, S, F, __FILE__, _circa_str_(__LINE__))
 
 #define seq_do(S, F) seq_do_iso(typeof(*S), S, F)
 
-#define seq_apply_iso(T, S, F) \
+#define seq_apply_(T, S, F, FNAME, LINE) \
 do { \
-  for (size_t I = 0; I < seq(S)->len; I++) { \
-    seq_set_iso(T, S, I, F(seq_get_iso(T, S, I)); \
+  T V; \
+  for (size_t I = 0; I < seq_(S, FNAME, LINE)->len; I++) { \
+    (V) = F((*((T*) seq_get_(sizeof(T), S, I, FNAME, LINE)))); \
+    (S) = seq_set_(sizeof(T), S, I, &V, FNAME, LINE); \
   } \
 } while (0)
+
+#define seq_apply_iso(T, S, F) seq_apply_(T, S, F, __FILE__, _circa_str_(__LINE__))
 
 #define seq_apply(S, F) seq_apply_iso(typeof(*S), S, F)
 
-#define seq_map_iso(T, A, F, B) \
+#define seq_map_(T, A, F, B, FNAME, LINE) \
 do { \
-  seq_rqr_iso(T, B, seq(A)->len); \
-  seq(B)->len = seq(A)->len; \
-  for (size_t I = 0; I < seq(A)->len; I++) { \
-    seq_set_iso(T, B, I, F(seq_get_iso(T, A, I))); \
+  T V; \
+  (B) = seq_rqr_(sizeof(T), B, seq_(A, FNAME, LINE)->len, FNAME, LINE); \
+  seq_(B, FNAME, LINE)->len = seq_(A, FNAME, LINE)->len; \
+  for (size_t I = 0; I < seq_(A, FNAME, LINE)->len; I++) { \
+    (V) = F((*((T*) seq_get_(sizeof(T), A, I, FNAME, LINE)))); \
+    (B) = seq_set_(sizeof(T), B, I, &V, FNAME, LINE); \
   } \
 } while (0)
 
+#define seq_map_iso(T, A, F, B) seq_map_(T, A, F, B, __FILE__, _circa_str_(__LINE__))
+
 #define seq_map(A, F, B) seq_map_iso(typeof(*A), A, F, B)
 
-#define seq_filter_iso(T, A, F, B) \
+#define seq_filter_(T, A, F, B, FNAME, LINE) \
 do { \
-  seq_rqr(B, seq(A)->len); \
-  seq(B)->len = 0; \
-  for(size_t I = 0; I < seq(A)->len; I++) { \
-    if (F(seq_get_iso(T, A, I))) { \
-      seq_push_iso(T, B, seq_get_iso(T, A, I));\
+  T V; \
+  (B) = seq_rqr_(sizeof(T), B, seq_(A, FNAME, LINE)->len, FNAME, LINE); \
+  seq_(B, FNAME, LINE)->len = 0; \
+  for(size_t I = 0; I < seq_(A, FNAME, LINE)->len; I++) { \
+    (V) = (*((T*) seq_get_(sizeof(T), A, I, FNAME, LINE))); \
+    if (F(V)) { \
+      (B) = seq_push_(sizeof(T), B, &V, FNAME, LINE);\
     } \
   } \
 } while (0)
 
+#define seq_filter_iso(T, A, F, B) seq_filter_(T, A, F, B, __FILE__, _circa_str_(__LINE__))
+
 #define seq_filter(A, F, B) seq_filter_iso(typeof(*A), A, F, B)
 
-#define seq_reduce_iso(T, A, F, B) \
+#define seq_reduce_(T, A, F, B) \
 do { \
-  for (size_t I = 0; I < seq(A)->len; I++) { \
-    B = F(B, seq_get_iso(T, A, I)); \
+  for (size_t I = 0; I < seq_(A, FNAME, LINE)->len; I++) { \
+    B = F(B, (*((T*) seq_get_(sizeof(T), A, I, FNAME, LINE)))); \
   } \
 } while (0)
+
+#define seq_reduce_iso(T, A, F, B) seq_reduce_(T, A, F, B, __FILE__, _circa_str_(__LINE__))
 
 #define seq_reduce(A, F, B) seq_reduce_iso(typeof(*A), A, F, B)
 
