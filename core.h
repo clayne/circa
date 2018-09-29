@@ -58,12 +58,12 @@
 
 /* Environment */
 
-#define CIRCA_D_STATIC true // Enable static linkage. Desirable in most cases.
-#define CIRCA_D_INLINE true // Enable inlining. Desireable in most cases.
+#define CIRCA_D_STATIC true /* Enable static linkage. Desirable in most cases. */
+#define CIRCA_D_INLINE true /* Enable inlining. Desireable in most cases. */
 
 /* Debugging */
 
-#define CIRCA_D_DBG true  // Enable assertions.
+#define CIRCA_D_DBG true /* Enable assertions. */
 
 /*
 ** Config Handling
