@@ -218,7 +218,7 @@ _circa_
 char str_get_(Str s, size_t addr, circa_msg fname, circa_msg line) {
   {
     circa_assert(s != NULL, fname, line);
-    circa_assert(str(s)->len < 0, fname, line);
+    circa_assert(str(s)->len > 0, fname, line);
     circa_assert(addr < str(s)->len, fname, line);
   }
   return s[addr];
