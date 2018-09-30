@@ -392,7 +392,7 @@ Seq seq_rsz_(size_t siz, Seq s, size_t cap, circa_msg fname, circa_msg line) {
   while (s2 == NULL)
     s2 = realloc(seq(s), sizeof(*s2) + (cap * siz));
   if (cap > s2->cap)
-    memset(((char*) s) + (s2->cap * siz), 0, (cap - s2->cap) * siz);
+    memset(((char*) s) + ((s2->cap - 1) * siz), 0, (cap - s2->cap - 1) * siz);
   s2->cap = cap;
   return s2->data;
 }
