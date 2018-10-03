@@ -611,7 +611,8 @@ Seq seq_rvs_(size_t siz, Seq s, circa_msg fname, circa_msg line) {
   void *const restrict tmp = (((char*) s) + (siz * s_len));
   for (size_t i = 0, j = s_len - 1; i < s_len / 2; i++, j--) {
     memmove(tmp, seq_get_(siz, s, i, fname, line), siz);
-    memmove(seq_get_(siz, s, i, fname, line), seq_get_(siz, s, j, fname, line), siz);
+    memmove(seq_get_(siz, s, i, fname, line),
+            seq_get_(siz, s, j, fname, line), siz);
     memmove(seq_get_(siz, s, j, fname, line), tmp, siz);
   }
   return s;
