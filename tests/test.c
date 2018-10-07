@@ -7,10 +7,6 @@
 ** Dependencies
 */
 
-/* Vendored */
-
-#include <snow/snow.h>
-
 /* Internal */
 
 #include "../core.h"
@@ -19,6 +15,10 @@
 #include "../seq.h"
 #include "../str.h"
 #include "../dict.h"
+
+/* Vendored */
+
+#include <snow/snow.h>
 
 /*
 ** Tests
@@ -30,14 +30,14 @@ describe(Seq) {
   subdesc(Allocators) {
     it("seq_new") {
       sq = seq_new(int, 5);
-      assert(sq == NULL, "The sequence shouldn't be NULL after allocation.");
+      assert(sq != NULL, "The sequence shouldn't be NULL after allocation.");
       assert(seq(sq)->cap == 5, "The sequence capacity should be equal to 5.");
       assert(seq(sq)->len == 0, "The sequence length should be zero.");
     }
 
     it("seq_rsz") {
       seq_rsz(sq, 10);
-      assert(sq == NULL, "The sequence shouldn't be NULL after resizing.");
+      assert(sq != NULL, "The sequence shouldn't be NULL after resizing.");
       assert(seq(sq)->cap == 10, "The sequence capacity should be equal to 10.");
       assert(seq(sq)->len == 0, "The sequence length should be zero.");
     }

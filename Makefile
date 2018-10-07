@@ -29,20 +29,20 @@ MUTE=>/dev/null 2>/dev/null
 default: build
 
 update:
-	-@git remote add -f snow https://github.com/mortie/snow
-	-@git fetch snow master
-	-@git subtree pull --prefix lib/snow snow master --squash
+	git remote add -f snow https://github.com/mortie/snow
+	git fetch snow master
+	git subtree pull --prefix lib/snow snow master --squash
 
 build:
-	-@$(CC) -c $(CFLAGS) *.h $(LDFLAGS)
+	$(CC) -c $(CFLAGS) *.h $(LDFLAGS)
 
 test: tests/test.c
-	-@$(CC) $(CFLAGS) $(CDBG) tests/test.c -Ilib/snow -DSNOW_ENABLED -g -o test.o
+	$(CC) $(CFLAGS) $(CDBG) tests/test.c -Ilib/snow -DSNOW_ENABLED -g -o test.o
 
 examples:
-	-@$(CC) $(CFLAGS) $(CFAST) ex/str/readme.c  -o readme.o $(LDFLAGS)
-	-@$(CC) $(CFLAGS) $(CFAST) ex/seq/odd.c     -o odd.o    $(LDFLAGS)
-	-@$(CC) $(CFLAGS) $(CFAST) ex/dict/fruits.c -o fruits.o $(LDFLAGS)
+	$(CC) $(CFLAGS) $(CFAST) ex/str/readme.c  -o readme.o $(LDFLAGS)
+	$(CC) $(CFLAGS) $(CFAST) ex/seq/odd.c     -o odd.o    $(LDFLAGS)
+	$(CC) $(CFLAGS) $(CFAST) ex/dict/fruits.c -o fruits.o $(LDFLAGS)
 
 clean:
-	-@rm -rf *.o *.gch $(MUTE)
+	rm -rf *.o *.gch $(MUTE)
