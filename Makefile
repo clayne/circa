@@ -29,6 +29,7 @@ MUTE=>/dev/null 2>/dev/null
 default: build
 
 update:
+	-@git remote add -f snow https://github.com/mortie/snow
 	-@git fetch snow master
 	-@git subtree pull --prefix lib/snow snow master --squash
 
