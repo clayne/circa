@@ -64,6 +64,7 @@ describe(Seq) {
 
 describe(Str) {
   Str st;
+  
   subdesc(Allocators) {
     it("str_new") {
       st = str_new(5);
