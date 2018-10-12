@@ -24,9 +24,9 @@
 ** Tests
 */
 
-describe(Seq) {
-  Seq(int) sq;
+Seq(int) sq;
 
+describe(Seq) {
   subdesc(Allocators) {
     it("seq_new") {
       sq = seq_new(int, 5);
@@ -62,9 +62,9 @@ describe(Seq) {
   }
 }
 
+Str st;
+
 describe(Str) {
-  Str st;
-  
   subdesc(Allocators) {
     it("str_new") {
       st = str_new(5);
@@ -100,9 +100,9 @@ describe(Str) {
   }
 }
 
-describe(Dict) {
-  Dict(int) d;
+Dict(int) d;
 
+describe(Dict) {
   subdesc(Allocators) {
     it("dict_new") {
       d = dict_new(int, 5);
