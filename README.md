@@ -241,7 +241,7 @@ int main() {
 ```
 
 So we see that `Seq(int)` is actually `int*` in reality, which shouldn't be
-suprising; but there's a lot more to it.
+suprising; but there's more to it.
 
 Each function is boiled down to a form that has an underscore following it,
 which are how they're actually defined in the library itself. These take the raw

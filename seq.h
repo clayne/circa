@@ -111,16 +111,22 @@ _circa_ _circa_rets_ Seq seq_del_(size_t siz, Seq s, circa_msg fname, circa_msg 
 /* Stack Operations */
 
 #define seq_push_iso(T, S, V) (S) = seq_push_(sizeof(T), (S), (&V), __FILE__, _circa_str_(__LINE__))
-#define seq_push(S, V) seq_push_iso(typeof(*S), (S), (V))
+#define seq_push(S, V) seq_push_iso(typeof(*S), S, V)
 #define seq_push_lit_iso(T, S, V) (S) = seq_push_(sizeof(T), (S), &(T){V}, __FILE__, _circa_str_(__LINE__))
 #define seq_push_lit(S, V) seq_push_lit_iso(typeof(*S), S, V)
-_circa_ _circa_rets_ Seq  seq_push_(size_t siz, Seq s, void *val, circa_msg fname, circa_msg line);
+_circa_ _circa_rets_ Seq seq_push_(size_t siz, Seq s, void *val, circa_msg fname, circa_msg line);
 
-#define seq_tos_iso(T, S) (*((seq(T)) seq_tos_(sizeof(T), (S), __FILE__, _circa_str_(__LINE__))))
+#define seq_push_ext_iso(T, S, V, E) (S) = seq_push_ext_(sizeof(T), (S), (&V), (E), __FILE__, _circa_str_(__LINE__))
+#define seq_push_ext(S, V, E) seq_push_ext_iso(typeof(*S), S, V, E)
+#define seq_push_lit_ext_iso(T, S, V, E) (S) = seq_push_ext_(sizeof(T), (S), &(T){V}, (E), __FILE__, _circa_str_(__LINE__))
+#define seq_push_lit_ext(S, V, E) seq_push_lit_ext_iso(typeof(*S), S, V, E)
+_circa_ _circa_rets_ Seq seq_push_ext_(size_t siz, Seq s, void *val, size_t ext, circa_msg fname, circa_msg line);
+
+#define seq_tos_iso(T, S) (*((T*) seq_tos_(sizeof(T), (S), __FILE__, _circa_str_(__LINE__))))
 #define seq_tos(S) seq_tos_iso(typeof(*S), (S))
 _circa_ _circa_rets_ void *seq_tos_(size_t siz, Seq s, circa_msg fname, circa_msg line);
 
-#define seq_pop_iso(T, S) (*((seq(T)) seq_pop_(sizeof(T), (S), __FILE__, _circa_str_(__LINE__))))
+#define seq_pop_iso(T, S) (*((T*) seq_pop_(sizeof(T), (S), __FILE__, _circa_str_(__LINE__))))
 #define seq_pop(S) seq_pop_iso(typeof(*S), (S))
 _circa_ _circa_rets_ void *seq_pop_(size_t siz, Seq s, circa_msg fname, circa_msg line);
 
@@ -440,7 +446,7 @@ Seq seq_shr_(size_t siz, Seq s, circa_msg fname, circa_msg line) {
     circa_assert(siz > 0, fname, line);
     circa_assert(s != NULL, fname, line);
   }
-  const size_t len = seq(s)->len;
+  const size_t len = seq(s)->len + (seq(s)->len < 1 ? 1 : 0);
   if (seq(s)->cap > len)
     return seq_rsz_(siz, s, len, fname, line);
   else
@@ -527,7 +533,53 @@ circa_msg line) {
 }
 
 /*
-** sequence Ops
+** -- seq_tos_ --
+** Description
+**   Returns the top value of a sequence.
+** Arguments
+**   siz: Type Size (size_t)
+**   s: Sequence (Seq)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
+** Returns
+**   Value (void*)
+*/
+
+_circa_
+void *seq_tos_(size_t siz, Seq s, circa_msg fname, circa_msg line) {
+  {
+    circa_assert(siz > 0, fname, line);
+    circa_assert(s != NULL, fname, line);
+    circa_assert(seq(s)->len > 0, fname, line);
+  }
+  return seq_get_(siz, s, seq(s)->len - 1, fname, line);
+}
+
+/*
+** -- seq_pop_ --
+** Description
+**   Pops the top value of a sequence.
+** Arguments
+**   siz: Type Size (size_t)
+**   s: Sequence (Seq)
+**   fname: Filename (circa_msg)
+**   line: Line Number (circa_msg)
+** Returns
+**   Value (void*)
+*/
+
+_circa_
+void *seq_pop_(size_t siz, Seq s, circa_msg fname, circa_msg line) {
+  {
+    circa_assert(siz > 0, fname, line);
+    circa_assert(s != NULL, fname, line);
+    circa_assert(seq(s)->len > 0, fname, line);
+  }
+  return seq_get_(siz, s, --seq(s)->len, fname, line);
+}
+
+/*
+** Sequence Ops
 */
 
 /*
