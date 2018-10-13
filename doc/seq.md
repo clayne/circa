@@ -81,8 +81,8 @@ printf("%zu\n", seq(s)->cap); // Check the capacity. (7; needed 2, ext 5.)
 ### seq_get
 
 ```C
-<type> seq_get_iso(<type>, Seq, size_t addr);
-<type> seq_get(Seq, size_t addr);
+<value> seq_get_iso(<type>, Seq, size_t addr);
+<value> seq_get(Seq, size_t addr);
 void *seq_get_(size_t siz, Seq s, size_t addr, circa_msg fname, circa_msg line);
 ```
 
