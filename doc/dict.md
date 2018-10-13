@@ -34,7 +34,7 @@ struct dict_data {
 };
 ```
 
-Here are the user-facing fields of the `Dict` type, accessed by `dict()`. There
+Here are the user-facing fields of the `Dict(T)` type, accessed by `dict()`. There
 are other fields, but interfacing them directly is highly discouraged.
 
 ## Accessors

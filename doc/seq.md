@@ -16,7 +16,7 @@ struct seq_data {
 };
 ```
 
-Here are the user-facing fields of the `Dict` type. The `data` field is the one
+Here are the user-facing fields of the `Seq(T)` type. The `data` field is the one
 pointed to by `Seq(T)`, and getting a pointer to the structure detailed above
 can be done with the `seq()` function.
 
