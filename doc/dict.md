@@ -94,7 +94,7 @@ bool dict_has_iso(<type>, Dict, char*);
 bool dict_has_(size_t siz, Dict d, char *a, circa_msg fname, circa_msg line);
 ```
 
-Checks if a dictionary has a value a given index.
+Checks if a dictionary has a value at a given index.
 
 ```C
 Dict(int) d = dict_new(int, 10);
