@@ -49,9 +49,9 @@ struct dict_data *dict_(Dict d, circa_msg fname, circa_msg line);
 Access the core structure of a dictionary.
 
 ```C
-Dict(int) d = dict_new(int, 10);
-dict_set(d, "foo", 500);
-printf("%zu\n", dict(d)->len); // 1
+Dict(int) d = dict_new(int, 10); // Allocate a dictioanry of 10 integers.
+dict_set(d, "foo", 500);         // Set the value at index "foo" to 500.
+printf("%zu\n", dict(d)->len);   // Print the length of the dictionary. (1)
 ```
 
 ### dict_set
@@ -65,9 +65,9 @@ Dict dict_set_(size_t siz, Dict d, char *a, void *v, circa_msg fname, circa_msg 
 Sets a dictionary's value at a given index.
 
 ```C
-Dict(int) d = dict_new(int, 10);
-dict_set(d, "foo", 500);
-printf("%i\n", dict_get(d, "foo")); // 500
+Dict(int) d = dict_new(int, 10);    // Allocate a dictionary of 10 integers.
+dict_set(d, "foo", 500);            // Set the value at index "foo" to 500.
+printf("%i\n", dict_get(d, "foo")); // Print the value at index "foo". (500)
 ```
 
 ### dict_get
@@ -81,9 +81,9 @@ void *dict_get_(size_t siz, Dict d, char *a, circa_msg fname, circa_msg line);
 Gets a dictionary's value at a given index.
 
 ```C
-Dict(int) d = dict_new(int, 10);
-dict_set(d, "foo", 500);
-printf("%i\n", dict_get(d, "foo")); // 500
+Dict(int) d = dict_new(int, 10);    // Allocate a dictionary of 10 integers.
+dict_set(d, "foo", 500);            // Set the value at index "foo" to 500.
+printf("%i\n", dict_get(d, "foo")); // Print the value at index "foo", (500)
 ```
 
 ### dict_has
@@ -97,10 +97,10 @@ bool dict_has_(size_t siz, Dict d, char *a, circa_msg fname, circa_msg line);
 Checks if a dictionary has a value at a given index.
 
 ```C
-Dict(int) d = dict_new(int, 10);
-dict_set(d, "foo", 500);
-if (dict_has(d, "foo"))
-  puts("d has foo");
+Dict(int) d = dict_new(int, 10); // Allocate a dictionary of 10 integers.
+dict_set(d, "foo", 500);         // Set the value at index "foo" to 500.
+if (dict_has(d, "foo"))          // If the dictionary has index "foo":
+  puts("d has foo");             // Print "d has foo."
 ```
 
 ## Allocators
@@ -119,8 +119,8 @@ closest prime. If you need to know what number this comes out to be, you can
 find this using the `u32_primegt` function found in `circa/bits.h`.
 
 ```C
-Dict(int) d = dict_new(int, 10);
-printf("%zu\n", dict(d)->cap); // 17
+Dict(int) d = dict_new(int, 10); // Allocate a dictionary of 10 integers.
+printf("%zu\n", dict(d)->cap);   // Print the capacity of the dictionary. (17)
 ```
 
 ### dict_rsz
@@ -138,9 +138,9 @@ out to be, you can find this using the `u32_primegt` function found in
 `circa/bits.h`.
 
 ```C
-Dict(int) d = dict_new(int, 10);
-dict_rsz(d, 20);
-printf("%zu\n", dict(d)->cap); // 37
+Dict(int) d = dict_new(int, 10); // Allocate a dictionary of 10 integers.
+dict_rsz(d, 20);                 // Resize the dictionary to 20 integers.
+printf("%zu\n", dict(d)->cap);   // Print the capacity of the dictionary. (37)
 ```
 
 ### dict_del
@@ -151,11 +151,10 @@ void dict_del_iso(<type>, Dict);
 Dict dict_del_(size_t siz, Dict d, circa_msg fname, circa_msg line);
 ```
 
-Deletes a dictionary and set it to NULL. All freed memory will be zeroed first.
-Deleting a dictionary twice will not result in an error.
+Deletes a dictionary and sets the pointer to NULL.
 
 ```C
-Dict(int) d = dict_new(int, 10);
-dict_del(d);
-dict_del(d);
+Dict(int) d = dict_new(int, 10); // Allocate a dictionary of 10 integers.
+dict_del(d);                     // Delete the dictionary, setting it to NULL.
+dict_del(d);                     // A second deletion won't result in an error.
 ```

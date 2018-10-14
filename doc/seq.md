@@ -32,10 +32,10 @@ struct seq_data *seq_(Seq s, circa_msg fname, circa_msg line);
 Access the core structure of a dictionary.
 
 ```C
-Seq(int) s = seq_new(int, 1); // Allocate a new sequence of integers.
-seq_push(s, 500);             // Push the value 500 onto the sequence.
-seq_push(s, 250);             // Push the value 250 onto the sequence.
-printf("%zu\n", seq(s)->len); // Check the length of the sequence. (2)
+Seq(int) a = seq_new(int, 1); // Allocate a new sequence of 1 integer.
+seq_push(a, 500);             // Push the value 500 onto the sequence.
+seq_push(a, 250);             // Push the value 250 onto the sequence.
+printf("%zu\n", seq(a)->len); // Check the length of the sequence. (2)
 ```
 
 ### seq_set
@@ -51,9 +51,9 @@ Seq seq_set_(size_t siz, Seq s, size_t addr, void *val, circa_msg fname, circa_m
 Sets a sequence's value at a given index.
 
 ```C
-Seq(int) s = seq_new(int, 1);  // Allocate a new sequence of integers.
-seq_set_lit(s, 0, 1);          // Set the value at index 0 to the literal 1.
-printf("%i\n", seq_get(s, 0)); // Print out the value at index 0. (1)
+Seq(int) a = seq_new(int, 1);  // Allocate a new sequence of 1 integer.
+seq_set_lit(a, 0, 1);          // Set the value at index 0 to the literal 1.
+printf("%i\n", seq_get(a, 0)); // Print out the value at index 0. (1)
 ```
 
 ### seq_set_ext
@@ -73,9 +73,9 @@ the new value, then `ext` more elements will be allocated than usual. This can
 be useful for avoiding reallocation too frequently.
 
 ```C
-Seq(int) s = seq_new(int, 1); // Allocate a new sequence of integers.
-seq_set_ext_lit(s, 1, 2, 5);  // Set the value at the index 1 to 2 with an ext of 5.
-printf("%zu\n", seq(s)->cap); // Check the capacity. (7; needed 2, ext 5.)
+Seq(int) a = seq_new(int, 1); // Allocate a new sequence of 1 integer.
+seq_set_ext_lit(a, 1, 2, 5);  // Set the value at the index 1 to 2 with an ext of 5.
+printf("%zu\n", seq(a)->cap); // Check the capacity. (7; needed 2, ext 5.)
 ```
 
 ### seq_get
@@ -89,9 +89,9 @@ void *seq_get_(size_t siz, Seq s, size_t addr, circa_msg fname, circa_msg line);
 Gets a sequence's value at a given index.
 
 ```C
-Seq(int) s = seq_new(int, 1);  // Allocate a new sequence of integers.
-seq_set_lit(s, 0, 1);          // Set the value at the index 0 to 1.
-printf("%i\n", seq_get(s, 0)); // Print the value at the index 0. (1)
+Seq(int) a = seq_new(int, 1);  // Allocate a new sequence of 1 integer.
+seq_set_lit(a, 0, 1);          // Set the value at the index 0 to 1.
+printf("%i\n", seq_get(a, 0)); // Print the value at the index 0. (1)
 ```
 
 ## Allocators
@@ -110,7 +110,7 @@ The `_iso` variant is the exact same as the GNU variant; it is provided only
 as a stylistic convenience.
 
 ```C
-Seq(int) s = seq_new(int, 10); // Allocate a new sequence of 10 integers.
+Seq(int) a = seq_new(int, 10); // Allocate a new sequence of 10 integers.
 ```
 
 ### seq_lit
@@ -127,9 +127,9 @@ The `_iso` variant is the exact same as the GNU variant; it is provided only
 as a stylistic convenience.
 
 ```C
-Seq(int) s = seq_lit(int, 1, 2, 3, 4, 5); // Allocate a sequence holding the values (1, 2, 3, 4, 5).
+Seq(int) a = seq_lit(int, 1, 2, 3, 4, 5); // Allocate a sequence holding the values (1, 2, 3, 4, 5).
 for (size_t i = 0; i < 5; i++)
-  printf("%i\n", seq_get(s, i));          // Print out each element. (1, 2, 3, 4, 5)
+  printf("%i\n", seq_get(a, i));          // Print out each element. (1, 2, 3, 4, 5)
 ```
 
 ### seq_from
