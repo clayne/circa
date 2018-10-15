@@ -1,10 +1,21 @@
 # Circa Docs : Sequences
 
+[Home](README.md)
+- [Dict(T)](dict.md)
+- Seq(T)
+- [Str](str.md)
+
+## Introduction
+
 Sequences (`Seq(T)`) are Circa's implementation of dynamic arrays. The main goal
 is to reduce the amount of boilerplate required in a given C library. Instead of
 passing around a bunch of capacity and length variables and needing to write
 your own functions for doing trivial operations on the arrays, sequences do all
 of that for you.
+
+Because the pointer to the sequence actually points to the first element in the
+array, sequences are binary compatible with a normal `T*`. For example, you
+could pass in `Seq(int)` to a function that takes `int[]` or `int*`.
 
 ## Structure
 
@@ -35,7 +46,7 @@ Access the core structure of a dictionary.
 Seq(int) a = seq_new(int, 1); // Allocate a new sequence of 1 integer.
 seq_push(a, 500);             // Push the value 500 onto the sequence.
 seq_push(a, 250);             // Push the value 250 onto the sequence.
-printf("%zu\n", seq(a)->len); // Check the length of the sequence. (2)
+printf("%zu\n", seq(a)->len); // Print the length of the sequence. (2)
 ```
 
 ### seq_set
@@ -75,7 +86,7 @@ be useful for avoiding reallocation too frequently.
 ```C
 Seq(int) a = seq_new(int, 1); // Allocate a new sequence of 1 integer.
 seq_set_ext_lit(a, 1, 2, 5);  // Set the value at the index 1 to 2 with an ext of 5.
-printf("%zu\n", seq(a)->cap); // Check the capacity. (7; needed 2, ext 5.)
+printf("%zu\n", seq(a)->cap); // Print the capacity. (7; needed 2, ext 5.)
 ```
 
 ### seq_get
@@ -184,7 +195,7 @@ needed.
 Seq(int) a = seq_new(int, 5); // Allocate a sequence of 5 integers.
 seq_rsz(a, 10);               // Resize the sequence from 5 elements to 10.
 seq_rsz(a, 2);                // Resize the sequence from 10 elements to 2.
-printf("%zu\n", seq(s)->cap); // Print out the capacity of the sequence. (2)
+printf("%zu\n", seq(s)->cap); // Print the capacity of the sequence. (2)
 ```
 
 ### seq_rqr
@@ -236,6 +247,7 @@ Seq seq_del_(size_t siz, Seq s, circa_msg fname, circa_msg line);
 ```
 
 Deletes a sequence.
+Zero-sets all memory before doing so.
 
 ```C
 Seq(int) a = seq_new(int, 1); // Allocate a new sequence of 1 integer.
@@ -398,4 +410,103 @@ Seq(int) a = seq_lit(int, 1, 2, 3, 4, 5); // Allocate a sequence holding the val
 seq_rvs(a);                               // Reverse the sequence.
 for (size_t i = 0; i < 5; i++)
   printf("%i\n", seq_get(a, i));          // Print out each value. (5, 4, 3, 2, 1)
+```
+
+## Functional
+
+### seq_do
+
+```C
+void seq_do_iso(<type>, Seq, <function>);
+void seq_do(Seq, <function>);
+void seq_do_(<type>, Seq, <function>, circa_msg fname, circa_msg line);
+```
+
+Performs an operation for each element in a sequence.
+
+Takes a function of the form `void f(T)`.
+
+```C
+void puti(int i) { printf("%i\n", i); }    // Create a function to print an int.
+Seq(int) xs = seq_lit(int, 1, 2, 3, 4, 5); // Allocate a sequence holding the values (1, 2, 3, 4, 5).
+seq_do(xs, puti);                          // Print each value using puti. (1, 2, 3, 4, 5)
+```
+
+### seq_apply
+
+```C
+void seq_apply_iso(<type>, Seq, <function>);
+void seq_apply(Seq, <function>);
+void seq_apply_(<type>, Seq, <function>, circa_msg fname, circa_msg line);
+```
+
+Performs an operation for each element in a sequence, assigning that element to
+the result of the operation.
+
+Takes a function of the form `T f(T)`.
+
+```C
+void puti(int i) { printf("%i\n", i); }    // Create a function to print an int.
+int bytwo(int i) { return i * 2; }         // Create a function to multiply an int by two.
+Seq(int) xs = seq_lit(int, 1, 2, 3, 4, 5); // Allocate a sequence holding the values (1, 2, 3, 4, 5).
+seq_apply(xs, bytwo);                      // Multiply each value by two with bytwo.
+seq_do(xs, puti);                          // Print each value using puti. (2, 4, 6, 8, 10).
+```
+
+### seq_map
+
+```C
+void seq_map_iso(<type>, Seq dst, <function>, Seq src);
+void seq_map(Seq dst, <function>, Seq dst);
+void seq_map_(<type>, Seq dst, <function>, Seq src, circa_msg fname, circa_msg line);
+```
+
+Performs an operation for each element in `src`, then assigns that element to
+the corresponding element in `dst`.
+
+Takes a function of the form `T f(T)`.
+
+```C
+void puti(int i) { printf("%i\n", i); }   // Create a function to print an int.
+int sq(int i) { return i * i; }           // Create a function to square an int.
+Seq(int) a = seq_lit(int, 1, 2, 3, 4, 5); // Allocate a sequence holding the values (1, 2, 3, 4, 5).
+Seq(int) b = seq_new(1);                  // Allocate a sequence of 1 integer.
+seq_map(b, sq, a);                        // Square each element in a using sq and put it into b.
+seq_do(b, puti);                          // Print each value using puti. (1, 4, 9, 16, 25).
+```
+
+### seq_keepif
+
+```C
+void seq_keepif_iso(<type>, Seq, <function>);
+void seq_keepif(Seq, <function>);
+void seq_keepif_(<type>, Seq dst, <function>, Seq src, circa_msg fname, circa_msg line);
+```
+
+Performs 
+
+```
+
+```
+
+### seq_filter
+
+```C
+void seq_filter_iso(<type>, Seq dst, <function>, Seq src);
+void seq_filter(Seq dst, <function>, Seq src);
+void seq_filter_(<type>, Seq dst, <function>, Seq src, circa_msg fname, circa_msg line);
+```
+
+Performs an operation for each element in `src`. If that operation returns true,
+then that element will be pushed onto `dst`.
+
+Takes a function of the form `bool f(T)`.
+
+```C
+void puti(int i) { printf("%i\n", i); }
+bool odd(int i) { return i & 1; }
+Seq(int) a = seq_lit(int, 1, 2, 3, 4, 5);
+Seq(int) b = seq_new(1);
+seq_filter(b, odd, a);
+seq_do(b, puti);
 ```

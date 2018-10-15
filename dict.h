@@ -241,8 +241,9 @@ void *dict_get_(size_t siz, Dict d, char *a, circa_msg fname, circa_msg line) {
   size_t addr = hash % dict(d)->cap;
   /* Search for the index. */
   for (size_t i = addr; i < dict(d)->cap; i++)
-    if (!strcmp(dict(d)->buckets[i].key, a))
-      return ((char*) d) + (siz * i);
+    if (dict(d)->buckets[i].key != NULL)
+      if (!strcmp(dict(d)->buckets[i].key, a))
+        return ((char*) d) + (siz * i);
   return NULL;
 }
 
@@ -425,7 +426,6 @@ do { \
 } while(0)
 
 #define dict_foreach_iso(T, D, K, V, ...) dict_foreach_(T, D, K, V, __FILE__, _circa_str_(__LINE__), __VA_ARGS__)
-
 #define dict_foreach(D, K, V, ...) dict_foreach_iso(typeof(*D), D, K, V, __VA_ARGS__)
 
 #endif /* CIRCA_DICT_H */

@@ -716,12 +716,12 @@ do { \
 #define seq_filter_(T, A, F, B, FNAME, LINE) \
 do { \
   T V; \
-  (B) = seq_rqr_(sizeof(T), B, seq_(A, FNAME, LINE)->len, FNAME, LINE); \
-  seq_(B, FNAME, LINE)->len = 0; \
-  for(size_t I = 0; I < seq_(A, FNAME, LINE)->len; I++) { \
-    (V) = (*((T*) seq_get_(sizeof(T), A, I, FNAME, LINE))); \
+  (A) = seq_rqr_(sizeof(T), A, seq_(B, FNAME, LINE)->len, FNAME, LINE); \
+  seq_(A, FNAME, LINE)->len = 0; \
+  for(size_t I = 0; I < seq_(B, FNAME, LINE)->len; I++) { \
+    (V) = (*((T*) seq_get_(sizeof(T), B, I, FNAME, LINE))); \
     if (F(V)) { \
-      (B) = seq_push_(sizeof(T), B, &V, FNAME, LINE);\
+      (A) = seq_push_(sizeof(T), A, &V, FNAME, LINE);\
     } \
   } \
 } while (0)
@@ -732,8 +732,8 @@ do { \
 
 #define seq_reduce_(T, A, F, B) \
 do { \
-  for (size_t I = 0; I < seq_(A, FNAME, LINE)->len; I++) { \
-    B = F(B, (*((T*) seq_get_(sizeof(T), A, I, FNAME, LINE)))); \
+  for (size_t I = 0; I < seq_(B, FNAME, LINE)->len; I++) { \
+    A = F(A, (*((T*) seq_get_(sizeof(T), B, I, FNAME, LINE)))); \
   } \
 } while (0)
 

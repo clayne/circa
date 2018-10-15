@@ -105,13 +105,11 @@ _circa_ bool str_eq_(Str a, Str b, circa_msg fname, circa_msg line);
 _circa_ bool str_eq_len_(Str a, Str b, size_t start, size_t stop, circa_msg fname, circa_msg line);
 
 #define str_eq_lit(S, C) str_eq_lit_((S), (C), __FILE__, _circa_str_(__LINE__))
-_circa_ bool str_eq_lit_(Str s, const char *restrict c, circa_msg fname, circa_msg line);
+_circa_ bool str_eq_lit_(Str s, const char *restrict cs, circa_msg fname, circa_msg line);
 
+// TODO: Implement this.
 #define str_eq_lit_len(S, C, T, P) str_eq_lit_len_((S), (C), (T), (P), __FILE__, _circa_str_(__LINE__))
-_circa_ bool str_eq_lit_len_(Str s, const char *restrict c, size_t start, size_t stop, circa_msg fname, circa_msg line);
-
-#define str_hash(S) str_hash_((S), __FILE__, _circa_str_(__LINE__))
-_circa_ size_t str_hash_(Str s, circa_msg fname, circa_msg line);
+_circa_ bool str_eq_lit_len_(Str s, const char *restrict cs, size_t start, size_t stop, circa_msg fname, circa_msg line);
 
 /* Stack Operations */
 

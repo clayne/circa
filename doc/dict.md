@@ -1,5 +1,12 @@
 # Circa Docs : Dictionaries
 
+[Home](README.md)
+- Dict(T)
+- [Seq(T)](seq.md)
+- [Str](str.md)
+
+## Introduction
+
 Dictionaries (`Dict(T)`) are Circa's implementation of a hash table. Unlike most
 other speed-oriented hash table implementations, the capacities are made to be
 prime numbers-- usually this has speed disadvantages, but a lookup table is used
@@ -28,8 +35,8 @@ by more evenly distributing the buckets relative to their probe counts.
 
 ```C
 struct dict_data {
-  size_t cap;
-  size_t len;
+  size_t cap; // The capacity of the dictionary.
+  size_t len; // The length of the dictionary.
   // ...
 };
 ```
@@ -152,6 +159,7 @@ Dict dict_del_(size_t siz, Dict d, circa_msg fname, circa_msg line);
 ```
 
 Deletes a dictionary and sets the pointer to NULL.
+Zero-sets all memory before doing so.
 
 ```C
 Dict(int) d = dict_new(int, 10); // Allocate a dictionary of 10 integers.
