@@ -21,5 +21,5 @@ relevant to deciding if a given library would fit into your projects.
 
 # Links
 
-- [Documentation](doc)
+- [Documentation](doc/README.md)
 - [Example Code](ex)
