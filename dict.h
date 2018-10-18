@@ -161,8 +161,8 @@ circa_msg line) {
   struct dict_bucket *bs = NULL;
   while (bs == NULL)
     bs = calloc(1, sizeof(struct dict_bucket));
-  while (bs->key == NULL) // or this one?
-    bs->key = calloc(strlen(a) + 1, 1); // the offending line
+  while (bs->key == NULL)
+    bs->key = calloc(strlen(a) + 1, 1);
   /* Load the key/value into the swap values. */
   memcpy(bs->key, a, strlen(a) + 1);
   memcpy(ds, v, siz);
@@ -205,6 +205,7 @@ circa_msg line) {
     /* Re-hash and re-insert. */
     d = dict_rsz_(siz, d, dict(d)->cap + 1, fname, line);
     d = dict_set_(siz, d, bs->key, ds, fname, line);
+    free(bs->key);
   }
   /* Free the temporary arrays. */
   free(bs);
@@ -355,15 +356,19 @@ circa_msg line) {
   while (dd == NULL)
     dd = realloc(dict(d), sizeof(struct dict_data) + (cap * siz));
   dd->cap = cap;
+  free(dd->buckets); // TODO: realloc() instead ?
   memset(&dd->len, 0, sizeof(&dd->len) + sizeof(&dd->buckets) + (cap * siz));
   d = dd->data;
   /* Allocate the buckets. */
   while (dd->buckets == NULL)
     dd->buckets = calloc(cap, sizeof(struct dict_bucket));
   /* Load the temp arrays into the dictionary. */
-  for (i = 0; i < j; i++)
-    if (bs[i].key != NULL)
+  for (i = 0; i < j; i++) {
+    if (bs[i].key != NULL) {
       d = dict_set_(siz, d, bs[i].key, ((char*) ds) + (i * siz), fname, line);
+      free(bs[i].key);
+    }
+  }
   // TODO: resize on high load without infinite recursion ?
   /* Free the temp arrays. */
   free(ds);
@@ -393,8 +398,7 @@ Dict dict_del_(size_t siz, Dict d, circa_msg fname, circa_msg line) {
   if (d != NULL) {
     for (size_t i = 0; i < dict(d)->cap; i++) {
       char *key = dict(d)->buckets[i].key;
-      if (key != NULL)
-        free(key);
+      free(key);
     }
     free(dict(d)->buckets);
     free(dict(d));

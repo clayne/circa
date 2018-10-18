@@ -475,18 +475,28 @@ seq_map(b, sq, a);                        // Square each element in a using sq a
 seq_do(b, puti);                          // Print each value using puti. (1, 4, 9, 16, 25).
 ```
 
-### seq_keepif
+### seq_keep
+
+NOTE: This function is **not** implemented yet.
 
 ```C
-void seq_keepif_iso(<type>, Seq, <function>);
-void seq_keepif(Seq, <function>);
-void seq_keepif_(<type>, Seq dst, <function>, Seq src, circa_msg fname, circa_msg line);
+void seq_keep_iso(<type>, Seq, <function>);
+void seq_keep(Seq, <function>);
+void seq_keep_(<type>, Seq dst, <function>, Seq src, circa_msg fname, circa_msg line);
 ```
 
-Performs 
+Performs an operation for each element in `src`. If that operation returns true,
+then that element will be kept. Otherwise, it will be discarded from the
+sequence.
+
+Takes a function of the form `bool f(T)`.
 
 ```
-
+void puti(int n) { printf("%i\n", n); }   // Create a function to print an int.
+bool odd(int n) { return n & 1; }         // Create a function to test if an int is odd.
+Seq(int) a = seq_lit(int, 1, 2, 3, 4, 5); // Allocate a sequence holding the values (1, 2, 3, 4, 5).
+seq_keep(a, odd);                         // Keep only the odd elements.
+seq_do(a, puti);                          // Print each value using puti. (1, 3, 5).
 ```
 
 ### seq_filter
@@ -503,10 +513,10 @@ then that element will be pushed onto `dst`.
 Takes a function of the form `bool f(T)`.
 
 ```C
-void puti(int i) { printf("%i\n", i); }
-bool odd(int i) { return i & 1; }
-Seq(int) a = seq_lit(int, 1, 2, 3, 4, 5);
-Seq(int) b = seq_new(1);
-seq_filter(b, odd, a);
-seq_do(b, puti);
+void puti(int i) { printf("%i\n", i); }   // Create a function to print an int.
+bool odd(int i) { return i & 1; }         // Create a function to test if an int is odd.
+Seq(int) a = seq_lit(int, 1, 2, 3, 4, 5); // Allocate a sequence holding the values (1, 2, 3, 4, 5).
+Seq(int) b = seq_new(int, 1);             // Allocate a new sequence of 1 integer.
+seq_filter(b, odd, a);                    // Filter only the odd integers into the new sequence.
+seq_do(b, puti);                          // Print out each integer. (1, 3, 5)
 ```

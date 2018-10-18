@@ -148,6 +148,14 @@ _circa_ _circa_rets_ Seq seq_cat_(size_t siz, Seq dst, Seq src, circa_msg fname,
 #define seq_rvs(S) seq_rvs_iso(typeof(*S), (S))
 _circa_ _circa_rets_ Seq seq_rvs_(size_t siz, Seq s, circa_msg fname, circa_msg line);
 
+/* Insert / Remove */
+
+// TODO: put & put_lit
+_circa_ _circa_rets_ Seq seq_put_(size_t siz, Seq s, size_t addr, void *val, circa_msg fname, circa_msg line);
+
+// TODO: rm_single? rm_range? idk what to name
+_circa_ _circa_rets_ Seq seq_rm_(size_t siz, Seq s, size_t start, size_t stop, circa_msg fname, circa_msg line);
+
 /*
 ** Accessors
 */
@@ -712,6 +720,13 @@ do { \
 #define seq_map_iso(T, A, F, B) seq_map_(T, A, F, B, __FILE__, _circa_str_(__LINE__))
 
 #define seq_map(A, F, B) seq_map_iso(typeof(*A), A, F, B)
+
+#define seq_keep_(T, S, F, FNAME, LINE) \
+do { \
+  for (size_t I = 0; I < seq_(S, FNAME, LINE)->len; I++) { \
+    (S) = seq_set_(sizeof(T), (S), ) \
+  } \
+} while (0)
 
 #define seq_filter_(T, A, F, B, FNAME, LINE) \
 do { \
