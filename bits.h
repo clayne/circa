@@ -224,7 +224,7 @@ u8 u32_clz(u32 n) {
     circa_assert(n != 0, "?", "?");
   }
   #if defined(__GNUC__)
-    return (u8) __builtin_clz(n);
+    return (u8) __builtin_clzll((u64) n) - (64 - 32);
   #else
     n |= (n >> 1);
     n |= (n >> 2);
@@ -251,7 +251,7 @@ u8 u16_clz(u16 n) {
     circa_assert(n != 0, "?", "?");
   }
   #if defined(__GNUC__)
-    return (u8) __builtin_clz(n);
+    return (u8) __builtin_clzll((u64) n) - (64 - 16);
   #else
     n |= (n >> 1);
     n |= (n >> 2);
@@ -277,7 +277,7 @@ u8 u8_clz(u8 n) {
     circa_assert(n != 0, "?", "?");
   }
   #if defined(__GNUC__)
-    return (u8) __builtin_clz(n);
+    return (u8) __builtin_clzll((u64) n) - (64 - 8);
   #else
     n |= (n >> 1);
     n |= (n >> 2);
