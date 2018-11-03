@@ -1,48 +1,34 @@
-#
-# circa/Makefile | Circa's Makefile.
-# https://github.com/davidgarland/circa
-#
-
-CC=cc
-CDBG=-fsanitize=undefined -Og -DCIRCA_DBG
-CFAST=-Os -DNDEBUG
-CFLAGS=-pipe
+CC=clang
+CFLAGS=-O2 -pipe
 LDFLAGS=
 
-#
-# Env Handling
-#
-
-CFLAGS+=$(shell printenv CFLAGS)
-LDFLAGS+=$(shell printenv LDFLAGS)
-
-#
-# Variables
-#
-
-MUTE=>/dev/null 2>/dev/null 
-
-#
-# Build Options
-#
+CDEBUG=-Og -fsanitize=undefined -fno-omit-frame-pointer
+CRELEASE=-O3 -DNDEBUG
+CNATIVE=-march=native -flto
 
 default: build
 
-update:
-	git remote add -f snow https://github.com/mortie/snow
-	git fetch snow master
-	git subtree pull --prefix lib/snow snow master --squash
-
 build:
-	$(CC) -c $(CFLAGS) *.h $(LDFLAGS)
+	$(CC) -c $(CFLAGS) src/c/*.c $(LDFLAGS)
+	ar -cvq libcirca-a.a *.o
+	-@rm -rf *.o
 
-test: tests/test.c
-	$(CC) $(CFLAGS) $(CDBG) tests/test.c -Ilib/snow -DSNOW_ENABLED -g -o test.o
+debug:
+	$(CC) -c $(CFLAGS) $(CDEBUG) src/c/*.c $(LDFLAGS)
+	ar -cvq libcirca-a.a *.o
+	-@rm -rf *.o
 
-examples:
-	$(CC) $(CFLAGS) $(CFAST) ex/str/readme.c  -o readme.o $(LDFLAGS)
-	$(CC) $(CFLAGS) $(CFAST) ex/seq/odd.c     -o odd.o    $(LDFLAGS)
-	$(CC) $(CFLAGS) $(CFAST) ex/dict/fruits.c -o fruits.o $(LDFLAGS)
+release:
+	$(CC) -c $(CFLAGS) $(CRELEASE) src/c/*.c $(LDFLAGS)
+	ar -cvq libcirca-a.a *.o
+	-@rm -rf *.o
+
+native:
+	$(CC) -c $(CFLAGS) $(CNATIVE) src/c/*.c $(LDFLAGS)
+	ar -cvq libcirca-a.a *.o
+	-@rm -rf *.o
+
+test: debug
 
 clean:
-	rm -rf *.o *.gch $(MUTE)
+	-@rm -rf *.o *.out *.a *.so
