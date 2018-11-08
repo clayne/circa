@@ -1,6 +1,8 @@
 # Circa
 ## A core library set for C.
 
+## NOTE: This library is undergoing a rewrite in the devel branch, so I wouldn't reccomend using it for anything critical. Everything is subject to change.
+
 Circa is a set of libraries ranging in versions from ANSI C89 to GNU C11 that
 aim to do two things:
 - Add the generic data-structures C is missing.
