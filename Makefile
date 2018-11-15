@@ -1,4 +1,4 @@
-CC=clang
+CC=cc
 CFLAGS=-O2 -pipe
 LDFLAGS=
 
@@ -29,6 +29,9 @@ native:
 	-@rm -rf *.o
 
 test: debug
+	$(CC) $(CFLAGS) $(CDEBUG)	tests/test.c libcirca-a.a -I. -Ilib/snow -DSNOW_ENABLED -g $(LDFLAGS)
+	-@./a.out
+	-@rm -rf *.a *.out
 
 clean:
 	-@rm -rf *.o *.out *.a *.so

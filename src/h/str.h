@@ -33,7 +33,7 @@ struct str_data {
 /* Accessors */
 
 #define str(S) str_((S), CIRCA_DBGI)
-_circa_ struct str_data *str_(Str s, CIRCA_ARGS);
+struct str_data *str_(Str s, CIRCA_ARGS);
 
 #define str_set(S, A, V) (S) = str_set_((S), (A), (V), CIRCA_DBGI)
 _circa_rets_ Str str_set_(Str s, size_t a, char c, CIRCA_ARGS);
@@ -59,7 +59,7 @@ _circa_alcs_ Str str_wrap_(char *cs, size_t len, CIRCA_ARGS);
 #define str_rsz(S, C) (S) = str_rsz_((S), (C), CIRCA_DBGI)
 _circa_rets_ Str str_rsz_(Str s, size_t cap, CIRCA_ARGS);
 
-#define str_rqr(S, C) (S) = str_rqr((S), (C), CIRCA_DBGI)
+#define str_rqr(S, C) (S) = str_rqr_((S), (C), CIRCA_DBGI)
 _circa_rets_ Str str_rqr_(Str s, size_t cap, CIRCA_ARGS);
 
 #define str_shr(S) (S) = str_shr_((S), CIRCA_DBGI)

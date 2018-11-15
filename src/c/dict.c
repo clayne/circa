@@ -42,7 +42,8 @@ Dict dict_set_(size_t siz, Dict d, char *a, void *v, CIRCA_ARGS) {
   struct dict_bucket *swp = NULL;
   while (swp == NULL)
     swp = calloc(2, bsiz);
-  swp->key = calloc(strlen(a), 1);
+  while (swp->key == NULL)
+    swp->key = calloc(strlen(a) + 1, 1);
   memcpy(swp->key, a, strlen(a) + 1);
   memcpy(swp->data, v, siz);
   // Find the hash address.
@@ -68,6 +69,17 @@ Dict dict_set_(size_t siz, Dict d, char *a, void *v, CIRCA_ARGS) {
     swp->probe++;
   }
   dict(d)->len++;
+  if (i < dict(d)->cap) {
+    // A position was found, so fill it in.
+    if (b->key == NULL)
+      b->key = swp->key;
+    memcpy(b->data, v, siz);
+  } else {
+    // No position was found, so retry.
+    d = dict_rqr_(siz, d, dict(d)->cap + 1, fname, line);
+    d = dict_set_(siz, d, swp->key, swp->data, fname, line);
+    free(swp->key);
+  }
   // Exit.
   free(swp);
   return d;
@@ -80,6 +92,16 @@ void *dict_get_(size_t siz, Dict d, char *a, CIRCA_ARGS) {
     circa_assert(siz > 0, fname, line);
     circa_assert(d != NULL, fname, line);
     circa_assert(a != NULL, fname, line);
+  }
+  // Find the hash address.
+  const size_t hash = dict_xxh(a);
+  const size_t addr = hash % dict(d)->cap;
+  // Seek the proper destination bucket.
+  struct dict_bucket *b = NULL;
+  for (size_t i = addr; i < dict(d)->cap; i++) {
+    b = dict_rawget(siz, d, i);
+    if (b->key == NULL) return NULL;
+    if (!strcmp(b->key, a)) return b->data;
   }
   return NULL;
 }
@@ -181,6 +203,21 @@ Dict dict_shr_(size_t siz, Dict d, CIRCA_ARGS) {
   }
   register const size_t len = dict(d)->len;
   return (dict(d)->cap > len) ? dict_rsz_(siz, d, len, fname, line) : d;
+}
+
+/* Deletes a dictionary. */
+
+_circa_rets_
+Dict dict_del_(size_t siz, Dict d, CIRCA_ARGS) {
+  {
+    circa_assert(siz > 0, fname, line);
+  }
+  if (d != NULL) {
+    for (size_t i = 0; i < dict(d)->cap; i++)
+      free(dict_rawget(siz, d, i)->key);
+    free(dict(d));
+  }
+  return NULL;
 }
 
 /*

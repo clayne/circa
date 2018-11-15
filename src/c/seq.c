@@ -103,7 +103,6 @@ Seq seq_rqr_(size_t siz, Seq s, size_t cap, size_t ext, CIRCA_ARGS) {
 Seq seq_del_(size_t siz, Seq s, CIRCA_ARGS) {
   {
     circa_assert(siz > 0, fname, line);
-    circa_assert(s != NULL, fname, line);
   }
   if (s != NULL) {
     memset(seq(s), 0, sizeof(*seq(s)) + seq(s)->cap * siz);
@@ -123,7 +122,7 @@ Seq seq_push_(size_t siz, Seq s, void *v, size_t ext, CIRCA_ARGS) {
     circa_assert(s != NULL, fname, line);
     circa_assert(v != NULL, fname, line);
   }
-
+  return seq_set_(siz, s, seq(s)->len, v, ext, fname, line);
 }
 
 void *seq_pop_(size_t siz, Seq s, size_t n, CIRCA_ARGS) {
@@ -132,7 +131,7 @@ void *seq_pop_(size_t siz, Seq s, size_t n, CIRCA_ARGS) {
     circa_assert(s != NULL, fname, line);
     circa_assert(seq(s)->len > 0, fname, line);
   }
-
+  return seq_get_(siz, s, seq(s)->len - 1, fname, line);
 }
 
 /*
