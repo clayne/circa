@@ -9,7 +9,6 @@
 ** Accessors
 */
 
-_circa_
 struct str_data *str_(Str s, CIRCA_ARGS) {
   {
     circa_assert(s != NULL, fname, line);
@@ -17,7 +16,7 @@ struct str_data *str_(Str s, CIRCA_ARGS) {
   return ((struct str_data*) s) - 1;
 }
 
-_circa_ _circa_rets_
+_circa_rets_
 Str str_set_(Str s, size_t a, char c, CIRCA_ARGS) {
   {
     circa_assert(s != NULL, fname, line);
@@ -31,7 +30,6 @@ Str str_set_(Str s, size_t a, char c, CIRCA_ARGS) {
   return s;
 }
 
-_circa_
 char str_get_(Str s, size_t a, CIRCA_ARGS) {
   {
     circa_assert(s != NULL, fname, line);
@@ -44,7 +42,7 @@ char str_get_(Str s, size_t a, CIRCA_ARGS) {
 ** Allocators
 */
 
-_circa_ _circa_alcs_
+_circa_alcs_
 Str str_new_(size_t cap, CIRCA_ARGS) {
   {
     circa_assert(cap > 0, fname, line);
@@ -56,7 +54,7 @@ Str str_new_(size_t cap, CIRCA_ARGS) {
   return s->data;
 }
 
-_circa_ _circa_alcs_
+_circa_alcs_
 Str str_lit_(const char *const restrict cs, CIRCA_ARGS) {
   {
     circa_assert(cs != NULL, fname, line);
@@ -67,7 +65,7 @@ Str str_lit_(const char *const restrict cs, CIRCA_ARGS) {
   return s;
 }
 
-_circa_ _circa_alcs_
+_circa_alcs_
 Str str_from_(Str s, CIRCA_ARGS) {
   {
     circa_assert(s != NULL, fname, line);
@@ -78,7 +76,7 @@ Str str_from_(Str s, CIRCA_ARGS) {
   return s2;
 }
 
-_circa_ _circa_alcs_
+_circa_alcs_
 Str str_wrap_(char *cs, size_t len, CIRCA_ARGS) {
   {
     circa_assert(cs != NULL, fname, line);
@@ -88,7 +86,7 @@ Str str_wrap_(char *cs, size_t len, CIRCA_ARGS) {
   return s;
 }
 
-_circa_ _circa_rets_
+_circa_rets_
 Str str_rsz_(Str s, size_t cap, CIRCA_ARGS) {
   {
     circa_assert(s != NULL, fname, line);
@@ -106,7 +104,7 @@ Str str_rsz_(Str s, size_t cap, CIRCA_ARGS) {
   return sp2->data;
 }
 
-_circa_ _circa_rets_
+_circa_rets_
 Str str_rqr_(Str s, size_t cap, CIRCA_ARGS) {
   {
     circa_assert(s != NULL, fname, line);
@@ -115,7 +113,7 @@ Str str_rqr_(Str s, size_t cap, CIRCA_ARGS) {
   return (cap > str(s)->cap) ? str_rsz_(s, cap, fname, line) : s;
 }
 
-_circa_ _circa_rets_
+_circa_rets_
 Str str_shr_(Str s, CIRCA_ARGS) {
   {
     circa_assert(s != NULL, fname, line);
@@ -123,7 +121,7 @@ Str str_shr_(Str s, CIRCA_ARGS) {
   return str_rsz_(s, str(s)->len + 1, fname, line);
 }
 
-_circa_ _circa_rets_
+_circa_rets_
 Str str_del_(Str s, CIRCA_ARGS) {
   if (s) {
     memset(str(s), 0, sizeof(*str(s)) + str(s)->cap);

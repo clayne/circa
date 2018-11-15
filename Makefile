@@ -29,7 +29,7 @@ native:
 	-@rm -rf *.o
 
 test: debug
-	$(CC) $(CFLAGS) $(CDEBUG)	tests/test.c libcirca-a.a -I. -Ilib/snow -DSNOW_ENABLED -g $(LDFLAGS)
+	$(CC) $(CFLAGS) $(CDEBUG) tests/test.c -I. -Ilib/snow -DSNOW_ENABLED -g -L. -lcirca-a $(LDFLAGS)
 	-@./a.out
 	-@rm -rf *.a *.out
 
