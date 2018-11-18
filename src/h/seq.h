@@ -55,6 +55,8 @@ void *seq_get_(size_t siz, Seq s, size_t a, CIRCA_ARGS);
 #define seq_new(T, C) seq_new_iso(T, C)
 _circa_alcs_ Seq seq_new_(size_t siz, size_t cap, CIRCA_ARGS);
 
+#define seq_from_iso(T, S) seq_wrap_(sizeof(T), seq(S)->len, (S), CIRCA_DBGI)
+#define seq_from(S) seq_from_iso(typeof(*S), S)
 #define seq_wrap_iso(T, L, P) seq_wrap_(sizeof(T), (L), (P), CIRCA_DBGI)
 #define seq_wrap(L, P) seq_wrap_iso(typeof(*P), L, P)
 #define seq_lit_iso(T, ...) seq_wrap_iso(T, sizeof((T[]){__VA_ARGS__}) / sizeof(T), &(T[]){__VA_ARGS__})

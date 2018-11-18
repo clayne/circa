@@ -9,6 +9,8 @@
 ** Accessors
 */
 
+/* Accesses the underlying structure of a sequence. */
+
 struct seq_data *seq_(Seq s, CIRCA_ARGS) {
   {
     circa_assert(s != NULL, fname, line);
@@ -16,6 +18,9 @@ struct seq_data *seq_(Seq s, CIRCA_ARGS) {
   return ((struct seq_data*) s) - 1;
 }
 
+/* Sets the value at an index from a sequence. */
+
+_circa_rets_
 Seq seq_set_(size_t siz, Seq s, size_t a, void *v, size_t ext, CIRCA_ARGS) {
   {
     circa_assert(siz > 0, fname, line);
@@ -27,6 +32,8 @@ Seq seq_set_(size_t siz, Seq s, size_t a, void *v, size_t ext, CIRCA_ARGS) {
   memcpy(((char*) s) + (siz * a), v, siz);
   return s;
 }
+
+/* Gets the value at an index from a sequence. */
 
 void *seq_get_(size_t siz, Seq s, size_t a, CIRCA_ARGS) {
   {
@@ -41,6 +48,9 @@ void *seq_get_(size_t siz, Seq s, size_t a, CIRCA_ARGS) {
 ** Allocators
 */
 
+/* Allocate a new sequence. */
+
+_circa_alcs_
 Seq seq_new_(size_t siz, size_t cap, CIRCA_ARGS) {
   {
     circa_assert(siz > 0, fname, line);
@@ -52,6 +62,8 @@ Seq seq_new_(size_t siz, size_t cap, CIRCA_ARGS) {
   dp->cap = cap;
   return dp->data;
 }
+
+/* Resizes a sequence. */
 
 Seq seq_rsz_(size_t siz, Seq s, size_t cap, CIRCA_ARGS) {
   {
@@ -71,6 +83,8 @@ Seq seq_rsz_(size_t siz, Seq s, size_t cap, CIRCA_ARGS) {
   return dp->data;
 }
 
+/* Creates a sequence from a normal array. */
+
 Seq seq_wrap_(size_t siz, size_t len, void *v, CIRCA_ARGS) {
   {
     circa_assert(siz > 0, fname, line);
@@ -83,15 +97,9 @@ Seq seq_wrap_(size_t siz, size_t len, void *v, CIRCA_ARGS) {
   return s;
 }
 
-Seq seq_from_(size_t siz, Seq s, CIRCA_ARGS) {
-  {
-    circa_assert(siz > 0, fname, line);
-    circa_assert(s != NULL, fname, line);
-    circa_assert(seq(s)->len > 0, fname, line);
-  }
-  return seq_wrap_(siz, seq(s)->len, s, fname, line);
-}
+/* Requires that a sequence be able to hold a given capacity. */
 
+_circa_rets_
 Seq seq_rqr_(size_t siz, Seq s, size_t cap, size_t ext, CIRCA_ARGS) {
   {
     circa_assert(siz > 0, fname, line);
@@ -99,6 +107,23 @@ Seq seq_rqr_(size_t siz, Seq s, size_t cap, size_t ext, CIRCA_ARGS) {
   }
   return (seq(s)->cap < cap) ? seq_rsz_(siz, s, cap + ext, fname, line) : s;
 }
+
+/* Shrinks a sequence as much as possible. */
+
+_circa_rets_
+Seq seq_shr_(size_t siz, Seq s, CIRCA_ARGS) {
+  {
+    circa_assert(siz > 0, fname, line);
+    circa_assert(s != NULL, fname, line);
+  }
+  const size_t len = seq(s)->len;
+  if (seq(s)->cap > len)
+    return seq_rsz_(siz, s, len, fname, line);
+  else
+    return s;
+}
+
+/* Deletes a sequence. */
 
 Seq seq_del_(size_t siz, Seq s, CIRCA_ARGS) {
   {
@@ -115,6 +140,8 @@ Seq seq_del_(size_t siz, Seq s, CIRCA_ARGS) {
 ** Stack Ops
 */
 
+/* Pushes a value onto a sequence. */
+
 _circa_rets_
 Seq seq_push_(size_t siz, Seq s, void *v, size_t ext, CIRCA_ARGS) {
   {
@@ -124,6 +151,8 @@ Seq seq_push_(size_t siz, Seq s, void *v, size_t ext, CIRCA_ARGS) {
   }
   return seq_set_(siz, s, seq(s)->len, v, ext, fname, line);
 }
+
+/* Pops a value off of a sequence. */
 
 void *seq_pop_(size_t siz, Seq s, size_t n, CIRCA_ARGS) {
   {
@@ -137,6 +166,8 @@ void *seq_pop_(size_t siz, Seq s, size_t n, CIRCA_ARGS) {
 /*
 ** Sequence Ops
 */
+
+/* Copies one sequence into another. */
 
 _circa_rets_
 Seq seq_cpy_(size_t siz, Seq dst, Seq src, size_t ext, CIRCA_ARGS) {
@@ -154,6 +185,8 @@ Seq seq_cpy_(size_t siz, Seq dst, Seq src, size_t ext, CIRCA_ARGS) {
   return dst;
 }
 
+/* Catenates one sequence onto another. */
+
 _circa_rets_
 Seq seq_cat_(size_t siz, Seq dst, Seq src, size_t ext, CIRCA_ARGS) {
   {
@@ -170,6 +203,8 @@ Seq seq_cat_(size_t siz, Seq dst, Seq src, size_t ext, CIRCA_ARGS) {
   seq(dst)->len = tot_len;
   return dst;
 }
+
+/* Reverses a sequence. */
 
 _circa_rets_
 Seq seq_rvs_(size_t siz, Seq s, CIRCA_ARGS) {

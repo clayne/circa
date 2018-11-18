@@ -37,6 +37,7 @@ Dict dict_set_(size_t siz, Dict d, char *a, void *v, CIRCA_ARGS) {
     circa_assert(a != NULL, fname, line);
     circa_assert(v != NULL, fname, line);
   }
+  // TODO: Automatically dict_rqr if load factor gets too high.
   // Allocate a swap bucket and load the key/value into it.
   const size_t bsiz = buck_siz(siz);
   struct dict_bucket *swp = NULL;

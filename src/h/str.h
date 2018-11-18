@@ -49,9 +49,7 @@ _circa_alcs_ Str str_new_(size_t cap, CIRCA_ARGS);
 #define str_lit(CS) str_lit_((CS), CIRCA_DBGI)
 _circa_alcs_ Str str_lit_(const char *const restrict cs, CIRCA_ARGS);
 
-#define str_from(S) str_from_((S), CIRCA_DBGI)
-_circa_alcs_ Str str_from_(Str s, CIRCA_ARGS);
-
+#define str_from(S) str_wrap_((S), str(S)->len, CIRCA_DBGI)
 #define str_wrap(CS) str_wrap_((CS), (strlen(CS)), CIRCA_DBGI)
 #define str_wrap_len(CS, L) str_wrap_((CS), (L), CIRCA_DBGI)
 _circa_alcs_ Str str_wrap_(char *cs, size_t len, CIRCA_ARGS);
@@ -83,5 +81,7 @@ _circa_rets_ Str str_push_(Str s, char c, CIRCA_ARGS);
 char str_pop_(Str s, size_t n, CIRCA_ARGS);
 
 /* String Ops */
+
+
 
 #endif /* CIRCA_STR_H */

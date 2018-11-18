@@ -9,12 +9,16 @@
 ** Accessors
 */
 
+/* Access the underlying structure of a string. */
+
 struct str_data *str_(Str s, CIRCA_ARGS) {
   {
     circa_assert(s != NULL, fname, line);
   }
   return ((struct str_data*) s) - 1;
 }
+
+/* Set the value at an index from a string. */
 
 _circa_rets_
 Str str_set_(Str s, size_t a, char c, CIRCA_ARGS) {
@@ -30,6 +34,8 @@ Str str_set_(Str s, size_t a, char c, CIRCA_ARGS) {
   return s;
 }
 
+/* Get the value at an index from a string. */
+
 char str_get_(Str s, size_t a, CIRCA_ARGS) {
   {
     circa_assert(s != NULL, fname, line);
@@ -41,6 +47,8 @@ char str_get_(Str s, size_t a, CIRCA_ARGS) {
 /*
 ** Allocators
 */
+
+/* Allocates a new string. */
 
 _circa_alcs_
 Str str_new_(size_t cap, CIRCA_ARGS) {
@@ -54,6 +62,8 @@ Str str_new_(size_t cap, CIRCA_ARGS) {
   return s->data;
 }
 
+/* Allocates a new string holding a C string literal. */
+
 _circa_alcs_
 Str str_lit_(const char *const restrict cs, CIRCA_ARGS) {
   {
@@ -65,16 +75,7 @@ Str str_lit_(const char *const restrict cs, CIRCA_ARGS) {
   return s;
 }
 
-_circa_alcs_
-Str str_from_(Str s, CIRCA_ARGS) {
-  {
-    circa_assert(s != NULL, fname, line);
-  }
-  register const size_t len = str(s)->len;
-  Str s2 = str_new(len + 1);
-  memcpy(s, s2, len + 1);
-  return s2;
-}
+/* Creates a string from a normal array. */
 
 _circa_alcs_
 Str str_wrap_(char *cs, size_t len, CIRCA_ARGS) {
@@ -85,6 +86,8 @@ Str str_wrap_(char *cs, size_t len, CIRCA_ARGS) {
   memcpy(s, cs, len + 1);
   return s;
 }
+
+/* Resizes a string. */
 
 _circa_rets_
 Str str_rsz_(Str s, size_t cap, CIRCA_ARGS) {
@@ -104,6 +107,8 @@ Str str_rsz_(Str s, size_t cap, CIRCA_ARGS) {
   return sp2->data;
 }
 
+/* Requires that a string be able to hold a given capacity. */
+
 _circa_rets_
 Str str_rqr_(Str s, size_t cap, CIRCA_ARGS) {
   {
@@ -113,6 +118,8 @@ Str str_rqr_(Str s, size_t cap, CIRCA_ARGS) {
   return (cap > str(s)->cap) ? str_rsz_(s, cap, fname, line) : s;
 }
 
+/* Shrinks a string as much as possible. */
+
 _circa_rets_
 Str str_shr_(Str s, CIRCA_ARGS) {
   {
@@ -120,6 +127,8 @@ Str str_shr_(Str s, CIRCA_ARGS) {
   }
   return str_rsz_(s, str(s)->len + 1, fname, line);
 }
+
+/* Deletes a string. */
 
 _circa_rets_
 Str str_del_(Str s, CIRCA_ARGS) {
@@ -134,6 +143,8 @@ Str str_del_(Str s, CIRCA_ARGS) {
 ** Stack Ops
 */
 
+/* Pushes a value on top of a string. */
+
 _circa_rets_
 Str str_push_(Str s, char c, CIRCA_ARGS) {
   {
@@ -142,6 +153,8 @@ Str str_push_(Str s, char c, CIRCA_ARGS) {
   s = str_set_(s, str(s)->len, c, fname, line);
   return s;
 }
+
+/* Pops a value off of a string. */
 
 char str_pop_(Str s, size_t n, CIRCA_ARGS) {
   {
@@ -156,3 +169,5 @@ char str_pop_(Str s, size_t n, CIRCA_ARGS) {
 /*
 ** String Ops 
 */
+
+// TODO
