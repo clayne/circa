@@ -38,7 +38,7 @@ Dict dict_set_(size_t siz, Dict d, char *a, void *v, CIRCA_ARGS) {
     circa_assert(v != NULL, fname, line);
   }
   // TODO: Automatically dict_rqr if load factor gets too high.
-  // Allocate a swap bucket and load the key/value into it.
+  circa_info("Allocate a swap bucket and load the key/value into it.");
   const size_t bsiz = buck_siz(siz);
   struct dict_bucket *swp = NULL;
   while (swp == NULL)
@@ -47,22 +47,25 @@ Dict dict_set_(size_t siz, Dict d, char *a, void *v, CIRCA_ARGS) {
     swp->key = calloc(strlen(a) + 1, 1);
   memcpy(swp->key, a, strlen(a) + 1);
   memcpy(swp->data, v, siz);
-  // Find the hash address.
+  circa_info("Find the hash address.");
   const size_t hash = dict_xxh(a);
   const size_t addr = hash % dict(d)->cap;
-  // Seek the proper destination bucket.
+  circa_info("Seek the proper destination bucket.");
   struct dict_bucket *b = NULL;
   size_t i;
   for (i = addr; i < dict(d)->cap; i++) {
     b = dict_rawget(siz, d, i);
     if (b->key == NULL) {
-      break; // Free bucket found.
+      circa_info("A free bucket was found.");
+      break;
     }
     if (!strcmp(b->key, swp->key)) {
+      circa_info("A match was found.");
       dict(d)->len--;
-      break; // Match found.
+      break;
     }
     if (b->probe < swp->probe) {
+      circa_info("Swapping buckets...");
       memcpy(swp + 1, swp, bsiz);
       memcpy(swp, b, bsiz);
       memcpy(b, swp + 1, bsiz);
@@ -71,17 +74,16 @@ Dict dict_set_(size_t siz, Dict d, char *a, void *v, CIRCA_ARGS) {
   }
   dict(d)->len++;
   if (i < dict(d)->cap) {
-    // A position was found, so fill it in.
-    if (b->key == NULL)
-      b->key = swp->key;
-    memcpy(b->data, v, siz);
+    circa_info("Filling in the final found position.");
+    memcpy(b, swp, bsiz);
   } else {
-    // No position was found, so retry.
+    puts("db");
+    circa_info("No position was found; resizing the dictionary.");
     d = dict_rqr_(siz, d, dict(d)->cap + 1, fname, line);
+    circa_info("Retrying insertion of swap bucket.");
     d = dict_set_(siz, d, swp->key, swp->data, fname, line);
     free(swp->key);
   }
-  // Exit.
   free(swp);
   return d;
 }
@@ -97,13 +99,20 @@ void *dict_get_(size_t siz, Dict d, char *a, CIRCA_ARGS) {
   // Find the hash address.
   const size_t hash = dict_xxh(a);
   const size_t addr = hash % dict(d)->cap;
-  // Seek the proper destination bucket.
+  circa_info("Seeking the proper destination bucket.");
   struct dict_bucket *b = NULL;
   for (size_t i = addr; i < dict(d)->cap; i++) {
     b = dict_rawget(siz, d, i);
-    if (b->key == NULL) return NULL;
-    if (!strcmp(b->key, a)) return b->data;
+    if (b->key == NULL) {
+      circa_info("No bucket found, returning NULL.");
+      return NULL;
+    }
+    circa_info("Bucket found, returning.");
+    if (!strcmp(b->key, a)) {
+      return b->data;
+    }
   }
+  circa_info("No bucket found after full search, returning NULL.");
   return NULL;
 }
 

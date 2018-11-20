@@ -103,9 +103,15 @@ typedef const char *const restrict CircaDbg;
 #define CIRCA_STR(X) CIRCA_STR_(X)
 #define CIRCA_DBGI __FILE__, CIRCA_STR(__LINE__)
 
+#define circa_msg_(MSG, FNAME, LINE, FUNC) circa_dbg({ \
+  printf("[%s:%s:%s] %s", FNAME, FUNC, LINE, MSG); \
+})
+#define circa_msg(MSG, FNAME, LINE) circa_msg_(MSG, FNAME, LINE, __func__)
+
 #define circa_error_(MSG, FNAME, LINE, FUNC) circa_dbg({    \
   printf("Error in file '%s', on line %s:\n", FNAME, LINE); \
-  printf("  By function '%s': '%s'\n", FUNC, MSG);          \
+  printf("By function '%s': '%s'\n", FUNC, MSG);            \
+  exit(1);                                                  \
 })
 #define circa_error(MSG, FNAME, LINE) circa_error_(MSG, FNAME, LINE, __func__)
 
@@ -115,5 +121,7 @@ typedef const char *const restrict CircaDbg;
   }                                                                     \
 })
 #define circa_assert(COND, FNAME, LINE) circa_assert_(COND, #COND, FNAME, LINE, __func__)
+
+#define circa_info(M) circa_msg(M, __FILE__, __LINE__)
 
 #endif /* CIRCA_CORE_H */

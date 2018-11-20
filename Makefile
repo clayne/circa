@@ -31,7 +31,7 @@ native:
 test: debug
 	$(CC) $(CFLAGS) $(CDEBUG) tests/test.c -I. -Ilib/snow -DSNOW_ENABLED -g -L. -lcirca-a $(LDFLAGS)
 	-@./a.out
-	-@rm -rf *.a *.out
+	#-@rm -rf *.a *.out
 
 clean:
 	-@rm -rf *.o *.out *.a *.so

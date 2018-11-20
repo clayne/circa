@@ -47,9 +47,9 @@ struct dict_data {
 #define dict(D) dict_((D), CIRCA_DBGI)
 struct dict_data *dict_(Dict d, CIRCA_ARGS);
 
-#define dict_set_lit_iso(T, D, A, V) (D) = dict_set_(sizeof(T), (D), (A), &(V), CIRCA_DBGI)
+#define dict_set_lit_iso(T, D, A, V) (D) = dict_set_(sizeof(T), (D), (A), &(T){V}, CIRCA_DBGI)
 #define dict_set_lit(D, A, V) dict_set_lit_iso(typeof(*D), D, A, V)
-#define dict_set_iso(T, D, A, V) (D) = dict_set_(sizeof(T), (D), (A), &(T){V}, CIRCA_DBGI)
+#define dict_set_iso(T, D, A, V) (D) = dict_set_(sizeof(T), (D), (A), &(V), CIRCA_DBGI)
 #define dict_set(D, A, V) dict_set_iso(typeof(*D), D, A, V)
 _circa_rets_ Dict dict_set_(size_t siz, Dict d, char *a, void *v, CIRCA_ARGS);
 

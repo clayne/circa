@@ -77,8 +77,9 @@ Seq seq_rsz_(size_t siz, Seq s, size_t cap, CIRCA_ARGS) {
   struct seq_data *restrict dp = NULL;
   while (dp == NULL)
     dp = realloc(seq(s), sizeof(*dp) + (cap * siz));
-  if (cap > dp->cap)
-    memset(((char*) s) + ((dp->cap - 1) * siz), 0, (cap - dp->cap - 1) * siz);
+  // TODO: Debug this.
+  //if (cap > dp->cap)
+  //  memset(((char*) s) + dp->cap * siz, 0, (cap - dp->cap) * siz);
   dp->cap = cap;
   return dp->data;
 }

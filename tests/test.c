@@ -130,6 +130,31 @@ describe(Dict) {
       assert(d == NULL, "The dictionary should be null after second deletion.");
     }
   }
+
+  subdesc(Accessors) {
+    it("dict_set") {
+      d = dict_new(int, 1);
+      puts("1");
+      dict_set_lit(d, "oranges", 5);
+      assert(dict(d)->len == 1);
+      puts("2");
+      dict_set_lit(d, "apples", 2);
+      assert(dict(d)->len == 2);
+      puts("3");
+      dict_set_lit(d, "peaches", 8);
+      assert(dict(d)->len == 3);
+      puts("4");
+      dict_set_lit(d, "mangos", 10);
+      assert(dict(d)->len == 4);
+      puts("5");
+      dict_set_lit(d, "bananas", 12);
+      assert(dict(d)->len == 5);
+    }
+
+    it("dict_get") {
+
+    }
+  }
 }
 
 snow_main();

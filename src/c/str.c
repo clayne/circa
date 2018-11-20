@@ -101,8 +101,9 @@ Str str_rsz_(Str s, size_t cap, CIRCA_ARGS) {
     memset(s + cap, 0, sp->cap - cap);
   while (sp2 == NULL)
     sp2 = realloc(sp, sizeof(*sp) + cap);
-  if (cap > sp->cap) // Zero-initialize any new memory.
-    memset(sp2->data + sp->cap, 0, cap - sp->cap);
+  // TODO: Debug this.
+  //if (cap > sp->cap) // Zero-initialize any new memory.
+  //  memset(sp2->data + sp->cap, 0, cap - sp->cap);
   sp2->cap = cap;
   return sp2->data;
 }
