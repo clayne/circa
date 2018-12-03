@@ -5,6 +5,11 @@
 
 #include "../h/str.h"
 
+#ifdef __clang__
+  #pragma clang diagnostic push
+  #pragma clang diagnostic ignored "-Wcast-align"
+#endif
+
 /*
 ** Accessors
 */
@@ -133,7 +138,7 @@ Str str_shr_(Str s, CIRCA_ARGS) {
 
 _circa_rets_
 Str str_del_(Str s, CIRCA_ARGS) {
-  if (s) {
+  if (s != NULL) {
     memset(str(s), 0, sizeof(*str(s)) + str(s)->cap);
     free(str(s));
   }
@@ -172,3 +177,7 @@ char str_pop_(Str s, size_t n, CIRCA_ARGS) {
 */
 
 // TODO
+
+#ifdef __clang__
+  #pragma clang diagnostic pop /* -Wcast-align */
+#endif

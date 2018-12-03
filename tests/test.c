@@ -4,6 +4,18 @@
 */
 
 #include <circa.h>
+
+#ifdef __clang__
+  #pragma clang diagnostic push
+  #pragma clang diagnostic ignored "-Wused-but-marked-unused"
+  #pragma clang diagnostic push
+  #pragma clang diagnostic ignored "-Wbad-function-cast"
+  #pragma clang diagnostic push
+  #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+  #pragma clang diagnostic push
+  #pragma clang diagnostic ignored "-Wstrict-prototypes"
+#endif
+
 #include <snow/snow.h>
 
 Str st;
@@ -90,6 +102,7 @@ describe(Seq) {
   }
 }
 
+/*
 Dict(int) d;
 
 describe(Dict) {
@@ -134,27 +147,33 @@ describe(Dict) {
   subdesc(Accessors) {
     it("dict_set") {
       d = dict_new(int, 1);
-      puts("1");
       dict_set_lit(d, "oranges", 5);
       assert(dict(d)->len == 1);
-      puts("2");
       dict_set_lit(d, "apples", 2);
       assert(dict(d)->len == 2);
-      puts("3");
       dict_set_lit(d, "peaches", 8);
       assert(dict(d)->len == 3);
-      puts("4");
       dict_set_lit(d, "mangos", 10);
       assert(dict(d)->len == 4);
-      puts("5");
       dict_set_lit(d, "bananas", 12);
       assert(dict(d)->len == 5);
     }
 
     it("dict_get") {
+      assert(dict_get(d, "oranges") == 5);
+      assert(dict_get(d, "apples") == 2);
+      assert(dict_get(d, "peaches") == 8);
+      assert(dict_get(d, "mangos") == 10);
+      assert(dict_get(d, "bananas") == 12);
+    }
+  }
 
+  subdesc(Cleanup) {
+    it("dict_del") {
+      dict_del(d);
     }
   }
 }
+*/
 
 snow_main();

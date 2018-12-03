@@ -12,8 +12,20 @@
 
 /* Vendored */
 
-#define XXH_INLINE_ALL
-#include "../../lib/xxHash/xxhash.h"
+#ifdef __clang__
+  #pragma clang diagnostic push
+  #pragma clang diagnostic ignored "-Wbad-function-cast"
+  #pragma clang diagnostic push
+  #pragma clang diagnostic ignored "-Wpadded"
+#endif
+
+  #define XXH_INLINE_ALL
+  #include "../../lib/xxHash/xxhash.h"
+
+#ifdef __clang__
+  #pragma clang diagnostic pop /* -Wpadded            */
+  #pragma clang diagnostic pop /* -Wbad-function-cast */
+#endif
 
 /* Internal */
 
@@ -28,14 +40,13 @@
 typedef Dict(void) Dict;
 
 struct dict_bucket {
-  char *key;
+  void *data; // TODO: how does one pack data
   size_t probe;
-  char data[];
 };
 
 struct dict_data {
   size_t cap, len;
-  char data[];
+  struct dict_bucket bucket[];
 };
 
 /*

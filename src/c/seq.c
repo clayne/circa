@@ -48,7 +48,7 @@ void *seq_get_(size_t siz, Seq s, size_t a, CIRCA_ARGS) {
 ** Allocators
 */
 
-/* Allocate a new sequence. */
+/* Allocates a new sequence. */
 
 _circa_alcs_
 Seq seq_new_(size_t siz, size_t cap, CIRCA_ARGS) {
@@ -118,10 +118,7 @@ Seq seq_shr_(size_t siz, Seq s, CIRCA_ARGS) {
     circa_assert(s != NULL, fname, line);
   }
   const size_t len = seq(s)->len;
-  if (seq(s)->cap > len)
-    return seq_rsz_(siz, s, len, fname, line);
-  else
-    return s;
+  return (seq(s)->cap < len) ? seq_rsz_(siz, s, len, fname, line) : s;
 }
 
 /* Deletes a sequence. */

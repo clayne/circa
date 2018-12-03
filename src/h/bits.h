@@ -101,6 +101,14 @@ _circa_static_ _circa_pure_ uint64_t u32_primegt(uint32_t n);
 _circa_static_ _circa_pure_ uint64_t u64_primegt(uint64_t n);
 _circa_static_ _circa_pure_ size_t   usz_primegt(size_t   n);
 
+/* Generic Round */
+
+_circa_static_ _circa_pure_ uint16_t  u8_round(uint8_t  n, uint8_t  m);
+_circa_static_ _circa_pure_ uint32_t u16_round(uint16_t n, uint16_t m);
+_circa_static_ _circa_pure_ uint64_t u32_round(uint32_t n, uint32_t m);
+_circa_static_ _circa_pure_ uint64_t u64_round(uint64_t n, uint64_t m);
+_circa_static_ _circa_pure_ size_t   usz_round(size_t   n, size_t   m);
+
 /*
 ** Binary Popcount
 */
@@ -425,6 +433,35 @@ uint64_t u64_primegt(uint64_t n) {
 _circa_static_ _circa_pure_
 size_t usz_primegt(size_t n) {
   return (sizeof(size_t) == 8) ? u64_primegt(n) : u32_primegt(n);
+}
+
+/*
+** Generic Round
+*/
+
+_circa_static_ _circa_pure_
+uint16_t u8_round(uint8_t n, uint8_t m) {
+  return ((n + m - 1) / m) * m;
+}
+
+_circa_static_ _circa_pure_
+uint32_t u16_round(uint16_t n, uint16_t m) {
+  return ((n + m - 1) / m) * m;
+}
+
+_circa_static_ _circa_pure_
+uint64_t u32_round(uint32_t n, uint32_t m) {
+  return ((n + m - 1) / m) * m;
+}
+
+_circa_static_ _circa_pure_
+uint64_t u64_round(uint64_t n, uint64_t m) {
+  return ((n + m - 1) / m) * m;
+}
+
+_circa_static_ _circa_pure_
+size_t usz_round(size_t n, size_t m) {
+  return (sizeof(size_t) == 8) ? u64_round(n, m) : u32_round(n, m);
 }
 
 #endif /* CIRCA_BITS_H */
