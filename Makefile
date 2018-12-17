@@ -9,8 +9,8 @@ build:
 	rm *.o
 
 ex: build
-	$(CC) $(CFLAGS) $(WFLAGS) -o odd.o  ex/seq/oddsq.c -lcirca $(LDFLAGS)
-	$(CC) $(CFLAGS) $(WFLAGS) -o self.o ex/txt/self.c  -lcirca $(LDFLAGS)
+	$(CC) $(CFLAGS) $(WFLAGS) -o oddsq.o ex/seq/oddsq.c -lcirca $(LDFLAGS)
+	$(CC) $(CFLAGS) $(WFLAGS) -o self.o  ex/txt/self.c  -lcirca $(LDFLAGS)
 	rm *.a
 
 clean:
