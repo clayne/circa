@@ -1,122 +1,165 @@
 /*
-** seq.h | The Circa Library Set | Seq(T) Header
+** seq.h | The Circa Library Set | Dynamic Sequences
 ** https://github.com/davidgarland/circa
 */
 
 #ifndef CIRCA_SEQ_H
 #define CIRCA_SEQ_H
 
-/*
-** Dependencies
-*/
-
-/* Internal */
-
 #include "core.h"
 
 /*
-** Types
+** Dynamic sequences work by using a style of "fat pointers" where the data is
+** stored in an address that preceeds the data stored by the array portion.
+** This can be seen below; there is `cap` for capacity, `len` for the length,
+** and `data` as a flexible array member to be used for the type-generic array.
+*/
+
+struct seq_data {
+  size_t cap;
+  size_t len;
+  char data[];
+};
+
+/*
+** Because macros are run during preprocessing, they actually don't take up any
+** namespace as far as variables and types are concerned. This means we can have
+** a type named `Seq` and a macro named `Seq(T)` without any conflict; only if
+** it sees parenthesis will it be checked as a macro.
 */
 
 #define Seq(T) T*
 typedef Seq(void) Seq;
 
-struct seq_data {
-  size_t cap, len;
-  char data[];
-};
-
 /*
-** Prototypes
+** Now we define our accessor functions. Note how the raw forms of the functions
+** have a trailing underscore-- this will become a recurring pattern. The macros
+** exist to make the functions more ergonomic, avoiding the need for idioms such
+** as setting the sequence to the return value of the function, like you might
+** see in a library such as Antirez's SDS. Additionally, you'll see there are
+** `_iso` variants of functions-- these are for ISO-compliant standard C with
+** no GNU extensions.
 */
 
-/* Accessors */
+static inline struct seq_data *seq(Seq s);
 
-#define seq(S) seq_((S), CIRCA_DBGI)
-struct seq_data *seq_(Seq s, CIRCA_ARGS);
-
-#define seq_set_lit_ext_iso(T, S, A, V, E) (S) = seq_set_(sizeof(T), (S), (A), &(T){V}, (E), CIRCA_DBGI)
-#define seq_set_lit_ext(S, A, V, E) seq_set_lit_ext_iso(typeof(*S), S, A, V, E)
-#define seq_set_lit_iso(T, S, A, V) seq_set_lit_ext_iso(T, S, A, V, 0)
-#define seq_set_lit(S, A, V) seq_set_lit_iso(typeof(*S), S, A, V)
-#define seq_set_ext_iso(T, S, A, V, E) (S) = seq_set_(sizeof(T), (S), (A), &(V), (E), CIRCA_DBGI)
-#define seq_set_ext(S, A, V, E) seq_set_ext_iso(typeof(*S), S, A, V, E)
-#define seq_set_iso(T, S, A, V) seq_set_ext_iso(T, S, A, V, 0)
+#define seq_set_iso(T, S, A, V) (S) = seq_set_(sizeof(T), (S), (A), &(T){V})
 #define seq_set(S, A, V) seq_set_iso(typeof(*S), S, A, V)
-Seq seq_set_(size_t siz, Seq s, size_t a, void *v, size_t ext, CIRCA_ARGS);
+Seq seq_set_(size_t siz, Seq s, size_t a, void *v);
 
-#define seq_get_iso(T, S, A) (*((T*) seq_get_(sizeof(T), (S), (A), CIRCA_DBGI)))
+#define seq_has_iso(T, S, A) seq_has_(sizeof(T), (S), (A))
+#define seq_has(S, A) seq_has_iso(typeof(*S), S, A)
+bool seq_has_(size_t siz, Seq s, size_t a);
+
+#define seq_get_iso(T, S, A) (*((T*) seq_get_(sizeof(T), (S), (A))))
 #define seq_get(S, A) seq_get_iso(typeof(*S), S, A)
-void *seq_get_(size_t siz, Seq s, size_t a, CIRCA_ARGS);
+void *seq_get_(size_t siz, Seq s, size_t a);
 
-/* Allocators */
+#define seq_alloc_iso(T, C) seq_alloc_(sizeof(T), C)
+#define seq_alloc(T, C) seq_alloc_iso(T, C)
+Seq seq_alloc_(size_t siz, size_t cap);
 
-#define seq_new_iso(T, C) seq_new_(sizeof(T), (C), CIRCA_DBGI)
-#define seq_new(T, C) seq_new_iso(T, C)
-_circa_alcs_ Seq seq_new_(size_t siz, size_t cap, CIRCA_ARGS);
+#define seq_realloc_iso(T, S, C) (S) = seq_realloc_(sizeof(T), (S), (C))
+#define seq_realloc(S, C) seq_realloc_iso(typeof(*S), C)
+Seq seq_realloc_(size_t siz, Seq s, size_t cap);
 
-#define seq_from_iso(T, S) seq_wrap_(sizeof(T), seq(S)->len, (S), CIRCA_DBGI)
-#define seq_from(S) seq_from_iso(typeof(*S), S)
-#define seq_wrap_iso(T, L, P) seq_wrap_(sizeof(T), (L), (P), CIRCA_DBGI)
-#define seq_wrap(L, P) seq_wrap_iso(typeof(*P), L, P)
-#define seq_lit_iso(T, ...) seq_wrap_iso(T, sizeof((T[]){__VA_ARGS__}) / sizeof(T), &(T[]){__VA_ARGS__})
-#define seq_lit(T, ...) seq_lit_iso(T, __VA_ARGS__)
-_circa_alcs_ Seq seq_wrap_(size_t siz, size_t len, void *v, CIRCA_ARGS);
+#define seq_require_iso(T, S, C) (S) = seq_require_(sizeof(T), (S), (C))
+#define seq_require(S, C) seq_require_iso(typeof(*S), C)
+Seq seq_require_(size_t siz, Seq s, size_t cap);
 
-#define seq_rsz_iso(T, S, C) (S) = seq_rsz_(sizeof(T), (S), (C), CIRCA_DBGI)
-#define seq_rsz(S, C) seq_rsz_iso(typeof(*S), S, C)
-_circa_rets_ Seq seq_rsz_(size_t siz, Seq s, size_t cap, CIRCA_ARGS);
+#define seq_wrap_iso(T, N, V) seq_wrap_(sizeof(T), (N), (V))
+#define seq_wrap(N, V) seq_wrap_iso(typeof(*V), N, V)
+Seq seq_wrap_(size_t siz, size_t n, void *v);
 
-#define seq_rqr_ext_iso(T, S, C, E) (S) = seq_rqr_(sizeof(T), (S), (C), (E), CIRCA_DBGI)
-#define seq_rqr_ext(S, C, E) seq_rqr_ext_iso(typeof(*S), S, C, E)
-#define seq_rqr_iso(T, S, C) seq_rqr_ext_iso(T, S, C, 0)
-#define seq_rqr(S, C) seq_rqr_iso(typeof(*S), S, C)
-_circa_rets_ Seq seq_rqr_(size_t siz, Seq s, size_t cap, size_t ext, CIRCA_ARGS);
+#define seq_free(S) (S) = seq_free_((S))
+Seq seq_free_(Seq s);
 
-#define seq_shr_iso(T, S) (S) = seq_shr_(sizeof(T), (S), CIRCA_DBGI)
-#define seq_shr(S) seq_shr_iso(typeof(*S), S)
-_circa_rets_ Seq seq_shr_(size_t siz, Seq s, CIRCA_ARGS);
-
-#define seq_del_iso(T, S) (S) = seq_del_(sizeof(T), (S), CIRCA_DBGI)
-#define seq_del(S) seq_del_iso(typeof(*S), (S))
-_circa_rets_ Seq seq_del_(size_t siz, Seq s, CIRCA_ARGS);
-
-/* Stack Ops */
-
-#define seq_push_lit_ext_iso(T, S, V, E) (S) = seq_push_(sizeof(T), (S), &(T){V}, E, CIRCA_DBGI)
-#define seq_push_lit_ext(S, V, E) seq_push_lit_ext_iso(typeof(*S), S, V, E)
-#define seq_push_lit_iso(T, S, V) seq_push_lit_ext_iso(T, S, V, 0)
-#define seq_push_lit(S, V) seq_push_lit_iso(typeof(*S), S, V)
-#define seq_push_ext_iso(T, S, V, E) (S) = seq_push_(sizeof(T), (S), &(V), E, CIRCA_DBGI)
-#define seq_push_ext(S, V, E) seq_push_ext_iso(typeof(*S), S, V, E)
-#define seq_push_iso(T, S, V) seq_push_ext_iso(T, S, V, 0)
+#define seq_push_iso(T, S, V) (S) = seq_push_(sizeof(T), (S), &(T){V})
 #define seq_push(S, V) seq_push_iso(typeof(*S), S, V)
-_circa_rets_ Seq seq_push_(size_t siz, Seq s, void *v, size_t ext, CIRCA_ARGS);
+Seq seq_push_(size_t siz, Seq s, void *v);
 
-#define seq_tos_iso(T, S) (*((T*) seq_pop_(sizeof(T), (S), 0, CIRCA_DBGI)))
+#define seq_tos_iso(T, S) (*((T*) seq_pop_(sizeof(T), (S), 0)))
 #define seq_tos(S) seq_tos_iso(typeof(*S), S)
-#define seq_pop_iso(T, S) (*((T*) seq_pop_(sizeof(T), (S), 1, CIRCA_DBGI)))
+#define seq_pop_iso(T, S) (*((T*) seq_pop_(sizeof(T), (S), 1)))
 #define seq_pop(S) seq_pop_iso(typeof(*S), S)
-void *seq_pop_(size_t siz, Seq s, size_t n, CIRCA_ARGS);
+void *seq_pop_(size_t siz, Seq s, size_t n);
 
-#define seq_dup_iso(T, S) (S) = seq_dup(sizeof(T), S, CIRCA_DBGI)
-#define seq_dup(S) seq_dup_iso(typeof(*S), S)
-_circa_rets_ Seq seq_dup_(size_t siz, Seq s, CIRCA_ARGS);
+/*
+** Finally, there are some static function implementations.
+*/
 
-/* Seq Ops */
+static inline
+struct seq_data *seq(Seq s) {
+  return s ? ((struct seq_data*) s) - 1 : s;
+}
 
-// TODO: _ext variants
-#define seq_cpy_iso(T, DST, SRC) (DST) = seq_cpy_(sizeof(T), (DST), (SRC), 0, CIRCA_DBGI)
-#define seq_cpy(DST, SRC) seq_cpy_iso(typeof(*DST), DST, SRC)
-_circa_rets_ Seq seq_cpy_(size_t siz, Seq dst, Seq src, size_t ext, CIRCA_ARGS);
+/*
+** And now we can make some nice iteration macros.
+*/
 
-// TODO: _ext variants
-#define seq_cat_iso(T, DST, SRC) (DST) = seq_cat_(sizeof(T), (DST), (SRC), 0, CIRCA_DBGI)
-#define seq_cat(DST, SRC) seq_cat_iso(typeof(*DST), DST, SRC)
-_circa_rets_ Seq seq_cat_(size_t siz, Seq dst, Seq src, size_t ext, CIRCA_ARGS);
+/* Translatory */
 
-#define seq_rvs_iso(T, S) (S) = seq_rvs_(sizeof(T), (S), CIRCA_DBGI)
-#define seq_rvs(S) seq_rvs_iso(typeof(*S), S)
-_circa_rets_ Seq seq_rvs_(size_t siz, Seq s, CIRCA_ARGS);
+// TODO: seq_require() for A
+#define seq_map_iso(T, A, F, B)                  \
+do {                                             \
+  seq(A)->len = 0;                               \
+  for (size_t I = 0; I < seq(B)->len; I++)       \
+    seq_push_iso(T, A, F(seq_get_iso(T, B, I))); \
+} while (0)
+#define seq_map(A, F, B) seq_map_iso(typeof(*B), A, F, B)
+
+#define seq_filter_iso(T, A, F, B)              \
+do {                                            \
+  seq(A)->len = 0;                              \
+  for (size_t I = 0; I < seq(B)->len; I++)      \
+    if (F(seq_get_iso(T, B, I)))                \
+      seq_push_iso(T, A, seq_get_iso(T, B, I)); \
+} while (0)
+#define seq_filter(A, F, B) seq_filter_iso(typeof(*B), A, F, B)
+
+#define seq_reduce_iso(T, A, F, B)         \
+do {                                       \
+  for (size_t I = 0; I < seq(B)->len; I++) \
+    A = F(A, seq_get_iso(T, B, I));        \
+} while (0)
+#define seq_reduce(A, F, B) seq_reduce_iso(typeof(*B), A, F, B)
+
+/* In-Place */
+
+#define seq_apply_iso(T, S, F)                     \
+do {                                               \
+  for (size_t I = 0; I < seq(S)->len; I++)         \
+    seq_set_iso(T, S, I, F(seq_get_iso(T, S, I))); \
+} while (0)
+#define seq_apply(S, F) seq_apply_iso(typeof(*S), S, F)
+
+#define seq_keep_iso(T, S, F)                                        \
+do {                                                                 \
+  size_t LEN = seq(S)->len;                                          \
+  for (size_t I = 0; I < LEN; I++)                                   \
+    if (F(seq_get_iso(T, S, I)))                                     \
+      seq_push_iso(T, S, seq_get_iso(T, S, I));                      \
+  seq(S)->len -= LEN;                                                \
+  memcpy(S, ((char*) S) + LEN * sizeof(T), seq(S)->len * sizeof(T)); \
+} while (0)
+#define seq_keep(S, F) seq_keep_iso(typeof(*S), S, F)
+
+#define seq_collapse_iso(T, S, F) \
+do {                              \
+  T VAL = {0};                    \
+  seq_reduce_iso(T, VAL, F, S);   \
+  seq(S)->len = 1;                \
+  seq_set_iso(T, S, 0, VAL);      \
+} while (0)
+#define seq_collapse(S, F) seq_collapse_iso(typeof(*S), S, F)
+
+/* Side Effectful */
+
+#define seq_do_iso(T, S, F)                \
+do {                                       \
+  for (size_t I = 0; I < seq(S)->len; I++) \
+    F(seq_get_iso(T, S, I));               \
+} while (0)
+#define seq_do(S, F) seq_do_iso(typeof(*S), S, F)
 
 #endif /* CIRCA_SEQ_H */

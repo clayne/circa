@@ -1,96 +1,108 @@
 /*
-** dict.h | The Circa Library Set | Dict(T) Header
+** dict.h | The Circa Library Set | Dynamic Robin Hood dictionaries.
 ** https://github.com/davidgarland/circa
 */
 
 #ifndef CIRCA_DICT_H
 #define CIRCA_DICT_H
 
-/*
-** Dependencies
-*/
-
-/* Vendored */
-
-#ifdef __clang__
-  #pragma clang diagnostic push
-  #pragma clang diagnostic ignored "-Wbad-function-cast"
-  #pragma clang diagnostic push
-  #pragma clang diagnostic ignored "-Wpadded"
-#endif
-
-  #define XXH_INLINE_ALL
-  #include "../../lib/xxHash/xxhash.h"
-
-#ifdef __clang__
-  #pragma clang diagnostic pop /* -Wpadded            */
-  #pragma clang diagnostic pop /* -Wbad-function-cast */
-#endif
-
-/* Internal */
-
 #include "core.h"
 #include "bits.h"
 
 /*
-** Types
+** Unlike the `Str` or `Seq` types, `Dict` has a slightly more complicated
+** structure because of how hash tables work. Each value in the array is
+** stored in a "bucket" which holds the data, the key, a "probe count", and
+** a boolean indicating if the bucket has been deleted.
+**
+** The probe count just says how far the bucket is from its "ideal" location,
+** determined by using a hash function on the key. This is stored in order to
+** allow us to more efficiently organize the buckets using Robin Hood hashing.
+**
+** The "deleted" flag is so we can continue to index the dictionary normally
+** with robin hood hashing without having to rehash the entire dictionary,
+** which would be extremely expensive performance-wise.
+*/
+
+struct bucket_data {
+  void *data; // TODO: Pack `data` and `key` into one array, if possible.
+  char *key;
+  size_t probe;
+  bool deleted;
+};
+
+/*
+** From here on out, though, `Dict` follows the same cookie-cutter structure
+** as `Seq` and `Str`. Just a fat pointer with a capacity, a length, and a
+** main data section-- this time the data section isn't intended to be indexed
+** like a normal C array though. Instead, the only reason `Dict(T)` expands to
+** `T*` is to allow the non-`_iso` versions of the functions to infer the type
+** of the dictionary when it is passed in.
+*/
+
+struct dict_data {
+  size_t cap;
+  size_t len;
+  struct bucket_data buckets[];
+};
+
+/*
+** The same trick as `Seq`: defining `Dict(T)` as `T*` and then declaring `Dict`
+** to be `Dict(void)`.
 */
 
 #define Dict(T) T*
 typedef Dict(void) Dict;
 
-struct dict_bucket {
-  void *data; // TODO: how does one pack data
-  size_t probe;
-};
-
-struct dict_data {
-  size_t cap, len;
-  struct dict_bucket bucket[];
-};
-
 /*
-** Prototypes
+** Now we need a structure accessor and a way of indexing the dictionary. Much
+** like `Seq`, macros are needed for just about every function because of the
+** genericity of the functions in regard to type size.
 */
 
-/* Accessors */
+static inline struct dict_data *dict(Dict d);
 
-#define dict(D) dict_((D), CIRCA_DBGI)
-struct dict_data *dict_(Dict d, CIRCA_ARGS);
+#define dict_set_iso(T, D, K, V) dict_set_(sizeof(T), (D), (K), &(T){V})
+#define dict_set(D, K, V) dict_set_iso(typeof(*D), D, K, V)
+Dict dict_set_(size_t siz, Dict d, char *k, void *v);
 
-#define dict_set_lit_iso(T, D, A, V) (D) = dict_set_(sizeof(T), (D), (A), &(T){V}, CIRCA_DBGI)
-#define dict_set_lit(D, A, V) dict_set_lit_iso(typeof(*D), D, A, V)
-#define dict_set_iso(T, D, A, V) (D) = dict_set_(sizeof(T), (D), (A), &(V), CIRCA_DBGI)
-#define dict_set(D, A, V) dict_set_iso(typeof(*D), D, A, V)
-_circa_rets_ Dict dict_set_(size_t siz, Dict d, char *a, void *v, CIRCA_ARGS);
+#define dict_has_iso(T, D, K) dict_has_(sizeof(T), (D), (K))
+#define dict_has(D, K) dict_has_iso(typeof(*D), D, K)
+bool dict_has_(size_t siz, Dict d, char *k);
 
-#define dict_get_iso(T, D, A) (*((T*) dict_get_(sizeof(T), (D), (A), CIRCA_DBGI)))
-#define dict_get(D, A) dict_get_iso(typeof(*D), D, A)
-void *dict_get_(size_t siz, Dict d, char *a, CIRCA_ARGS);
+#define dict_get_iso(T, D, K) (*((T*) dict_get_(sizeof(T), (D), (K))))
+#define dict_get(D, K) dict_get_iso(typeof(*D), D, K)
+void *dict_get_(size_t siz, Dict d, char *k);
 
-#define dict_has_iso(T, D, A) dict_has_(sizeof(T), (D), (A), CIRCA_DBGI)
-#define dict_has(D, A) dict_has_iso(typeof(*D), D, A)
-bool dict_has_(size_t siz, Dict d, char *a, CIRCA_ARGS);
+/*
+** Then we need some allocators to get our dictionaries built.
+*/
 
-/* Allocators */
+#define dict_alloc_iso(T, C) dict_alloc_(sizeof(T), (C))
+#define dict_alloc(T, C) dict_alloc_iso(T, C)
+Dict dict_alloc_(size_t siz, size_t cap);
 
-#define dict_new_iso(T, C) dict_new_(sizeof(T), (C), CIRCA_DBGI)
-#define dict_new(T, C) dict_new_iso(T, C)
-_circa_alcs_ Dict dict_new_(size_t siz, size_t cap, CIRCA_ARGS);
+#define dict_realloc_iso(T, D, C) (D) = dict_realloc_(sizeof(T), (D), (C))
+#define dict_realloc(D, C) dict_realloc_iso(typeof(*D), D, C)
+Dict dict_realloc_(size_t siz, Dict d, size_t cap);
 
-#define dict_rsz_iso(T, D, C) (D) = dict_rsz_(sizeof(T), (D), (C), CIRCA_DBGI)
-#define dict_rsz(D, C) dict_rsz_iso(typeof(*D), D, C)
-_circa_rets_ Dict dict_rsz_(size_t siz, Dict d, size_t cap, CIRCA_ARGS);
+#define dict_require_iso(T, D, C) (D) = dict_require_(sizeof(T), (D), (C))
+#define dict_require(D, C) dict_require_iso(typeof(*D), D, C)
+Dict dict_require_(size_t siz, Dict d, size_t cap);
 
-#define dict_rqr_iso(T, D, C) (D) = dict_rqr_(sizeof(T), (D), (C), CIRCA_DBGI)
-#define dict_rqr(D, C) dict_rqr_iso(typeof(*D), D, C)
-_circa_rets_ Dict dict_rqr_(size_t siz, Dict d, size_t cap, CIRCA_ARGS);
+#define dict_free_iso(T, D) (T) = dict_free_(sizeof(T), (D))
+#define dict_free(D) dict_free_iso(typeof(*D), D)
+Dict dict_free_(size_t siz, Dict d);
 
-#define dict_shr_iso(T, D) (D) = dict_shr_(sizeof(T), (D), CIRCA_DBGI)
-#define dict_shr(D) dict_shr_iso(typeof(*D), D)
-_circa_rets_ Dict dict_shr_(size_t siz, Dict d, CIRCA_ARGS);
-#define dict_del_iso(T, D) (D) = dict_del_(sizeof(T), (D), CIRCA_DBGI)
-#define dict_del(D) dict_del_iso(typeof(*D), D)
-_circa_rets_ Dict dict_del_(size_t siz, Dict d, CIRCA_ARGS);
+/*
+** And finally we need to implement the static structure accessor function.
+** Just like with `Seq` and `Str`, it is important for performance reasons to do
+** it in the header and not the C file.
+*/
 
-#endif /* CIRCA_DICT_H */
+static inline
+struct dict_data *dict(Dict d) {
+  return ((struct dict_data*) d) - 1;
+}
+
+#endif // CIRCA_DICT_H

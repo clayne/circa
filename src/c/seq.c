@@ -1,5 +1,5 @@
 /*
-** seq.c | The Circa Library Set | Dynamically allocated sequences.
+** seq.c | The Circa Library Set | Dynamic Sequences
 ** https://github.com/davidgarland/circa
 */
 
@@ -9,216 +9,88 @@
 ** Accessors
 */
 
-/* Accesses the underlying structure of a sequence. */
-
-struct seq_data *seq_(Seq s, CIRCA_ARGS) {
-  {
-    circa_assert(s != NULL, fname, line);
-  }
-  return ((struct seq_data*) s) - 1;
-}
-
-/* Sets the value at an index from a sequence. */
-
-_circa_rets_
-Seq seq_set_(size_t siz, Seq s, size_t a, void *v, size_t ext, CIRCA_ARGS) {
-  {
-    circa_assert(siz > 0, fname, line);
-    circa_assert(s != NULL, fname, line);
-    circa_assert(v != NULL, fname, line);
-  }
-  s = seq_rqr_(siz, s, a + 1, ext, fname, line);
-  if (a >= seq(s)->len) seq(s)->len = a + 1;
-  memcpy(((char*) s) + (siz * a), v, siz);
+Seq seq_set_(size_t siz, Seq s, size_t a, void *v) {
+  if (!siz || !s || !v)
+    return s;
+  s = seq_require_(siz, s, a + 1);
+  if (seq(s)->len < a + 1)
+    seq(s)->len = a + 1;
+  memcpy(((char*) s) + a * siz, v, siz);
   return s;
 }
 
-/* Gets the value at an index from a sequence. */
+bool seq_has_(size_t siz, Seq s, size_t a) {
+  if (!siz || !s)
+    return false;
+  return (a < seq(s)->len);
+}
 
-void *seq_get_(size_t siz, Seq s, size_t a, CIRCA_ARGS) {
-  {
-    circa_assert(siz > 0, fname, line);
-    circa_assert(s != NULL, fname, line);
-    circa_assert(a < seq(s)->len, fname, line);
-  }
-  return (void*) (((char*) s) + (siz * a));
+void *seq_get_(size_t siz, Seq s, size_t a) {
+  if (!siz | !s)
+    return NULL;
+  return (a < seq(s)->len) ? ((char*) s) + a * siz : NULL;
 }
 
 /*
 ** Allocators
 */
 
-/* Allocates a new sequence. */
-
-_circa_alcs_
-Seq seq_new_(size_t siz, size_t cap, CIRCA_ARGS) {
-  {
-    circa_assert(siz > 0, fname, line);
-    circa_assert(cap > 0, fname, line);
-  }
-  struct seq_data* dp = NULL;
-  while (dp == NULL)
-    dp = calloc(sizeof(*dp) + (cap * siz), 1);
-  dp->cap = cap;
-  return dp->data;
+Seq seq_alloc_(size_t siz, size_t cap) {
+  if (!siz || !cap)
+    return NULL;
+  struct seq_data *sd = malloc(sizeof(*sd) + cap * siz);
+  if (!sd)
+    return NULL;
+  sd->cap = cap;
+  sd->len = 0;
+  return sd->data;
 }
 
-/* Resizes a sequence. */
-
-Seq seq_rsz_(size_t siz, Seq s, size_t cap, CIRCA_ARGS) {
-  {
-    circa_assert(siz > 0, fname, line);
-    circa_assert(s != NULL, fname, line);
-    circa_assert(cap > 0, fname, line);
-    circa_assert(cap >= seq(s)->len, fname, line);
-  }
-  if (cap < seq(s)->cap)
-    memset(((char*) s) + cap, 0, (seq(s)->cap - cap) * siz);
-  struct seq_data *restrict dp = NULL;
-  while (dp == NULL)
-    dp = realloc(seq(s), sizeof(*dp) + (cap * siz));
-  // TODO: Debug this.
-  //if (cap > dp->cap)
-  //  memset(((char*) s) + dp->cap * siz, 0, (cap - dp->cap) * siz);
-  dp->cap = cap;
-  return dp->data;
-}
-
-/* Creates a sequence from a normal array. */
-
-Seq seq_wrap_(size_t siz, size_t len, void *v, CIRCA_ARGS) {
-  {
-    circa_assert(siz > 0, fname, line);
-    circa_assert(len > 0, fname, line);
-    circa_assert(v != NULL, fname, line);
-  }
-  Seq s = seq_new_(siz, len, fname, line);
-  memcpy(s, v, (len * siz));
-  seq(s)->len = len;
+Seq seq_wrap_(size_t siz, size_t a, void *v) {
+  if (!siz || !a || !v)
+    return NULL;
+  Seq s = seq_alloc_(siz, a);
+  memcpy(s, v, a * siz);
   return s;
 }
 
-/* Requires that a sequence be able to hold a given capacity. */
-
-_circa_rets_
-Seq seq_rqr_(size_t siz, Seq s, size_t cap, size_t ext, CIRCA_ARGS) {
-  {
-    circa_assert(siz > 0, fname, line);
-    circa_assert(s != NULL, fname, line);
-  }
-  return (seq(s)->cap < cap) ? seq_rsz_(siz, s, cap + ext, fname, line) : s;
+Seq seq_realloc_(size_t siz, Seq s, size_t cap) {
+  if (!siz || !s || !cap)
+    return NULL;
+  struct seq_data *sd = seq(s);
+  sd = realloc(sd, sizeof(*sd) + cap * siz);
+  if (!sd)
+    return NULL;
+  sd->cap = cap;
+  return sd->data;
 }
 
-/* Shrinks a sequence as much as possible. */
-
-_circa_rets_
-Seq seq_shr_(size_t siz, Seq s, CIRCA_ARGS) {
-  {
-    circa_assert(siz > 0, fname, line);
-    circa_assert(s != NULL, fname, line);
-  }
-  const size_t len = seq(s)->len;
-  return (seq(s)->cap < len) ? seq_rsz_(siz, s, len, fname, line) : s;
+Seq seq_require_(size_t siz, Seq s, size_t cap) {
+  if (!siz || !s || !cap)
+    return NULL;
+  return (seq(s)->cap < cap) ? seq_realloc_(siz, s, cap) : s;
 }
 
-/* Deletes a sequence. */
-
-Seq seq_del_(size_t siz, Seq s, CIRCA_ARGS) {
-  {
-    circa_assert(siz > 0, fname, line);
-  }
-  if (s != NULL) {
-    memset(seq(s), 0, sizeof(*seq(s)) + seq(s)->cap * siz);
+Seq seq_free_(Seq s) {
+  if (s)
     free(seq(s));
-  }
   return NULL;
 }
 
 /*
-** Stack Ops
+** Stack Operations
 */
 
-/* Pushes a value onto a sequence. */
-
-_circa_rets_
-Seq seq_push_(size_t siz, Seq s, void *v, size_t ext, CIRCA_ARGS) {
-  {
-    circa_assert(siz > 0, fname, line);
-    circa_assert(s != NULL, fname, line);
-    circa_assert(v != NULL, fname, line);
-  }
-  return seq_set_(siz, s, seq(s)->len, v, ext, fname, line);
-}
-
-/* Pops a value off of a sequence. */
-
-void *seq_pop_(size_t siz, Seq s, size_t n, CIRCA_ARGS) {
-  {
-    circa_assert(siz > 0, fname, line);
-    circa_assert(s != NULL, fname, line);
-    circa_assert(seq(s)->len > 0, fname, line);
-  }
-  return seq_get_(siz, s, seq(s)->len - 1, fname, line);
-}
-
-/*
-** Sequence Ops
-*/
-
-/* Copies one sequence into another. */
-
-_circa_rets_
-Seq seq_cpy_(size_t siz, Seq dst, Seq src, size_t ext, CIRCA_ARGS) {
-  {
-    circa_assert(siz > 0, fname, line);
-    circa_assert(dst != NULL, fname, line);
-    circa_assert(src != NULL, fname, line);
-    circa_assert(seq(src)->len > 0, fname, line);
-  }
-  if (dst == src) return dst;
-  const size_t len = seq(src)->len;
-  dst = seq_rqr_(siz, dst, len, ext, fname, line);
-  seq(dst)->len = len;
-  memcpy(dst, src, len * siz);
-  return dst;
-}
-
-/* Catenates one sequence onto another. */
-
-_circa_rets_
-Seq seq_cat_(size_t siz, Seq dst, Seq src, size_t ext, CIRCA_ARGS) {
-  {
-    circa_assert(siz > 0, fname, line);
-    circa_assert(dst != NULL, fname, line);
-    circa_assert(src != NULL, fname, line);
-    circa_assert(seq(src)->len > 0, fname, line);
-  }
-  const size_t dst_len = seq(dst)->len;
-  const size_t src_len = seq(src)->len;
-  const size_t tot_len = dst_len + src_len;
-  dst = seq_rqr_(siz, dst, tot_len, ext, fname, line);
-  memcpy(((char*) dst) + (dst_len * siz), src, src_len * siz);
-  seq(dst)->len = tot_len;
-  return dst;
-}
-
-/* Reverses a sequence. */
-
-_circa_rets_
-Seq seq_rvs_(size_t siz, Seq s, CIRCA_ARGS) {
-  {
-    circa_assert(siz > 0, fname, line);
-    circa_assert(s != NULL, fname, line);
-    circa_assert(seq(s)->len > 0, fname, line);
-  }
-  const size_t s_len = seq(s)->len;
-  s = seq_rqr_(siz, s, s_len + 1, 0, fname, line);
-  void *const restrict tmp = (((char*) s) + (siz * s_len));
-  for (size_t i = 0, j = s_len - 1; i < s_len / 2; i++, j--) {
-    memmove(tmp, seq_get_(siz, s, i, fname, line), siz);
-    memmove(seq_get_(siz, s, i, fname, line),
-            seq_get_(siz, s, j, fname, line), siz);
-    memmove(seq_get_(siz, s, j, fname, line), tmp, siz);
-  }
+Seq seq_push_(size_t siz, Seq s, void *v) {
+  if (!siz || !s || !v)
+    return s;
+  seq_set_(siz, s, seq(s)->len, v); // TODO remove call for speed
   return s;
+}
+
+void *seq_pop_(size_t siz, Seq s, size_t n) {
+  if (!siz || !s || !seq(s)->len)
+    return s;
+  seq(s)->len -= n;
+  return ((char*) s) + seq(s)->len * siz;
 }
