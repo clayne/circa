@@ -25,10 +25,12 @@ Dict dict_realloc_(size_t siz, Dict d, size_t cap) {
 }
 
 Dict dict_require_(size_t siz, Dict d, size_t cap) {
+  if (!siz || !d || !cap)
+    return (CE = CE_ARG, d);
   return d;
 }
 
-Dict dict_free_(size_t siz, Dict d) {
+Dict dict_free_(Dict d) {
   if (d) {
     for (size_t i = 0; i < dict(d)->cap; i++) {
       free(dict(d)->buckets[i].data);

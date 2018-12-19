@@ -90,9 +90,9 @@ Dict dict_realloc_(size_t siz, Dict d, size_t cap);
 #define dict_require(D, C) dict_require_iso(typeof(*D), D, C)
 Dict dict_require_(size_t siz, Dict d, size_t cap);
 
-#define dict_free_iso(T, D) (T) = dict_free_(sizeof(T), (D))
+#define dict_free_iso(T, D) (D) = dict_free_((D))
 #define dict_free(D) dict_free_iso(typeof(*D), D)
-Dict dict_free_(size_t siz, Dict d);
+Dict dict_free_(Dict d);
 
 /*
 ** And finally we need to implement the static structure accessor function.
