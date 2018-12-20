@@ -6,25 +6,6 @@
 #ifndef CIRCA_DICT_H
 #define CIRCA_DICT_H
 
-#ifdef __clang__
-  #pragma clang diagnostic push
-  #pragma clang diagnostic ignored "-Wdisabled-macro-expansion"
-  #pragma clang diagnostic push
-  #pragma clang diagnostic ignored "-Wbad-function-cast"
-  #pragma clang diagnostic push
-  #pragma clang diagnostic ignored "-Wpadded"
-#endif
-
-  #define XXH_INLINE_ALL
-  #define XXH_NAMESPACE CIRCA
-  #include "../../lib/xxhash/xxhash.h"
-
-#ifdef __clang__
-  #pragma clang diagnostic pop
-  #pragma clang diagnostic pop
-  #pragma clang diagnostic pop
-#endif
-
 #include "core.h"
 #include "bits.h"
 

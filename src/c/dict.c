@@ -3,8 +3,6 @@
 ** https://github.com/davidgarland/circa
 */
 
-#include "../h/dict.h"
-
 #ifdef __clang__
   #pragma clang diagnostic push
   #pragma clang diagnostic ignored "-Wused-but-marked-unused"
@@ -12,7 +10,15 @@
   #pragma clang diagnostic ignored "-Wbad-function-cast"
   #pragma clang diagnostic push
   #pragma clang diagnostic ignored "-Wdisabled-macro-expansion"
+  #pragma clang diagnostic push
+  #pragma clang diagnostic ignored "-Wpadded"
 #endif
+
+#define XXH_INLINE_ALL
+#define XXH_NAMESPACE CIRCA
+#include "../../lib/xxhash/xxhash.h"
+
+#include "../h/dict.h"
 
 /*
 ** Accessors
