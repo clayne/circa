@@ -1,9 +1,22 @@
 /*
-** dict.c | The Circa Library Set | Dynamic Robin Hood dictionaries.
+** dict.c | The Circa Library Set | Dynamic Robin Hood Dictionaries
 ** https://github.com/davidgarland/circa
 */
 
 #include "../h/dict.h"
+
+#ifdef __clang__
+  #pragma clang diagnostic push
+  #pragma clang diagnostic ignored "-Wused-but-marked-unused"
+  #pragma clang diagnostic push
+  #pragma clang diagnostic ignored "-Wbad-function-cast"
+  #pragma clang diagnostic push
+  #pragma clang diagnostic ignored "-Wdisabled-macro-expansion"
+#endif
+
+/*
+** Accessors
+*/
 
 Dict dict_set_(size_t siz, Dict d, char *a, void *v) {
   if (!siz || !d || !v)
@@ -60,6 +73,10 @@ Dict dict_set_(size_t siz, Dict d, char *a, void *v) {
 
   return d;
 }
+
+/*
+** Allocators
+*/
 
 Dict dict_alloc_(size_t siz, size_t cap) {
   if (!siz || !cap)
@@ -120,3 +137,9 @@ Dict dict_free_(Dict d) {
   }
   return NULL;
 }
+
+#ifdef __clang__
+  #pragma clang diagnostic pop
+  #pragma clang diagnostic pop
+  #pragma clang diagnostic pop
+#endif
