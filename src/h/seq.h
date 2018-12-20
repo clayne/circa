@@ -60,11 +60,11 @@ void *seq_get_(size_t siz, Seq s, size_t a);
 Seq seq_alloc_(size_t siz, size_t cap);
 
 #define seq_realloc_iso(T, S, C) (S) = seq_realloc_(sizeof(T), (S), (C))
-#define seq_realloc(S, C) seq_realloc_iso(typeof(*S), C)
+#define seq_realloc(S, C) seq_realloc_iso(typeof(*S), S, C)
 Seq seq_realloc_(size_t siz, Seq s, size_t cap);
 
 #define seq_require_iso(T, S, C) (S) = seq_require_(sizeof(T), (S), (C))
-#define seq_require(S, C) seq_require_iso(typeof(*S), C)
+#define seq_require(S, C) seq_require_iso(typeof(*S), S, C)
 Seq seq_require_(size_t siz, Seq s, size_t cap);
 
 #define seq_wrap_iso(T, N, V) seq_wrap_(sizeof(T), (N), (V))
