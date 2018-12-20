@@ -11,7 +11,6 @@ Dict dict_alloc_(size_t siz, size_t cap) {
   cap = usz_primegt(cap);
   struct dict_data *dd = calloc(sizeof(*dd) + cap * sizeof(struct bucket_data), 1);
   dd->cap = cap;
-  // NOTE: The length doesn't need to be set to zero, `calloc` handles that.
   return dd->buckets;
 }
 

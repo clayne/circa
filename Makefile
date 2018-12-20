@@ -1,6 +1,6 @@
 CC=clang
 CFLAGS=-pipe
-WFLAGS=-Weverything -Wno-cast-align -Wno-padded -Wno-language-extension-token -Wno-unused-command-line-argument
+WFLAGS=-Weverything
 LDFLAGS=-I. -L.
 
 build:
@@ -9,8 +9,8 @@ build:
 	rm *.o
 
 ex: build
-	$(CC) $(CFLAGS) $(WFLAGS) -o oddsq.o ex/seq/oddsq.c -lcirca $(LDFLAGS)
-	$(CC) $(CFLAGS) $(WFLAGS) -o self.o  ex/txt/self.c  -lcirca $(LDFLAGS)
+	$(CC) $(CFLAGS) -o oddsq.o ex/seq/oddsq.c -lcirca $(LDFLAGS)
+	$(CC) $(CFLAGS) -o self.o  ex/txt/self.c  -lcirca $(LDFLAGS)
 	rm *.a
 
 clean:
