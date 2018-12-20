@@ -6,7 +6,9 @@
 #include <circa.h>
 
 int main() {
-  Txt buffer = txt_alloc(1);
+  Txt buffer = NULL;
+  circa_retry
+    buffer = txt_alloc(1);
   FILE *self = fopen("ex/txt/self.c", "r");
   txt_read(buffer, self);
   fclose(self);

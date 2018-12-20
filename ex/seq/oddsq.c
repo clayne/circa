@@ -23,7 +23,11 @@ bool odd(int n) {
 }
 
 int main() {
-  Seq(int) xs = seq_alloc(int, 10);
+  Seq(int) xs = NULL;
+  circa_retry
+    xs = seq_alloc(int, 10);
+  CE = CE_OOM;
+  circa_debug;
   for (size_t i = 0; i < seq(xs)->cap; i++)
     seq_push(xs, (int) i);
   seq_apply(xs, sq);
