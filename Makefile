@@ -1,7 +1,7 @@
 CC=clang
 CFLAGS=-pipe
 WFLAGS=-Weverything
-LDFLAGS=-I. -L.
+LDFLAGS=-I.
 
 build:
 	$(CC) $(CFLAGS) $(WFLAGS) -O2 -c src/c/*.c $(LDFLAGS)
