@@ -8,6 +8,13 @@
 
 #include "core.h"
 
+#ifdef __clang__
+  #pragma clang diagnostic push
+  #pragma clang diagnostic ignored "-Wpadded"
+  #pragma clang diagnostic push
+  #pragma clang diagnostic ignored "-Wcast-align"
+#endif
+
 /*
 ** Dynamic text, much like the dynamic sequences, use "fat pointers" in order to
 ** store their data. This means that the pointer the end programmer carries
@@ -100,5 +107,10 @@ static inline
 struct txt_data *txt(Txt t) {
   return ((struct txt_data*) t) - 1;
 }
+
+#ifdef __clang__
+  #pragma clang diagnostic pop // -Wcast-align
+  #pragma clang diagnostic pop // -Wpadded
+#endif
 
 #endif // CIRCA_TXT_H

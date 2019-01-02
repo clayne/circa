@@ -9,6 +9,13 @@
 #include "core.h"
 #include "bits.h"
 
+#ifdef __clang__
+  #pragma clang diagnostic push
+  #pragma clang diagnostic ignored "-Wpadded"
+  #pragma clang diagnostic push
+  #pragma clang diagnostic ignored "-Wcast-align"
+#endif
+
 /*
 ** Unlike the `Str` or `Seq` types, `Dict` has a slightly more complicated
 ** structure because of how hash tables work. Each value in the array is
@@ -104,5 +111,10 @@ static inline
 struct dict_data *dict(Dict d) {
   return ((struct dict_data*) d) - 1;
 }
+
+#ifdef __clang__
+  #pragma clang diagnostic pop // -Wcast-align
+  #pragma clang diagnostic pop // -Wpadded
+#endif
 
 #endif // CIRCA_DICT_H
