@@ -43,7 +43,9 @@ typedef Seq(void) Seq;
 
 static inline struct seq_data *seq(Seq s);
 
-#define seq_set_iso(T, S, A, V) (S) = seq_set_(sizeof(T), (S), (A), &(T){V})
+#define seq_set_lit_iso(T, S, A, V) (S) = seq_set_(sizeof(T), (S), (A), &(T){V})
+#define seq_set_lit(S, A, V) seq_set_lit_iso(typeof(*S), S, A, V)
+#define seq_set_iso(T, S, A, V) (S) = seq_set_(sizeof(T), (S), (A), &(V))
 #define seq_set(S, A, V) seq_set_iso(typeof(*S), S, A, V)
 Seq seq_set_(size_t siz, Seq s, size_t a, void *v);
 
@@ -74,7 +76,9 @@ Seq seq_wrap_(size_t siz, size_t n, void *v);
 #define seq_free(S) (S) = seq_free_((S))
 Seq seq_free_(Seq s);
 
-#define seq_push_iso(T, S, V) (S) = seq_push_(sizeof(T), (S), &(T){V})
+#define seq_push_lit_iso(T, S, V) (S) = seq_push_(sizeof(T), (S), &(T){V})
+#define seq_push_lit(S, V) seq_push_lit_iso(typeof(*S), S, V)
+#define seq_push_iso(T, S, V) (S) = seq_push_(sizeof(T), (S), &(V))
 #define seq_push(S, V) seq_push_iso(typeof(*S), S, V)
 Seq seq_push_(size_t siz, Seq s, void *v);
 
