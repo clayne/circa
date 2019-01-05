@@ -112,6 +112,33 @@ char txt_pop_(Txt t, size_t n) {
 }
 
 /*
+** String Operations
+*/
+
+bool txt_cmp(Txt a, Txt b) {
+  if (!a || !b)
+    return (CE = CE_ARG, false);
+  const size_t a_len = txt(a)->len;
+  if (a_len != txt(b)->len)
+    return false;
+  for (size_t i = 0; i < a_len; i++)
+    if (a[i] != b[i])
+      return false;
+  return true;
+}
+
+bool txt_cmp_len(Txt a, Txt b, size_t len) {
+  if (!a || !b)
+    return (CE = CE_ARG, false);
+  if (len > txt(a)->len || len > txt(b)->len)
+    return (CE = CE_OOB, false);
+  for (size_t i = 0; i < len; i++)
+    if (a[i] != b[i])
+      return false;
+  return true;
+}
+
+/*
 ** IO Operations
 */
 

@@ -89,6 +89,14 @@ Txt txt_push_(Txt t, char v);
 char txt_pop_(Txt t, size_t n);
 
 /*
+** Then there are our main string functions; comparison, upper, lower, checking
+** for nil or empty, etc.
+*/
+
+bool txt_cmp(Txt a, Txt b);
+bool txt_cmp_len(Txt a, Txt b, size_t len);
+
+/*
 ** And finally there are some basic IO functions, which just take a function
 ** pointer for flexibility and speed reasons.
 */
