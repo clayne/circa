@@ -15,6 +15,8 @@ Txt txt_set_(Txt t, size_t a, char v) {
   t = txt_require_(t, a + 1);
   if (a + 1 > txt(t)->cap)
     txt(t)->cap = a + 1;
+  if (a + 1 > txt(t)->len)
+    txt(t)->len = a + 1;
   t[a] = v;
   return t;
 }
