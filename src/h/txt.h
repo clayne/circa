@@ -46,6 +46,8 @@ typedef char *Txt;
 
 static inline struct txt_data *txt(Txt t);
 
+void txt_clear(Txt t);
+
 #define txt_set(T, A, V) (T) = txt_set_((T), (A), (V))
 Txt txt_set_(Txt t, size_t a, char v);
 

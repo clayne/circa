@@ -43,6 +43,10 @@ typedef Seq(void) Seq;
 
 static inline struct seq_data *seq(Seq s);
 
+#define seq_clear_iso(T, S) seq_clear_(sizeof(T), (S))
+#define seq_clear(S) seq_clear_iso(typeof(*S), S)
+void seq_clear_(size_t siz, Seq s);
+
 #define seq_set_lit_iso(T, S, A, V) (S) = seq_set_(sizeof(T), (S), (A), &(T){V})
 #define seq_set_lit(S, A, V) seq_set_lit_iso(typeof(*S), S, A, V)
 #define seq_set_iso(T, S, A, V) (S) = seq_set_(sizeof(T), (S), (A), &(V))

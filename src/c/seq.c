@@ -9,6 +9,15 @@
 ** Accessors
 */
 
+void seq_clear_(size_t siz, Seq s) {
+  if (!siz || !s) {
+    CE = CE_ARG;
+    return;
+  }
+  memset(s, 0, siz * seq(s)->len);
+  seq(s)->len = 0;
+}
+
 Seq seq_set_(size_t siz, Seq s, size_t a, void *v) {
   if (!siz || !s || !v)
     return (CE = CE_ARG, s);

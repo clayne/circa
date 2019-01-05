@@ -9,6 +9,15 @@
 ** Accessors
 */
 
+void txt_clear(Txt t) {
+  if (!t) {
+    CE = CE_ARG;
+    return;
+  }
+  memset(t, 0, txt(t)->len);
+  txt(t)->len = 0;
+}
+
 Txt txt_set_(Txt t, size_t a, char v) {
   if (!t || !v)
     return (CE = CE_ARG, t);
