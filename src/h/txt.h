@@ -7,6 +7,7 @@
 #define CIRCA_TXT_H
 
 #include "core.h"
+#include "slice.h"
 
 #ifdef __clang__
   #pragma clang diagnostic push
@@ -95,6 +96,7 @@ char txt_pop_(Txt t, size_t n);
 
 bool txt_cmp(Txt a, Txt b);
 bool txt_cmp_len(Txt a, Txt b, size_t len);
+bool txt_cmp_slice(Txt a, Slice sa, Txt b, Slice sb);
 
 /*
 ** And finally there are some basic IO functions, which just take a function

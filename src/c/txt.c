@@ -138,6 +138,19 @@ bool txt_cmp_len(Txt a, Txt b, size_t len) {
   return true;
 }
 
+bool txt_cmp_slice(Txt a, Slice sa, Txt b, Slice sb) {
+  if (!a || !b)
+    return (CE = CE_ARG, false);
+  if (!slice_in_len(sa, 0, txt(a)->len))
+    return (CE = CE_ARG, false);
+  if (!slice_in_len(sb, 0, txt(b)->len))
+    return (CE = CE_ARG, false);
+  for (size_t i = sa.le, j = sb.le; (i < sa.ri) && (j < sb.ri); i++, j++)
+    if (a[i] != b[j])
+      return false;
+  return true;
+}
+
 /*
 ** IO Operations
 */
