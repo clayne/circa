@@ -10,7 +10,7 @@
 */
 
 Txt txt_set_(Txt t, size_t a, char v) {
-  if (!t || !a || !v)
+  if (!t || !v)
     return (CE = CE_ARG, t);
   t = txt_require_(t, a + 1);
   if (a + 1 > txt(t)->cap)
@@ -26,7 +26,7 @@ bool txt_has(Txt t, size_t a) {
 }
 
 char txt_get(Txt t, size_t a) {
-  if (!t || !a)
+  if (!t)
     return (CE = CE_ARG, '\0');
   if (a >= txt(t)->len)
     return (CE = CE_OOB, '\0');
