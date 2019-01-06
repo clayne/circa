@@ -5,6 +5,11 @@
 
 #include "../h/slice.h"
 
+Slice slice_lit(size_t le, size_t ri) {
+  Slice s = {le, ri};
+  return s;
+}
+
 bool slice_in(Slice s, size_t n) {
   return (n >= s.le) && (n <= s.ri);
 }

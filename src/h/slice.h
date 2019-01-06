@@ -12,6 +12,7 @@ typedef struct {
   size_t le, ri;
 } Slice;
 
+Slice slice_lit(size_t le, size_t ri);
 bool slice_in(Slice s, size_t n);
 bool slice_in_len(Slice s, size_t n, size_t l);
 bool slice_overlap(Slice a, Slice b);
