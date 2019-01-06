@@ -38,7 +38,9 @@ static const char *const restrict CE_MSG[] = {
 for (CE = CE_NOK; CE; CE = CE_OK)
 
 #define circa_debug \
-for (int I = 0; I < 1; I++, CE && printf("[%s:%s:%i] circa_debug: %s\n", __FILE__, __func__, __LINE__, CE_MSG[CE]))
+for (int I = 0; I < 1; I++, CE && (CE != CE_NOK) && printf("[%s:%s:%i] circa_debug: %s\n", __FILE__, __func__, __LINE__, CE_MSG[CE]))
+
+#define circa_critical circa_retry circa_debug
 
 // TODO: Do this separately from the core header. It's not nice to do this.
 #pragma clang diagnostic push

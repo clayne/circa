@@ -95,7 +95,7 @@ Seq seq_free_(Seq s) {
 Seq seq_push_(size_t siz, Seq s, void *v) {
   if (!siz || !s || !v)
     return (CE = CE_ARG, s);
-  seq_set_(siz, s, seq(s)->len, v); // TODO remove call for speed
+  s = seq_set_(siz, s, seq(s)->len, v); // TODO remove call for speed
   return s;
 }
 
