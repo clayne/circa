@@ -26,8 +26,8 @@ int main() {
   Seq(int) xs = NULL;
   circa_retry
     xs = seq_alloc(int, 10);
-  for (size_t i = 0; i < seq(xs)->cap; i++)
-    seq_push(xs, (int) i);
+  for (int i = 0; i < (int) seq(xs)->cap; i++)
+    seq_push(xs, i);
   seq_apply(xs, sq);
   seq_keep(xs, odd);
   seq_do(xs, puti);

@@ -107,12 +107,12 @@ struct seq_data *seq(Seq s) {
 
 /* Translatory */
 
-// TODO: seq_require() for A
+// TODO: seq_require() for A. use variable for F(...), to allow structs.
 #define seq_map_iso(T, A, F, B)                  \
 do {                                             \
   seq(A)->len = 0;                               \
   for (size_t I = 0; I < seq(B)->len; I++)       \
-    seq_push_iso(T, A, F(seq_get_iso(T, B, I))); \
+    seq_push_lit_iso(T, A, F(seq_get_iso(T, B, I))); \
 } while (0)
 #define seq_map(A, F, B) seq_map_iso(typeof(*B), A, F, B)
 
@@ -121,7 +121,7 @@ do {                                            \
   seq(A)->len = 0;                              \
   for (size_t I = 0; I < seq(B)->len; I++)      \
     if (F(seq_get_iso(T, B, I)))                \
-      seq_push_iso(T, A, seq_get_iso(T, B, I)); \
+      seq_push_lit_iso(T, A, seq_get_iso(T, B, I)); \
 } while (0)
 #define seq_filter(A, F, B) seq_filter_iso(typeof(*B), A, F, B)
 
@@ -137,7 +137,7 @@ do {                                       \
 #define seq_apply_iso(T, S, F)                     \
 do {                                               \
   for (size_t I = 0; I < seq(S)->len; I++)         \
-    seq_set_iso(T, S, I, F(seq_get_iso(T, S, I))); \
+    seq_set_lit_iso(T, S, I, F(seq_get_iso(T, S, I))); \
 } while (0)
 #define seq_apply(S, F) seq_apply_iso(typeof(*S), S, F)
 
@@ -146,7 +146,7 @@ do {                                                                 \
   size_t LEN = seq(S)->len;                                          \
   for (size_t I = 0; I < LEN; I++)                                   \
     if (F(seq_get_iso(T, S, I)))                                     \
-      seq_push_iso(T, S, seq_get_iso(T, S, I));                      \
+      seq_push_lit_iso(T, S, seq_get_iso(T, S, I));                      \
   seq(S)->len -= LEN;                                                \
   memcpy(S, ((char*) S) + LEN * sizeof(T), seq(S)->len * sizeof(T)); \
 } while (0)
