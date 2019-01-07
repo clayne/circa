@@ -3,7 +3,7 @@
 # Snow
 
 Snow is a header-only unit testing library for C. Just include the file
-[snow/snow.h](https://github.com/mortie/snow/blob/v2.1.0/snow/snow.h).
+[snow/snow.h](https://github.com/mortie/snow/blob/v2.3.0/snow/snow.h).
 
 IRC channel: [#snow](http://webchat.freenode.net?channels=snow) on Freenode.
 If you have any questions, or just want to chat, just ping me (@mort) :)
@@ -16,7 +16,7 @@ Snow 2 is a complete rewrite of Snow. Here are the highlights:
 
 * Blocks have moved from inside of macro arguments (i.e `describe(foo, { ... })`)
   to outside of macro arguments (i.e `describe(foo) { ... }`). This applies to
-	`describe`, `subdesc`, `it`/`test`, `before_each`, and `after_each`.
+  `describe`, `subdesc`, `it`/`test`, `before_each`, and `after_each`.
 	* This means that it's possible to show line numbers, that compiler error
 	  messages are nicer, and syntax highlighters and auto indenters should be
 	  more happy.
@@ -37,15 +37,18 @@ Some miscellaneous points:
   Clang. It should even work on GCC and Clang versions too old to support C11
   (or even C99), but the convenience `asserteq` and `assertneq` macros require
   C11.
-* Windows is supported through MinGW or cygwin, with the caveat that it assumes
-  your terminal supports UTF-8. CMD.exe and Powershell will print mangled ✓ and ✕
-  characters. (Git Bash and Cygwin's terminal should be fine though)
-	* Windows also generally doesn't have the `<fnmatch.h>` header. You can compile
-	  your tests with `-DSNOW_USE_FNMATCH=0` to disable fnmatch, or install
-	  [Gnulib](https://www.gnu.org/software/gnulib/) in Cygwin.
 * I really recommend running the test executable with
   [valgrind](http://valgrind.org/). That will help you find memory issues such
   as memory leaks, out of bounds array reads/writes, etc.
+* Windows is supported through MinGW or cygwin, with the caveat that it assumes
+  your terminal supports UTF-8. CMD.exe and Powershell will print mangled ✓ and ✕
+  characters. (Git Bash and Cygwin's terminal should be fine though)
+	* Windows also generally doesn't have the `<fnmatch.h>` header.
+	  Snow defaults to compile without fnmatch under MinGW
+	  (and instead uses plain strcmp). You can control this with
+	  `-DSNOW_USE_FNMATCH=1` or `-DSNOW_USE_FNMATCH=0`.
+	  [Gnulib](https://www.gnu.org/software/gnulib/manual/gnulib.html)
+	  implements fnmatch, and supports Windows under Cygwin.
 
 ## Usage
 
