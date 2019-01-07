@@ -103,5 +103,5 @@ void *seq_pop_(size_t siz, Seq s, size_t n) {
   if (!siz || !s || !seq(s)->len)
     return (CE = CE_ARG, s);
   seq(s)->len -= n;
-  return ((char*) s) + seq(s)->len * siz;
+  return ((char*) s) + (seq(s)->len - (n ? 0 : 1)) * siz;
 }

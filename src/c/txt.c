@@ -145,7 +145,7 @@ bool txt_cmp_slice(Txt a, Slice sa, Txt b, Slice sb) {
     return (CE = CE_ARG, false);
   if (!slice_in_len(sb, 0, txt(b)->len))
     return (CE = CE_ARG, false);
-  for (size_t i = sa.le, j = sb.le; (i <= sa.ri + 1) && (j <= sb.ri + 1); i++, j++)
+  for (size_t i = sa.le, j = sb.le; (i <= sa.ri) && (j <= sb.ri); i++, j++)
     if (a[i] != b[j])
       return false;
   return true;
@@ -155,7 +155,7 @@ bool txt_cmp_slice_lit(Txt t, Slice s, char *c) {
   if (!t || !c)
     return (CE = CE_ARG, false);
   // TODO: More checks.
-  for (size_t i = s.le; i <= s.ri + 1; i++)
+  for (size_t i = s.le; i <= s.ri; i++)
     if (t[i] != c[i - s.le])
       return false;
   return true;
