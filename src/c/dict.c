@@ -25,7 +25,7 @@
 */
 
 Dict dict_set_(size_t siz, Dict d, char *a, void *v) {
-  if (!siz || !d || !v)
+  if (!siz || !d || !a || !v)
     return (CE = CE_ARG, d);
 
   // Set up a swap bucket.
@@ -35,8 +35,10 @@ Dict dict_set_(size_t siz, Dict d, char *a, void *v) {
     .probe   = 0,
     .deleted = false
   };
+
   if (!swp.data || !swp.key)
     return (CE = CE_OOM, d);
+
   memcpy(swp.data, v, siz);
   strcpy(swp.key, a);
 
@@ -52,7 +54,6 @@ Dict dict_set_(size_t siz, Dict d, char *a, void *v) {
     if (dict(d)->buckets[i].key) {
       if (!strcmp(dict(d)->buckets[i].key, swp.key)) {
         found = true;
-        i--;
         break;
       } else if (dict(d)->buckets[i].probe < swp.probe) {
         struct bucket_data tmp;
@@ -61,23 +62,40 @@ Dict dict_set_(size_t siz, Dict d, char *a, void *v) {
         swp = tmp;
       }
     } else {
+      dict(d)->len++;
       found = true;
-      i--;
       break;
     }
+    swp.probe++;
   }
 
   // If found, place the swap bucket. Otherwise, recurse.
   if (found) {
     dict(d)->buckets[i] = swp;
   } else {
-    d = dict_realloc_(siz, d, usz_primegt(dict(d)->cap + 1));
+    d = dict_realloc_(siz, d, dict(d)->cap + 1);
     d = dict_set_(siz, d, swp.key, swp.data);
     free(swp.key);
     free(swp.data);
   }
 
   return d;
+}
+
+void *dict_get_(size_t siz, Dict d, char *a) {
+  if (!siz || !d || !a)
+    return (CE = CE_ARG, NULL);
+
+  size_t hash = (sizeof(size_t) == 8) ? XXH64(a, strlen(a), 0)
+              : XXH32(a, strlen(a), 0);
+  size_t addr = hash % dict(d)->cap;
+
+  for (size_t i = addr; i < dict(d)->cap; i++)
+    if (dict(d)->buckets[i].key)
+      if (!strcmp(dict(d)->buckets[i].key, a))
+        return dict(d)->buckets[i].data;
+
+  return (CE = CE_OOB, NULL);
 }
 
 /*
@@ -98,7 +116,6 @@ Dict dict_realloc_(size_t siz, Dict d, size_t cap) {
     return (CE = CE_ARG, d);
   
   // Allocate a temporary array of buckets.
-  // TODO: Use the dictionary's array with extra space instead?
   struct bucket_data *bd = malloc(dict(d)->len * sizeof(*bd));
   if (!bd)
     return (CE = CE_OOM, d);
@@ -117,14 +134,19 @@ Dict dict_realloc_(size_t siz, Dict d, size_t cap) {
   d = dd->buckets;
   dict(d)->cap = cap;
 
+  // Clear the dictionary's memory out.
+  const size_t len = dict(d)->len;
+  dict(d)->len = 0;
+  memset(d, 0, cap * sizeof(*bd));
+
   // Load the temporary array of buckets back in to the dictionary.
-  for (size_t i = 0; i < dict(d)->len; i++)
-    continue;
+  for (size_t i = 0; i < len; i++)
+    d = dict_set_(siz, d, bd[i].key, bd[i].data);
 
   // Free the temporary bucket data.
-  //
+  free(bd);
 
-  return NULL;
+  return d;
 }
 
 Dict dict_require_(size_t siz, Dict d, size_t cap) {

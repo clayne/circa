@@ -22,7 +22,7 @@ enum circa_error {
   CE_FILE_WRITE  // Issues writing to a file.
 };
 
-static _Thread_local enum circa_error CE = CE_OK;
+extern _Thread_local enum circa_error CE;
 
 static const char *const restrict CE_MSG[] = {
   [CE_OK]         = "CE_OK: Everything is O-K.",
