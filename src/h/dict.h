@@ -69,7 +69,7 @@ typedef Dict(void) Dict;
 
 static inline struct dict_data *dict(Dict d);
 
-#define dict_set_iso(T, D, K, V) dict_set_(sizeof(T), (D), (K), &(T){V})
+#define dict_set_iso(T, D, K, V) (D) = dict_set_(sizeof(T), (D), (K), &(T){V})
 #define dict_set(D, K, V) dict_set_iso(typeof(*D), D, K, V)
 Dict dict_set_(size_t siz, Dict d, char *k, void *v);
 
