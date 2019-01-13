@@ -71,6 +71,8 @@ Dict dict_set_(size_t siz, Dict d, char *a, void *v) {
 
   // If found, place the swap bucket. Otherwise, recurse.
   if (found) {
+    free(dict(d)->buckets[i].key);
+    free(dict(d)->buckets[i].data);
     dict(d)->buckets[i] = swp;
   } else {
     d = dict_realloc_(siz, d, dict(d)->cap + 1);
@@ -140,8 +142,11 @@ Dict dict_realloc_(size_t siz, Dict d, size_t cap) {
   memset(d, 0, cap * sizeof(*bd));
 
   // Load the temporary array of buckets back in to the dictionary.
-  for (size_t i = 0; i < len; i++)
+  for (size_t i = 0; i < len; i++) {
     d = dict_set_(siz, d, bd[i].key, bd[i].data);
+    free(bd[i].key);
+    free(bd[i].data);
+  }
 
   // Free the temporary bucket data.
   free(bd);
