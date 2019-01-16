@@ -12,9 +12,9 @@ int main() {
     fruits = dict_alloc(int, 1);
   
   circa_debug {
-    dict_set(fruits, "orange", 5);
-    dict_set(fruits, "apple", 10);
-    dict_set(fruits, "banana", 13);
+    dict_set_lit(fruits, "orange", 5);
+    dict_set_lit(fruits, "apple", 10);
+    dict_set_lit(fruits, "banana", 13);
   }
 
   circa_debug {

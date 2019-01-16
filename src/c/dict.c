@@ -15,7 +15,7 @@
 #endif
 
 #define XXH_INLINE_ALL
-#define XXH_NAMESPACE CIRCA
+#define XXH_NAMESPACE CIRCA_DICT
 #include "../../lib/xxhash/xxhash.h"
 
 #include "../h/dict.h"
@@ -29,7 +29,7 @@ Dict dict_set_(size_t siz, Dict d, char *a, void *v) {
     return (CE = CE_ARG, d);
 
   // Set up a swap bucket.
-  struct bucket_data swp = {
+  struct dict_bucket swp = {
     .data    = malloc(siz),
     .key     = calloc(strlen(a) + 1, 1),
     .probe   = 0,
@@ -47,7 +47,7 @@ Dict dict_set_(size_t siz, Dict d, char *a, void *v) {
               : XXH32(a, strlen(a), 0);
   size_t addr = hash % dict(d)->cap;
 
-  // Traverse the dictionary in search of a position for it.
+  // Traverse the dictionary in search of a position for `swp`.
   size_t i;
   bool found = false;
   for (i = addr; i < dict(d)->cap; i++) {
@@ -56,7 +56,7 @@ Dict dict_set_(size_t siz, Dict d, char *a, void *v) {
         found = true;
         break;
       } else if (dict(d)->buckets[i].probe < swp.probe) {
-        struct bucket_data tmp;
+        struct dict_bucket tmp;
         tmp = dict(d)->buckets[i];
         dict(d)->buckets[i] = swp;
         swp = tmp;
@@ -88,15 +88,18 @@ void *dict_get_(size_t siz, Dict d, char *a) {
   if (!siz || !d || !a)
     return (CE = CE_ARG, NULL);
 
+  // Calculate the starting position using xxHash.
   size_t hash = (sizeof(size_t) == 8) ? XXH64(a, strlen(a), 0)
               : XXH32(a, strlen(a), 0);
   size_t addr = hash % dict(d)->cap;
 
+  // Traverse the dictionary for a match.
   for (size_t i = addr; i < dict(d)->cap; i++)
     if (dict(d)->buckets[i].key)
       if (!strcmp(dict(d)->buckets[i].key, a))
         return dict(d)->buckets[i].data;
 
+  // If no match is found, throw an out of bounds exception.
   return (CE = CE_OOB, NULL);
 }
 
@@ -107,8 +110,9 @@ void *dict_get_(size_t siz, Dict d, char *a) {
 Dict dict_alloc_(size_t siz, size_t cap) {
   if (!siz || !cap)
     return (CE = CE_ARG, NULL);
+
   cap = usz_primegt(cap);
-  struct dict_data *dd = calloc(sizeof(*dd) + cap * sizeof(struct bucket_data), 1);
+  struct dict_data *dd = calloc(sizeof(*dd) + cap * sizeof(struct dict_bucket), 1);
   dd->cap = cap;
   return dd->buckets;
 }
@@ -118,7 +122,7 @@ Dict dict_realloc_(size_t siz, Dict d, size_t cap) {
     return (CE = CE_ARG, d);
   
   // Allocate a temporary array of buckets.
-  struct bucket_data *bd = malloc(dict(d)->len * sizeof(*bd));
+  struct dict_bucket *bd = malloc(dict(d)->len * sizeof(*bd));
   if (!bd)
     return (CE = CE_OOM, d);
 
@@ -144,8 +148,8 @@ Dict dict_realloc_(size_t siz, Dict d, size_t cap) {
   // Load the temporary array of buckets back in to the dictionary.
   for (size_t i = 0; i < len; i++) {
     d = dict_set_(siz, d, bd[i].key, bd[i].data);
-    free(bd[i].key);
     free(bd[i].data);
+    free(bd[i].key);
   }
 
   // Free the temporary bucket data.
@@ -157,7 +161,7 @@ Dict dict_realloc_(size_t siz, Dict d, size_t cap) {
 Dict dict_require_(size_t siz, Dict d, size_t cap) {
   if (!siz || !d || !cap)
     return (CE = CE_ARG, d);
-  return d;
+  return d; // TODO
 }
 
 Dict dict_free_(Dict d) {
@@ -172,6 +176,7 @@ Dict dict_free_(Dict d) {
 }
 
 #ifdef __clang__
+  #pragma clang diagnostic pop
   #pragma clang diagnostic pop
   #pragma clang diagnostic pop
   #pragma clang diagnostic pop
