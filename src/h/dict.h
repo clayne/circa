@@ -31,7 +31,7 @@
 ** which would be extremely expensive performance-wise.
 */
 
-struct bucket_data {
+struct dict_bucket {
   void *data; // TODO: Pack `data` and `key` into one array, if possible.
   char *key;
   size_t probe;
@@ -50,7 +50,7 @@ struct bucket_data {
 struct dict_data {
   size_t cap;
   size_t len;
-  struct bucket_data buckets[];
+  struct dict_bucket buckets[];
 };
 
 /*
@@ -69,7 +69,9 @@ typedef Dict(void) Dict;
 
 static inline struct dict_data *dict(Dict d);
 
-#define dict_set_iso(T, D, K, V) (D) = dict_set_(sizeof(T), (D), (K), &(T){V})
+#define dict_set_lit_iso(T, D, K, V) (D) = dict_set_(sizeof(T), (D), (K), &(T){V})
+#define dict_set_lit(D, K, V) dict_set_lit_iso(typeof(*D), D, K, V)
+#define dict_set_iso(T, D, K, V) (D) = dict_set_(sizeof(T), (D), (K), &(V))
 #define dict_set(D, K, V) dict_set_iso(typeof(*D), D, K, V)
 Dict dict_set_(size_t siz, Dict d, char *k, void *v);
 
