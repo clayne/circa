@@ -153,7 +153,7 @@ Map map_realloc_(size_t sizk, size_t sizv, Map m, size_t cap) {
 Map map_require_(size_t sizk, size_t sizv, Map m, size_t cap) {
   if (!sizk || !sizv || !m || !cap)
     return (CE = CE_ARG, m);
-  return m; // TODO
+  return map(m)->cap < cap ? map_realloc_(sizk, sizv, m, cap) : m;
 }
 
 Map map_free_(Map m) {

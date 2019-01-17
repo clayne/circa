@@ -161,7 +161,7 @@ Dict dict_realloc_(size_t siz, Dict d, size_t cap) {
 Dict dict_require_(size_t siz, Dict d, size_t cap) {
   if (!siz || !d || !cap)
     return (CE = CE_ARG, d);
-  return d; // TODO
+  return dict(d)->cap < cap ? dict_realloc_(siz, d, cap) : d;
 }
 
 Dict dict_free_(Dict d) {
