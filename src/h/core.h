@@ -24,6 +24,10 @@ enum circa_error {
 
 extern _Thread_local enum circa_error CE;
 
+#ifdef __TINYC__
+  #define _Thread_local
+#endif
+
 static const char *const restrict CE_MSG[] = {
   [CE_OK]         = "CE_OK: Everything is O-K.",
   [CE_NOK]        = "CE_NOK: Placeholder value for circa_retry.",

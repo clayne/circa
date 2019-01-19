@@ -316,7 +316,7 @@ uint8_t u32_ctz(uint32_t n) {
     n |= (n >>  2);
     n |= (n >>  4);
     n |= (n >>  8);
-    n |= (n >> 16)'
+    n |= (n >> 16);
     n++;
     return (uint8_t) n;  
   #endif
