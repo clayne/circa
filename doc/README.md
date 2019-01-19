@@ -2,8 +2,7 @@
 
 ## Table of Contents
 
-[Introduction](#introduction)
-[Source And Usage](#source_and_usage)
+[Introduction](#introduction)  
 [Usage](#usage)
 
 ------
@@ -16,7 +15,7 @@ intrinsic functions, etc.
 
 ------
 
-## Source And Usage
+## Usage
 
 Circa is hosted on GitHub [here](https://github.com/davidgarland/circa).
 
