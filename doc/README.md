@@ -11,3 +11,5 @@
 ### API Documentation
 
 [Dictionaries](dict.md)
+
+[Maps](map.md)
