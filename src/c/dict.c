@@ -83,6 +83,11 @@ Dict dict_set_(size_t siz, Dict d, char *a, void *v) {
   return d;
 }
 
+bool dict_has_(size_t siz, Dict d, char *a) {
+  return dict_get_(siz, d, a) ? true
+       : (CE = CE_OK, false);
+}
+
 void *dict_get_(size_t siz, Dict d, char *a) {
   if (!siz || !d || !a)
     return (CE = CE_ARG, NULL);

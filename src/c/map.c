@@ -79,6 +79,11 @@ Map map_set_(size_t sizk, size_t sizv, Map m, void *k, void *v) {
   return m;
 }
 
+bool map_has_(size_t sizk, size_t sizv, Map m, void *k) {
+  return map_get_(sizk, sizv, m, k) ? true
+       : (CE = CE_OK, false);
+}
+
 void *map_get_(size_t sizk, size_t sizv, Map m, void *k) {
   if (!sizk || !sizv || !m || !k)
     return (CE = CE_ARG, NULL);

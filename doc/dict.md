@@ -72,7 +72,7 @@ d = dict_set_(sizeof(int), d, "e", &n); // d["e"] = 5
 #### dict_has
 
 ```C
-bool dict_has_iso(Type T, Dict(T) d, char *k);
+bool dict_has_iso(type T, Dict(T) d, char *k);
 bool dict_has(Dict(T) d, char *k);
 bool dict_has_(size_t siz, Dict d, char *k);
 ```
@@ -117,7 +117,7 @@ printf("%i\n", *(int*) dict_get_(sizeof(int), d, "c")); // 3
 
 ### Allocators
 
-This file details the allocators for the `Dict(T)` type in Circa.
+This section details the allocators for the `Dict(T)` type in Circa.
 
 #### dict_alloc
 
@@ -137,8 +137,8 @@ you can use the `usz_primegt` function found in the `bits` header.
 #### dict_realloc
 
 ```C
-void dict_realloc(Dict(T) d, size_t cap);
 void dict_realloc_iso(type T, Dict(T) d, size_t cap);
+void dict_realloc(Dict(T) d, size_t cap);
 Dict dict_realloc_(size_t siz, Dict d, size_t cap);
 ```
 
@@ -151,9 +151,9 @@ As with `dict_alloc`, `cap` will be run through `usz_primegt` before usage.
 #### dict_require
 
 ```C
+void dict_require_iso(type T, Dict(T) d, size_t cap);
 void dict_require(Dict(T) d, size_t cap);
-void dict_require_iso(type T, dict(T) d, size_t cap);
-Dict dict_require(size_t siz, Dict d, size_t cap);
+Dict dict_require_(size_t siz, Dict d, size_t cap);
 ```
 
 `dict_require` is essentially a modified version of `dict_realloc` that will
@@ -166,8 +166,8 @@ handle it.
 #### dict_free
 
 ```C
-void dict_free(Dict(T) d);
 void dict_free_iso(Dict(T) d);
+void dict_free(Dict(T) d);
 Dict dict_free_(Dict d);
 ```
 
