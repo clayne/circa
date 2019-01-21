@@ -57,7 +57,7 @@ Dict(int) d = dict_alloc_(sizeof(int), 10);
 d = dict_realloc_(sizeof(int), d, 20);
 ```
 
-However, you may notice these functions have a weird extra underscore at the
+However, you may notice these functions have an weird extra underscore at the
 end.. why is that?
 
 Well, to put it simply, this isn't at all a problem in Circa, because this isn't
