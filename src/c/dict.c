@@ -33,7 +33,6 @@ Dict dict_set_(size_t siz, Dict d, char *a, void *v) {
     .data    = malloc(siz),
     .key     = calloc(strlen(a) + 1, 1),
     .probe   = 0,
-    .deleted = false
   };
 
   if (!swp.data || !swp.key)

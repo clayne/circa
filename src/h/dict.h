@@ -25,17 +25,12 @@
 ** The probe count just says how far the bucket is from its "ideal" location,
 ** determined by using a hash function on the key. This is stored in order to
 ** allow us to more efficiently organize the buckets using Robin Hood hashing.
-**
-** The "deleted" flag is so we can continue to index the dictionary normally
-** with robin hood hashing without having to rehash the entire dictionary,
-** which would be extremely expensive performance-wise.
 */
 
 struct dict_bucket {
   void *data; // TODO: Pack `data` and `key` into one array, if possible.
   char *key;
   size_t probe;
-  bool deleted;
 };
 
 /*

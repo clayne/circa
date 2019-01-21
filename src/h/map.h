@@ -44,7 +44,6 @@ struct map_bucket {
   void *data; // TODO: Pack `data` and `key` into one array, if possible.
   void *key;
   size_t probe;
-  bool deleted;
 };
 
 /*

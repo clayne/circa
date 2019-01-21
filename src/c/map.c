@@ -29,7 +29,6 @@ Map map_set_(size_t sizk, size_t sizv, Map m, void *k, void *v) {
     .data    = malloc(sizv),
     .key     = malloc(sizk),
     .probe   = 0,
-    .deleted = false
   };
 
   if (!swp.data || !swp.key)
