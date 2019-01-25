@@ -17,6 +17,7 @@ debug:
 
 ex: debug
 	$(CC) $(CFLAGS) $(DBG) -o set.o    ex/map/set.c     -lcirca $(LDFLAGS)
+	$(CC) $(CFLAGS) $(DBG) -o sum.o    ex/seq/sum.c     -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS) $(DBG) -o fruits.o ex/dict/fruits.c -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS) $(DBG) -o oddsq.o  ex/seq/oddsq.c   -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS) $(DBG) -o self.o   ex/txt/self.c    -lcirca $(LDFLAGS)
@@ -24,6 +25,7 @@ ex: debug
 
 test: debug
 	$(CC) $(CFLAGS) $(DBG) tests/test.c -L. -I. -Ilib/snow -DSNOW_ENABLED -o test.o -lcirca
+	-@rm -rf *.dSYM
 
 clean:
 	-@rm -rf *.o *.out *.a *.dSYM
