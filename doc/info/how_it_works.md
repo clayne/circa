@@ -1,4 +1,4 @@
-# [Circa](README.md)
+# [Circa](../README.md)
 
 ## How It Works
 

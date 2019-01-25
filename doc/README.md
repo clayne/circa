@@ -2,14 +2,14 @@
 
 ## Contents
 
-### Description
+### Information
 
-[Introduction](intro.md)
+[Introduction](info/intro.md)
 
-[How It Works](how_it_works.md)
+[How It Works](info/how_it_works.md)
 
 ### API Documentation
 
-[Dictionaries](dict.md)
+[Dictionaries](api/dict.md)
 
-[Maps](map.md)
+[Maps](api/map.md)
