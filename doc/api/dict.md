@@ -19,8 +19,8 @@ probe count of every bucket very low, making for faster inserts and reads.
 struct dict_data *dict(Dict d);
 ```
 
-`dict` returns the pointer to the underlying structure of a dictionary,
-which is defined as shown below.
+`dict` returns the pointer to the underlying structure of a dictionary, which is
+defined as shown below.
 
 ```C
 struct dict_data {
@@ -30,7 +30,7 @@ struct dict_data {
 };
 ```
 
-This is considered the primary method to get a dictionary's length or capacity.
+This is considered the primary method to get a dictionary's length or capacity:
 
 ```C
 Dict(int) d = dict_alloc(int, 1);
