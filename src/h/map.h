@@ -126,6 +126,18 @@ struct map_data *map(Map m) {
   return ((struct map_data*) m) - 1;
 }
 
+/*
+** And now for the macros.
+*/
+
+#define map_foreach_iso(TK, TV, M, K, V) \
+for (size_t I = 0, J = 0; I < map(M)->cap; I++, J = 0) \
+for (TK *KP = map(M)->buckets[I].key; J != 1; J = 1) \
+if (KP) \
+for (TK K = *KP; J != 1; J = 1) \
+for (TV V = map_get_iso(TK, TV, M, K); J != 1; J = 1)
+#define map_foreach(M, K, V) map_foreach_iso(typeof(*M->k), typeof(*M->v), M, K, V)
+
 #ifdef __clang__
   #pragma clang diagnostic pop // -Wcast-align
   #pragma clang diagnostic pop // -Wpadded

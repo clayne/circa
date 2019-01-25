@@ -21,9 +21,8 @@ int main() {
   map_set(m, a, b);
   map_set(m, b, c);
   map_set(m, c, a);
-  sets_print(a, map_get(m, a));
-  sets_print(b, map_get(m, b));
-  sets_print(c, map_get(m, c));
+  map_foreach(m, x, y)
+    sets_print(x, y);
   map_free(m);
   return 0;
 }
