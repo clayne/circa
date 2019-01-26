@@ -38,13 +38,19 @@ static const char *const restrict CE_MSG[] = {
   [CE_FILE_WRITE] = "CE_FILE_WRITE: Error writing to a file."
 };
 
-#define circa_retry \
+#define ce_retry \
 for (CE = CE_NOK; CE; CE = CE_OK)
 
-#define circa_debug \
+#define ce_debug \
 for (int I = 0; I < 1; I++, CE && (CE != CE_NOK) && printf("[%s:%s:%i] circa_debug: %s\n", __FILE__, __func__, __LINE__, CE_MSG[CE]))
 
-#define circa_critical circa_retry circa_debug
+#define ce_critical ce_retry ce_debug
+
+#ifndef NDEBUG
+  #define ce_guard(...) if (__VA_ARGS__)
+#else
+  #define ce_guard(...) if (0)
+#endif
 
 // TODO: Do this separately from the core header. It's not nice to do this.
 #pragma clang diagnostic push

@@ -24,14 +24,19 @@ bool odd(int n) {
 
 int main() {
   Seq(int) xs = NULL;
-  circa_retry
+
+  ce_critical
     xs = seq_alloc(int, 10);
+  
   for (int i = 0; i < (int) seq(xs)->cap; i++)
     seq_push(xs, i);
+
   seq_apply(xs, sq);
   seq_keep(xs, odd);
   seq_do(xs, puti);
+  
   seq_free(xs);
+  
   return 0;
 }
 

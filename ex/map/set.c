@@ -17,12 +17,19 @@ int main() {
   Set a = {0, 1, 2};
   Set b = {2, 1, 0};
   Set c = {0, 1, 0};
-  Map(Set, Set) m = map_alloc(Set, Set, 1);
+  
+  Map(Set, Set) m = NULL;
+  
+  ce_critical
+    m = map_alloc(Set, Set, 1);
+  
   map_set(m, a, b);
   map_set(m, b, c);
   map_set(m, c, a);
+  
   map_foreach(m, x, y)
     sets_print(x, y);
+  
   map_free(m);
   return 0;
 }

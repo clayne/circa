@@ -10,8 +10,11 @@ int add(int a, int b) {
 }
 
 int main() {
-  Seq(int) xs = seq_alloc(int, 1);
+  Seq(int) xs = NULL;
   
+  ce_critical
+    xs = seq_alloc(int, 1);
+
   for (int i = 0; i < 10; i++)
     seq_push(xs, i);
   
