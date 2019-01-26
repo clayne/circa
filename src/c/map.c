@@ -21,7 +21,7 @@
 #include "../h/map.h"
 
 Map map_set_(size_t sizk, size_t sizv, Map m, void *k, void *v) {
-  if (!sizk || !sizv || !m || !k || !v)
+  ce_guard (!sizk || !sizv || !m || !k || !v)
     return (CE = CE_ARG, m);
 
   // Set up a swap bucket.
@@ -85,7 +85,7 @@ bool map_has_(size_t sizk, size_t sizv, Map m, void *k) {
 }
 
 void *map_get_(size_t sizk, size_t sizv, Map m, void *k) {
-  if (!sizk || !sizv || !m || !k)
+  ce_guard (!sizk || !sizv || !m || !k)
     return (CE = CE_ARG, NULL);
 
   // Calculate the starting position using xxHash.
@@ -104,7 +104,7 @@ void *map_get_(size_t sizk, size_t sizv, Map m, void *k) {
 }
 
 Map map_alloc_(size_t sizk, size_t sizv, size_t cap) {
-  if (!sizk || !sizv || !cap)
+  ce_guard (!sizk || !sizv || !cap)
     return (CE = CE_ARG, NULL);
 
   cap = usz_primegt(cap);
@@ -114,7 +114,7 @@ Map map_alloc_(size_t sizk, size_t sizv, size_t cap) {
 }
 
 Map map_realloc_(size_t sizk, size_t sizv, Map m, size_t cap) {
-  if (!sizk || !sizv || !m || !cap)
+  ce_guard (!sizk || !sizv || !m || !cap)
     return (CE = CE_ARG, m);
 
   // Allocate a temporary array of buckets.
@@ -155,7 +155,7 @@ Map map_realloc_(size_t sizk, size_t sizv, Map m, size_t cap) {
 }
 
 Map map_require_(size_t sizk, size_t sizv, Map m, size_t cap) {
-  if (!sizk || !sizv || !m || !cap)
+  ce_guard (!sizk || !sizv || !m || !cap)
     return (CE = CE_ARG, m);
   return map(m)->cap < cap ? map_realloc_(sizk, sizv, m, cap) : m;
 }
