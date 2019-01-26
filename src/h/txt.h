@@ -121,6 +121,15 @@ struct txt_data *txt(Txt t) {
   return ((struct txt_data*) t) - 1;
 }
 
+/*
+** And finally some iteration macros.
+*/
+
+#define txt_foreach_iso(T, V) \
+for (size_t I = 0, J = 0; I < txt(T)->len; I++, J = 0) \
+for (char V = txt_get(T, I); J != 1; J = 1)
+#define txt_foreach(T, V) txt_foreach_iso(T, V)
+
 #ifdef __clang__
   #pragma clang diagnostic pop // -Wcast-align
   #pragma clang diagnostic pop // -Wpadded
