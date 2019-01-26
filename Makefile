@@ -3,10 +3,11 @@ CFLAGS=-pipe
 WFLAGS=-Weverything
 LDFLAGS=-I. -L.
 
+RELEASE=-O2 -DNDEBUG
 DBG=-Og -g -fno-omit-frame-pointer
 
 build:
-	$(CC) $(CFLAGS) $(WFLAGS) -O2 -c src/c/*.c $(LDFLAGS)
+	$(CC) $(CFLAGS) $(WFLAGS) $(RELEASE) -c src/c/*.c $(LDFLAGS)
 	ar -cvq libcirca.a *.o 
 	-@rm -rf *.dSYM *.o
 
