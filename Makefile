@@ -53,7 +53,7 @@ ex: debug
 	-@rm -rf *.a *.dSYM
 
 test: debug
-	$(CC) $(CFLAGS) $(DBG) tests/test.c -L. -I. -Ilib/snow -DSNOW_ENABLED -o test.o -lcirca
+	$(CC) $(CFLAGS) $(DBG) tests/test.c -L. -I. -Ilib/snow -DSNOW_ENABLED -o test.o -lcirca -Llib/xxhash -lxxhash
 	-@rm -rf *.dSYM
 
 clean:
