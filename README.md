@@ -1,16 +1,59 @@
 # The Circa Library Set
 
-Circa is a library set for C aiming to make the language easier to use for
-common tasks that would benefit from dynamically sized generic datatypes.
+Circa is a set of libraries for GNU or ISO C99 and up
+that grants the programmer a variety of generic, dynamic
+datatypes with a focus on speed and small binaries.
 
-Documentation and explanations can be found [here](doc/README.md).
+- [Documentation](doc/README.md)
 
-A table of all of the implemented types can be found below.
+## Some Examples
 
-| Type      | Description                                                       |
-| --------- | ----------------------------------------------------------------- |
-| Dict(T)   | A Robin Hood hash table of `char* -> T` using open addressing.    |
-| Map(K, V) | Exactly like `Dict(T)` but `K -> V` instead.                      |
-| Seq(T)    | A dynamically sized array of `T`. Analogous to C++ `std::vector`. |
-| Txt       | A dynamically sized ASCII string. Analogous to C++ `std::string`. |
-| Slice     | A generic range type consisting of two `size_t` values.           |
+### Sequences
+
+A program that pushes the numbers `0` to `9` onto a
+sequence as though it were a stack, then uses the `foreach`
+construct to iterate through them and print them out.
+
+```C
+#include <stdio.h>
+#include <circa.h>
+
+int main() {
+  Seq(int) xs = seq_alloc(int, 1);
+  
+  for (int i = 0; i < 10; i++)
+    seq_push(xs, i);
+
+  seq_foreach(xs, x)
+    printf("%i\n", x);
+  
+  seq_free(xs);
+  
+  return 0;
+}
+```
+
+### Text
+
+A file `this.c` reads itself and prints itself out.
+
+```C
+#include <stdio.h>
+#include <circa.h>
+
+int main() {
+  Txt buf = txt_alloc(1);
+  
+  {
+    FILE *self = fopen("this.c", "r");
+    txt_read(buf, self);
+    fclose(self);
+  }
+  
+  printf("%s", buf);
+
+  txt_free(buf);
+
+  return 0;
+}
+```
