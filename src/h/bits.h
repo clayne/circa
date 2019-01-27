@@ -6,6 +6,8 @@
 #ifndef CIRCA_BITS_H
 #define CIRCA_BITS_H
 
+#include "core.h"
+
 /*
 ** Because we need a prime number as our capacity for `Dict` in order to have
 ** the best hash distribution, the solution used is to align an input number to

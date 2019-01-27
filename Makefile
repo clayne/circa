@@ -3,18 +3,40 @@ CFLAGS=-pipe
 WFLAGS=-Weverything
 LDFLAGS=-I. -L.
 
-RELEASE=-O2 -DNDEBUG
-DBG=-Og -g -fno-omit-frame-pointer
+BUILD=-O2 -DNDEBUG -fno-omit-frame-pointer
+FAST=-O3 -s -DNDEBUG -fomit-frame-pointer
+SMALL=-Os -s -DNDEBUG -fomit-frame-pointer
+DEBUG=-Og -g -fno-inline -fno-omit-frame-pointer
 
 build:
-	$(CC) $(CFLAGS) $(WFLAGS) $(RELEASE) -c src/c/*.c $(LDFLAGS)
+	$(CC) $(CFLAGS) $(BUILD) -c src/c/*.c $(LDFLAGS)
 	ar -cvq libcirca.a *.o 
 	-@rm -rf *.dSYM *.o
 
-debug:
-	$(CC) $(CFLAGS) $(WFLAGS) $(DBG) -c src/c/*.c $(LDFLAGS)
+fast:
+	$(CC) $(CFLAGS) $(FAST) -c src/c/*.c $(LDFLAGS)
 	ar -cvq libcirca.a *.o
 	-@rm -rf *.dSYM *.o
+
+small:
+	$(CC) $(CFLAGS) $(SMALL) -c src/c/*.c $(LDFLAGS)
+	ar -cvq libcirca.a *.o
+	-@rm -rf *.dSYM *.o
+
+debug:
+	$(CC) $(CFLAGS) $(DEBUG) -c src/c/*.c $(LDFLAGS)
+	ar -cvq libcirca.a *.o
+	-@rm -rf *.dSYM *.o
+
+compare:
+	$(MAKE) build
+	mv libcirca.a libcirca-build
+	$(MAKE) fast
+	mv libcirca.a libcirca-fast
+	$(MAKE) small
+	mv libcirca.a libcirca-small
+	$(MAKE) debug
+	mv libcirca.a libcirca-debug
 
 ex: debug
 	$(CC) $(CFLAGS) $(DBG) -o set.o    ex/map/set.c     -lcirca $(LDFLAGS)
@@ -29,4 +51,4 @@ test: debug
 	-@rm -rf *.dSYM
 
 clean:
-	-@rm -rf *.o *.out *.a *.dSYM
+	-@rm -rf *.o *.out *.a *.dSYM src/h/*.gch libcirca-build libcirca-fast libcirca-small libcirca-debug
