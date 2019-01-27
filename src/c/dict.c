@@ -14,8 +14,7 @@
   #pragma clang diagnostic ignored "-Wpadded"
 #endif
 
-#define XXH_INLINE_ALL
-#define XXH_NAMESPACE CIRCA_DICT
+#define XXH_STATIC_LINKING_ONLY
 #include "../../lib/xxhash/xxhash.h"
 
 #include "../h/dict.h"

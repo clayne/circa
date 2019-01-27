@@ -1,34 +1,37 @@
 CC=clang
 CFLAGS=-pipe
 WFLAGS=-Weverything
-LDFLAGS=-I. -L.
+LDFLAGS=-I. -L. -Llib/xxhash -lxxhash
 
 BUILD=-O2 -DNDEBUG -fno-omit-frame-pointer
 FAST=-O3 -s -DNDEBUG -fomit-frame-pointer
 SMALL=-Os -s -DNDEBUG -fomit-frame-pointer
 DEBUG=-Og -g -fno-inline -fno-omit-frame-pointer
 
-build:
+deps:
+	-@cd lib/xxhash && $(MAKE) -s libxxhash.a
+
+build: deps
 	$(CC) $(CFLAGS) $(BUILD) -c src/c/*.c $(LDFLAGS)
 	ar -cvq libcirca.a *.o 
 	-@rm -rf *.dSYM *.o
 
-fast:
+fast: deps
 	$(CC) $(CFLAGS) $(FAST) -c src/c/*.c $(LDFLAGS)
 	ar -cvq libcirca.a *.o
 	-@rm -rf *.dSYM *.o
 
-small:
+small: deps
 	$(CC) $(CFLAGS) $(SMALL) -c src/c/*.c $(LDFLAGS)
 	ar -cvq libcirca.a *.o
 	-@rm -rf *.dSYM *.o
 
-debug:
+debug: deps
 	$(CC) $(CFLAGS) $(DEBUG) -c src/c/*.c $(LDFLAGS)
 	ar -cvq libcirca.a *.o
 	-@rm -rf *.dSYM *.o
 
-disas:
+disas: deps
 	$(CC) $(CFLAGS) $(FAST) -S src/c/*.c $(DLFLAGS)
 
 compare:
@@ -54,4 +57,5 @@ test: debug
 	-@rm -rf *.dSYM
 
 clean:
+	-@cd lib/xxhash && $(MAKE) -s clean >/dev/null
 	-@rm -rf *.o *.s *.out *.a *.dSYM src/h/*.gch libcirca-build libcirca-fast libcirca-small libcirca-debug
