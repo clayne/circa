@@ -1,7 +1,7 @@
 CC=clang
 CFLAGS=-pipe
 WFLAGS=-Weverything
-LDFLAGS=-I. -L. -Llib/xxhash -lxxhash
+LDFLAGS=-I. -L.
 
 BUILD=-O2 -DNDEBUG -fno-omit-frame-pointer
 FAST=-O3 -s -DNDEBUG -fomit-frame-pointer
@@ -10,10 +10,12 @@ DEBUG=-Og -g -fno-inline -fno-omit-frame-pointer
 
 deps:
 	-@cd lib/xxhash && $(MAKE) -s libxxhash.a
+	-@ar -x lib/xxhash/libxxhash.a
+	-@rm -rf *SYM*
 
 build: deps
 	$(CC) $(CFLAGS) $(BUILD) -c src/c/*.c $(LDFLAGS)
-	ar -cvq libcirca.a *.o 
+	ar -cvq libcirca.a *.o
 	-@rm -rf *.dSYM *.o
 
 fast: deps
@@ -53,7 +55,7 @@ ex: debug
 	-@rm -rf *.a *.dSYM
 
 test: debug
-	$(CC) $(CFLAGS) $(DBG) tests/test.c -L. -I. -Ilib/snow -DSNOW_ENABLED -o test.o -lcirca -Llib/xxhash -lxxhash
+	$(CC) $(CFLAGS) $(DBG) tests/test.c -L. -I. -Ilib/snow -DSNOW_ENABLED -o test.o -lcirca
 	-@rm -rf *.dSYM
 
 clean:
