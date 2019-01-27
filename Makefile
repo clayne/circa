@@ -28,6 +28,9 @@ debug:
 	ar -cvq libcirca.a *.o
 	-@rm -rf *.dSYM *.o
 
+disas:
+	$(CC) $(CFLAGS) $(FAST) -S src/c/*.c $(DLFLAGS)
+
 compare:
 	$(MAKE) build
 	mv libcirca.a libcirca-build
@@ -51,4 +54,4 @@ test: debug
 	-@rm -rf *.dSYM
 
 clean:
-	-@rm -rf *.o *.out *.a *.dSYM src/h/*.gch libcirca-build libcirca-fast libcirca-small libcirca-debug
+	-@rm -rf *.o *.s *.out *.a *.dSYM src/h/*.gch libcirca-build libcirca-fast libcirca-small libcirca-debug
