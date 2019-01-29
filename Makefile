@@ -9,7 +9,7 @@ SMALL=-Os -s -DNDEBUG -fomit-frame-pointer
 DEBUG=-Og -g -fno-inline -fno-omit-frame-pointer
 
 deps:
-	-@cd lib/xxhash && $(MAKE) -s libxxhash.a
+	-@cd lib/xxhash && $(MAKE) -s libxxhash.a >/dev/null
 	-@ar -x lib/xxhash/libxxhash.a
 	-@rm -rf *SYM*
 
