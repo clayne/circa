@@ -8,20 +8,15 @@
 int main() {
   Dict(int) fruits;
 
-  circa_critical
+  ce_critical
     fruits = dict_alloc(int, 1);
   
-  circa_debug {
-    dict_set_lit(fruits, "orange", 5);
-    dict_set_lit(fruits, "apple", 10);
-    dict_set_lit(fruits, "banana", 13);
-  }
+  dict_set_lit(fruits, "orange", 5);
+  dict_set_lit(fruits, "apple", 10);
+  dict_set_lit(fruits, "banana", 13);
 
-  circa_debug {
-    printf("oranges: %i\n", dict_get(fruits, "orange"));
-    printf("apples: %i\n", dict_get(fruits, "apple"));
-    printf("bananas: %i\n", dict_get(fruits, "banana"));
-  }
+  dict_foreach(fruits, k, v)
+    printf("%s(s): %i\n", k, v);
   
   dict_free(fruits);
   

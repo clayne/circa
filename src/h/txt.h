@@ -8,6 +8,7 @@
 
 #include "core.h"
 #include "slice.h"
+#include "seq.h"
 
 #ifdef __clang__
   #pragma clang diagnostic push
@@ -47,31 +48,31 @@ typedef char *Txt;
 
 static inline struct txt_data *txt(Txt t);
 
-void txt_clear(Txt t);
+static inline void txt_clear(Txt t);
 
 #define txt_set(T, A, V) (T) = txt_set_((T), (A), (V))
-Txt txt_set_(Txt t, size_t a, char v);
+static inline Txt txt_set_(Txt t, size_t a, char v);
 
-bool txt_has(Txt t, size_t a);
+static inline bool txt_has(Txt t, size_t a);
 
-char txt_get(Txt t, size_t a);
+static inline char txt_get(Txt t, size_t a);
 
 /*
 ** Then some allocators.. nothing especially noteworthy here.
 */
 
-Txt txt_alloc(size_t cap);
+static inline Txt txt_alloc(size_t cap);
 
 #define txt_realloc(T, C) (T) = txt_realloc_((T), (C))
-Txt txt_realloc_(Txt t, size_t cap);
+static inline Txt txt_realloc_(Txt t, size_t cap);
 
 #define txt_require(T, C) (T) = txt_require_((T), (C))
-Txt txt_require_(Txt t, size_t cap);
+static inline Txt txt_require_(Txt t, size_t cap);
 
-Txt txt_wrap(char *c, size_t len);
+static inline Txt txt_wrap(char *c, size_t len);
 
 #define txt_free(T) (T) = txt_free_(T)
-Txt txt_free_(Txt t);
+static inline Txt txt_free_(Txt t);
 
 /*
 ** Next we have some stack functions, which allows us to easily append
@@ -83,11 +84,11 @@ Txt txt_free_(Txt t);
 */
 
 #define txt_push(T, V) (T) = txt_push_((T), (V))
-Txt txt_push_(Txt t, char v);
+static inline Txt txt_push_(Txt t, char v);
 
 #define txt_tos(T) txt_pop_((T), 0)
 #define txt_pop(T) txt_pop_((T), 1)
-char txt_pop_(Txt t, size_t n);
+static inline char txt_pop_(Txt t, size_t n);
 
 /*
 ** Then there are our main string functions; comparison, upper, lower, checking
@@ -110,16 +111,87 @@ Txt txt_read_(Txt t, FILE *fp);
 void txt_write(Txt t, FILE *fp);
 
 /*
-** The txt() function is implemented as being static inline, because I figured
-** it was too small to warrant having extra function overhead and possibly
-** making the compiler able to infer less. Something as frequent as accessing
-** the structure's capacity and length should probably be fast, I'd reason.
+** Accessors
 */
 
 static inline
 struct txt_data *txt(Txt t) {
   return ((struct txt_data*) t) - 1;
 }
+
+static inline
+void txt_clear(Txt t) {
+  return seq_clear_(1, t);
+}
+
+static inline
+Txt txt_set_(Txt t, size_t a, char v) {
+  return seq_set_(1, t, a, &v);
+}
+
+static inline
+bool txt_has_(Txt t, size_t a) {
+  return a < txt(t)->len;
+}
+
+static inline
+char txt_get(Txt t, size_t a) {
+  void *p = seq_get_(1, t, a);
+  return p ? *((char*) p) : '\0';
+}
+
+/*
+** Allocators
+*/
+
+static inline
+Txt txt_alloc(size_t cap) {
+  return seq_alloc_(1, cap);
+}
+
+static inline
+Txt txt_wrap(char *c, size_t len) {
+  return seq_wrap_(1, len + 1, c);
+}
+
+static inline
+Txt txt_realloc_(Txt t, size_t cap) {
+  return seq_realloc_(1, t, cap);
+}
+
+static inline
+Txt txt_require_(Txt t, size_t cap) {
+  return seq_require_(1, t, cap);
+}
+
+static inline
+Txt txt_free_(Txt t) {
+  return seq_free_(t);
+}
+
+/*
+** Stack Operations
+*/
+
+static inline
+Txt txt_push_(Txt t, char v) {
+  return seq_push_(1, t, &v);
+}
+
+static inline
+char txt_pop_(Txt t, size_t n) {
+  void *p = seq_pop_(1, t, n);
+  return p ? *((char*) p) : '\0';
+}
+
+/*
+** And finally some iteration macros.
+*/
+
+#define txt_foreach_iso(T, V) \
+for (size_t I = 0, J = 0; I < txt(T)->len; I++, J = 0) \
+for (char V = txt_get(T, I); J != 1; J = 1)
+#define txt_foreach(T, V) txt_foreach_iso(T, V)
 
 #ifdef __clang__
   #pragma clang diagnostic pop // -Wcast-align

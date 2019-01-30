@@ -25,17 +25,12 @@
 ** The probe count just says how far the bucket is from its "ideal" location,
 ** determined by using a hash function on the key. This is stored in order to
 ** allow us to more efficiently organize the buckets using Robin Hood hashing.
-**
-** The "deleted" flag is so we can continue to index the dictionary normally
-** with robin hood hashing without having to rehash the entire dictionary,
-** which would be extremely expensive performance-wise.
 */
 
 struct dict_bucket {
   void *data; // TODO: Pack `data` and `key` into one array, if possible.
   char *key;
   size_t probe;
-  bool deleted;
 };
 
 /*
@@ -113,6 +108,18 @@ static inline
 struct dict_data *dict(Dict d) {
   return ((struct dict_data*) d) - 1;
 }
+
+/*
+** Now that we're done with functions, how about some nice macros?
+*/
+
+
+#define dict_foreach_iso(T, D, K, V) \
+for (size_t I = 0, J = 0; I < dict(D)->cap; I++, J = 0) \
+for (char *K = dict(D)->buckets[I].key; J != 1; J = 1) \
+if (K) \
+for (T V = dict_get_iso(T, D, K); J != 1; J = 1)
+#define dict_foreach(D, K, V) dict_foreach_iso(typeof(*D), D, K, V)
 
 #ifdef __clang__
   #pragma clang diagnostic pop // -Wcast-align

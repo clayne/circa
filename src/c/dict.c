@@ -14,8 +14,7 @@
   #pragma clang diagnostic ignored "-Wpadded"
 #endif
 
-#define XXH_INLINE_ALL
-#define XXH_NAMESPACE CIRCA_DICT
+#define XXH_STATIC_LINKING_ONLY
 #include "../../lib/xxhash/xxhash.h"
 
 #include "../h/dict.h"
@@ -25,7 +24,7 @@
 */
 
 Dict dict_set_(size_t siz, Dict d, char *a, void *v) {
-  if (!siz || !d || !a || !v)
+  ce_guard (!siz || !d || !a || !v)
     return (CE = CE_ARG, d);
 
   // Set up a swap bucket.
@@ -33,7 +32,6 @@ Dict dict_set_(size_t siz, Dict d, char *a, void *v) {
     .data    = malloc(siz),
     .key     = calloc(strlen(a) + 1, 1),
     .probe   = 0,
-    .deleted = false
   };
 
   if (!swp.data || !swp.key)
@@ -84,8 +82,13 @@ Dict dict_set_(size_t siz, Dict d, char *a, void *v) {
   return d;
 }
 
+bool dict_has_(size_t siz, Dict d, char *a) {
+  return dict_get_(siz, d, a) ? true
+       : (CE = CE_OK, false);
+}
+
 void *dict_get_(size_t siz, Dict d, char *a) {
-  if (!siz || !d || !a)
+  ce_guard (!siz || !d || !a)
     return (CE = CE_ARG, NULL);
 
   // Calculate the starting position using xxHash.
@@ -108,7 +111,7 @@ void *dict_get_(size_t siz, Dict d, char *a) {
 */
 
 Dict dict_alloc_(size_t siz, size_t cap) {
-  if (!siz || !cap)
+  ce_guard (!siz || !cap)
     return (CE = CE_ARG, NULL);
 
   cap = usz_primegt(cap);
@@ -118,7 +121,7 @@ Dict dict_alloc_(size_t siz, size_t cap) {
 }
 
 Dict dict_realloc_(size_t siz, Dict d, size_t cap) {
-  if (!siz || !d || !cap)
+  ce_guard (!siz || !d || !cap)
     return (CE = CE_ARG, d);
   
   // Allocate a temporary array of buckets.
@@ -159,7 +162,7 @@ Dict dict_realloc_(size_t siz, Dict d, size_t cap) {
 }
 
 Dict dict_require_(size_t siz, Dict d, size_t cap) {
-  if (!siz || !d || !cap)
+  ce_guard (!siz || !d || !cap)
     return (CE = CE_ARG, d);
   return dict(d)->cap < cap ? dict_realloc_(siz, d, cap) : d;
 }
