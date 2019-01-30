@@ -8,6 +8,8 @@ FAST=-O3 -s -DNDEBUG -fomit-frame-pointer
 SMALL=-Os -s -DNDEBUG -fomit-frame-pointer
 DEBUG=-Og -g -fno-inline -fno-omit-frame-pointer
 
+default: build
+
 deps:
 	-@cd lib/xxhash && $(MAKE) -s libxxhash.a >/dev/null
 	-@ar -x lib/xxhash/libxxhash.a

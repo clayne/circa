@@ -32,7 +32,7 @@ struct map_data {
 };
 ```
 
-This is considered the primary method to get a map's length or capacity.
+This is considered the primary method to get a map's length or capacity:
 
 ```C
 Map(int, int) m = map_alloc(int, int, 1);
