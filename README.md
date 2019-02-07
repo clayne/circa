@@ -1,4 +1,5 @@
 # The Circa Library Set
+## NOTE: The API is subject to change at any time presently. This is not a stable, commercial-grade library.
 
 Circa is a set of libraries for GNU or ISO C99 and up
 that grants the programmer a variety of generic, dynamic
