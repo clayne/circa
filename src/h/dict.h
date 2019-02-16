@@ -1,5 +1,5 @@
 /*
-** dict.h | The Circa Library Set | Dynamic Robin Hood dictionaries.
+** dict.h | The Circa Library Set | Dictionaries
 ** https://github.com/davidgarland/circa
 */
 
@@ -7,123 +7,113 @@
 #define CIRCA_DICT_H
 
 #include "core.h"
-#include "bits.h"
-
-#ifdef __clang__
-  #pragma clang diagnostic push
-  #pragma clang diagnostic ignored "-Wpadded"
-  #pragma clang diagnostic push
-  #pragma clang diagnostic ignored "-Wcast-align"
-#endif
+#include "txt.h"
 
 /*
-** Unlike the `Str` or `Seq` types, `Dict` has a slightly more complicated
-** structure because of how hash tables work. Each value in the array is
-** stored in a "bucket" which holds the data, the key, a "probe count", and
-** a boolean indicating if the bucket has been deleted.
-**
-** The probe count just says how far the bucket is from its "ideal" location,
-** determined by using a hash function on the key. This is stored in order to
-** allow us to more efficiently organize the buckets using Robin Hood hashing.
+** Under the hood `Dict(T)` is just `SeqMap(char, T)`, so the type definitions
+** reflect that.
 */
 
-struct dict_bucket {
-  void *data; // TODO: Pack `data` and `key` into one array, if possible.
-  char *key;
-  size_t probe;
-};
+#define Dict(T) SeqMap(char, T)
+typedef void *Dict;
 
 /*
-** From here on out, though, `Dict` follows the same cookie-cutter structure
-** as `Seq` and `Str`. Just a fat pointer with a capacity, a length, and a
-** main data section-- this time the data section isn't intended to be indexed
-** like a normal C array though. Instead, the only reason `Dict(T)` expands to
-** `T*` is to allow the non-`_iso` versions of the functions to infer the type
-** of the dictionary when it is passed in.
+** And now we need accessors.
 */
 
-struct dict_data {
-  size_t cap;
-  size_t len;
-  struct dict_bucket buckets[];
-};
+static inline struct seqmap_data *dict(Dict d);
 
-/*
-** The same trick as `Seq`: defining `Dict(T)` as `T*` and then declaring `Dict`
-** to be `Dict(void)`.
-*/
-
-#define Dict(T) T*
-typedef Dict(void) Dict;
-
-/*
-** Now we need a structure accessor and a way of indexing the dictionary. Much
-** like `Seq`, macros are needed for just about every function because of the
-** genericity of the functions in regard to type size.
-*/
-
-static inline struct dict_data *dict(Dict d);
-
-#define dict_set_lit_iso(T, D, K, V) (D) = dict_set_(sizeof(T), (D), (K), &(T){V})
-#define dict_set_lit(D, K, V) dict_set_lit_iso(typeof(*D), D, K, V)
+#define dict_set_litv_iso(T, D, K, V) (D) = dict_set_(sizeof(T), (D), (K), &(T){V})
+#define dict_set_litv(D, K, V) dict_set_litv_iso(typeof(*D->v), D, K, V)
 #define dict_set_iso(T, D, K, V) (D) = dict_set_(sizeof(T), (D), (K), &(V))
-#define dict_set(D, K, V) dict_set_iso(typeof(*D), D, K, V)
-Dict dict_set_(size_t siz, Dict d, char *k, void *v);
+#define dict_set(D, K, V) dict_set_iso(typeof(*D->v), D, K, V)
+static inline Dict dict_set_(size_t siz, Dict d, char *k, void *v);
 
 #define dict_has_iso(T, D, K) dict_has_(sizeof(T), (D), (K))
-#define dict_has(D, K) dict_has_iso(typeof(*D), D, K)
-bool dict_has_(size_t siz, Dict d, char *k);
+#define dict_has(D, K) dict_has_iso(typeof(*D->v), D, K)
+static inline bool dict_has_(size_t siz, Dict d, char *k);
 
 #define dict_get_iso(T, D, K) (*((T*) dict_get_(sizeof(T), (D), (K))))
-#define dict_get(D, K) dict_get_iso(typeof(*D), D, K)
-void *dict_get_(size_t siz, Dict d, char *k);
+#define dict_get(D, K) dict_get_iso(typeof(*D->v), D, K)
+static inline void *dict_get_(size_t siz, Dict d, char *k);
 
 /*
-** Then we need some allocators to get our dictionaries built.
+** And some allocators to build the dictionaries.
 */
 
 #define dict_alloc_iso(T, C) dict_alloc_(sizeof(T), (C))
 #define dict_alloc(T, C) dict_alloc_iso(T, C)
-Dict dict_alloc_(size_t siz, size_t cap);
+static inline Dict dict_alloc_(size_t siz, size_t cap);
 
 #define dict_realloc_iso(T, D, C) (D) = dict_realloc_(sizeof(T), (D), (C))
-#define dict_realloc(D, C) dict_realloc_iso(typeof(*D), D, C)
-Dict dict_realloc_(size_t siz, Dict d, size_t cap);
+#define dict_realloc(D, C) dict_realloc_iso(typeof(*D->v), D, C)
+static inline Dict dict_realloc_(size_t siz, Dict d, size_t cap);
 
 #define dict_require_iso(T, D, C) (D) = dict_require_(sizeof(T), (D), (C))
-#define dict_require(D, C) dict_require_iso(typeof(*D), D, C)
-Dict dict_require_(size_t siz, Dict d, size_t cap);
+#define dict_require(D, C) dict_require_iso(typeof(*D->v), D, C)
+static inline Dict dict_require_(size_t siz, Dict d, size_t cap);
 
 #define dict_free_iso(T, D) (D) = dict_free_((D))
-#define dict_free(D) dict_free_iso(typeof(*D), D)
-Dict dict_free_(Dict d);
+#define dict_free(D) dict_free_iso(_, D)
+static inline Dict dict_free_(Dict d);
 
 /*
-** And finally we need to implement the static structure accessor function.
-** Just like with `Seq` and `Str`, it is important for performance reasons to do
-** it in the header and not the C file.
+** And now we just wrap the accessors from SeqMap with some changes.
+** TODO: Find some way of getting around this constant Txt allocation.
+**       It's definitely not cheap.
 */
 
 static inline
-struct dict_data *dict(Dict d) {
-  return ((struct dict_data*) d) - 1;
+struct seqmap_data *dict(Dict d) {
+  return seqmap(d);
+}
+
+static inline
+Dict dict_set_(size_t siz, Dict d, char *k, void *v) {
+  Txt t = txt_wrap(k, strlen(k));
+  d = seqmap_set_(1, siz, d, k, v);
+  txt_free_(t);
+  return d;
+}
+
+static inline
+bool dict_has_(size_t siz, Dict d, char *k) {
+  Txt t = txt_wrap(k, strlen(k));
+  bool has = seqmap_has_(1, siz, d, k);
+  txt_free_(t);
+  return has;
+}
+
+static inline
+void *dict_get_(size_t siz, Dict d, char *k) {
+  Txt t = txt_wrap(k, strlen(k));
+  void *p = seqmap_get_(1, siz, d, k);
+  txt_free_(t);
+  return p;
 }
 
 /*
-** Now that we're done with functions, how about some nice macros?
+** Same with the allocators.
 */
 
+static inline
+Dict dict_alloc_(size_t siz, size_t cap) {
+  return seqmap_alloc_(1, siz, cap);
+}
 
-#define dict_foreach_iso(T, D, K, V) \
-for (size_t I = 0, J = 0; I < dict(D)->cap; I++, J = 0) \
-for (char *K = dict(D)->buckets[I].key; J != 1; J = 1) \
-if (K) \
-for (T V = dict_get_iso(T, D, K); J != 1; J = 1)
-#define dict_foreach(D, K, V) dict_foreach_iso(typeof(*D), D, K, V)
+static inline
+Dict dict_realloc_(size_t siz, Dict d, size_t cap) {
+  return seqmap_realloc_(1, siz, d, cap);
+}
 
-#ifdef __clang__
-  #pragma clang diagnostic pop // -Wcast-align
-  #pragma clang diagnostic pop // -Wpadded
-#endif
+static inline
+Dict dict_require_(size_t siz, Dict d, size_t cap) {
+  return seqmap_require_(1, siz, d, cap);
+}
+
+static inline
+Dict dict_free_(Dict d) {
+  return seqmap_free_(d);
+}
 
 #endif // CIRCA_DICT_H

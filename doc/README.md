@@ -12,8 +12,6 @@
 
 *Note that all of this documentation is incomplete.*
 
-[Dictionaries](api/dict.md)
-
 [Maps](api/map.md)
 
 [Sequences](api/seq.md)

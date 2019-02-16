@@ -3,6 +3,7 @@
 ** https://github.com/davidgarland/circa
 */
 
+#include "../h/slice.h"
 #include "../h/seq.h"
 
 /*
@@ -62,6 +63,7 @@ Seq seq_wrap_(size_t siz, size_t a, void *v) {
     return (CE = CE_ARG, NULL);
   Seq s = seq_alloc_(siz, a);
   memcpy(s, v, a * siz);
+  seq(s)->len = a;
   return s;
 }
 
@@ -106,4 +108,42 @@ void *seq_pop_(size_t siz, Seq s, size_t n) {
     return (CE = CE_OOB, s);
   seq(s)->len -= n;
   return ((char*) s) + (seq(s)->len - (n ? 0 : 1)) * siz;
+}
+
+/*
+** Comparison Operations
+*/
+
+bool seq_cmp_(size_t siz, Seq a, Seq b) {
+  ce_guard(!siz || !a || !b)
+    return (CE = CE_ARG, false);
+  const size_t a_len = seq(a)->len;
+  if (a_len != seq(b)->len)
+    return false;
+  if (memcmp(a, b, a_len * siz))
+    return false;
+  return true;
+}
+
+bool seq_cmp_len_(size_t siz, Seq a, Seq b, size_t len) {
+  ce_guard (!siz || !a || !b)
+    return (CE = CE_ARG, false);
+  if (len > seq(a)->len || len > seq(b)->len)
+    return (CE = CE_OOB, false);
+  if (memcmp(a, b, len * siz))
+    return false;
+  return true;
+}
+
+bool seq_cmp_slice_(size_t siz, Seq a, Slice sa, Seq b, Slice sb) {
+  ce_guard (!siz || !a || !b)
+    return (CE = CE_ARG, false);
+  if (!slice_in_len(sa, 0, seq(a)->len))
+    return (CE = CE_ARG, false);
+  if (!slice_in_len(sb, 0, seq(b)->len))
+    return (CE = CE_ARG, false);
+  for (size_t i = sa.le, j = sb.le; (i <= sa.ri) && (j <= sb.ri); i++, j++)
+    if (memcmp(((char*) a) + siz * i, ((char*) b) + siz * j, siz))
+      return false;
+  return true;
 }

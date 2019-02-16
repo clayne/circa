@@ -95,9 +95,9 @@ static inline char txt_pop_(Txt t, size_t n);
 ** for nil or empty, etc.
 */
 
-bool txt_cmp(Txt a, Txt b);
-bool txt_cmp_len(Txt a, Txt b, size_t len);
-bool txt_cmp_slice(Txt a, Slice sa, Txt b, Slice sb);
+static inline bool txt_cmp(Txt a, Txt b);
+static inline bool txt_cmp_len(Txt a, Txt b, size_t len);
+static inline bool txt_cmp_slice(Txt a, Slice sa, Txt b, Slice sb);
 bool txt_cmp_slice_lit(Txt t, Slice s, char *c);
 
 /*
@@ -182,6 +182,25 @@ static inline
 char txt_pop_(Txt t, size_t n) {
   void *p = seq_pop_(1, t, n);
   return p ? *((char*) p) : '\0';
+}
+
+/*
+** String Operations
+*/
+
+static inline
+bool txt_cmp(Txt a, Txt b) {
+  return seq_cmp_(1, a, b);
+}
+
+static inline
+bool txt_cmp_len(Txt a, Txt b, size_t len) {
+  return seq_cmp_len_(1, a, b, len);
+}
+
+static inline
+bool txt_cmp_slice(Txt a, Slice sa, Txt b, Slice sb) {
+  return seq_cmp_slice_(1, a, sa, b, sb);
 }
 
 /*
