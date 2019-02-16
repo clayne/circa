@@ -31,47 +31,17 @@
   #pragma clang diagnostic ignored "-Wcast-align"
 #endif
 
-/*
-** Just like the `Dict` type, `Map` has a bucket type. However, there is one key
-** difference-- `Map`'s key type is `void*` instead of `char*`, because it has
-** to be generic.
-**
-** If you're curious what the other fields mean, I'd recommend digging through
-** `dict.h`, which already explains it.
-*/
-
-struct map_bucket {
-  void *data; // TODO: Pack `data` and `key` into one array, if possible.
-  void *key;
-  size_t probe;
-};
-
-/*
-** `Map` again works the same way as `Seq`, `Str`, and `Dict`. A fat pointer
-** with a capacity, length, etc.
-** And again much like `Dict`, the type the macro uses actually isn't the type
-** of the data held by the structure-- you aren't meant to access the type
-** directly, it is just to store type data for non-`_iso` versions of functions.
-*/
-
 struct map_data {
-  size_t cap;
-  size_t len;
-  struct map_bucket buckets[];
+  size_t  cap;
+  size_t  len;
+  bool   *used;
+  size_t *probe;
+  char   *data;
+  char    key[];
 };
-
-/*
-** Now here's something interesting-- (ab)using anonymous structs to store two
-** types in the signature of our Map type. This makes the non-`_iso` calls much
-** more ergonomic, saving us two arguments.
-*/
 
 #define Map(K, V) struct { K *k; V *v; } *
 typedef void *Map;
-
-/*
-** Now here are the accessor functions:
-*/
 
 static inline struct map_data *map(Map m);
 
@@ -97,10 +67,6 @@ bool map_has_(size_t sizk, size_t sizv, Map m, void *k);
 #define map_get(M, K) map_get_iso(typeof(*M->k), typeof(*M->v), M, K)
 void *map_get_(size_t sizk, size_t sizv, Map m, void *k);
 
-/*
-** Then we need some allocators to build our maps.
-*/
-
 #define map_alloc_iso(KT, VT, C) map_alloc_(sizeof(KT), sizeof(VT), (C))
 #define map_alloc(KT, VT, C) map_alloc_iso(KT, VT, C)
 Map map_alloc_(size_t sizk, size_t sizv, size_t cap);
@@ -113,29 +79,20 @@ Map map_realloc_(size_t sizk, size_t sizv, Map m, size_t cap);
 #define map_require(M, C) map_require_iso(typeof(*M->k), typeof(*M->v), (M), (C))
 Map map_require_(size_t sizk, size_t sizv, Map m, size_t cap);
 
-#define map_free(M) (M) = map_free_((M))
+#define map_free_iso(KT, VT, M) (M) = map_free_((M))
+#define map_free(M) map_free_iso(_, _, M)
 Map map_free_(Map m);
-
-/*
-** And finally we need to implement the static structure accessor function.
-** Exactly the same as `Dict`, `Seq`, and `Str`; header for performance.
-*/
 
 static inline
 struct map_data *map(Map m) { 
   return ((struct map_data*) m) - 1;
 }
 
-/*
-** And now for the macros.
-*/
-
 #define map_foreach_iso(TK, TV, M, K, V) \
 for (size_t I = 0, J = 0; I < map(M)->cap; I++, J = 0) \
-for (TK *KP = map(M)->buckets[I].key; J != 1; J = 1) \
-if (KP) \
-for (TK K = *KP; J != 1; J = 1) \
-for (TV V = map_get_iso(TK, TV, M, K); J != 1; J = 1)
+if (map(M)->used[I]) \
+for(TK K = *(TK*) (map(M)->key + (I * sizeof(TK))); J != 1; J = 1) \
+for(TV V = *(TV*) (map(M)->data + (I * sizeof(TV))); J != 1; J = 1)
 #define map_foreach(M, K, V) map_foreach_iso(typeof(*M->k), typeof(*M->v), M, K, V)
 
 #ifdef __clang__

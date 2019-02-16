@@ -17,88 +17,140 @@
 #define XXH_STATIC_LINKING_ONLY
 #include "../../lib/xxhash/xxhash.h"
 
+#include "../h/seq.h"
+
 #include "../h/map.h"
 
 Map map_set_(size_t sizk, size_t sizv, Map m, void *k, void *v) {
   ce_guard (!sizk || !sizv || !m || !k || !v)
     return (CE = CE_ARG, m);
 
-  // Set up a swap bucket.
-  struct map_bucket swp = {
-    .data    = malloc(sizv),
-    .key     = malloc(sizk),
-    .probe   = 0,
-  };
+  // Avoid redundant calls.
+  struct map_data *md = map(m);
 
-  if (!swp.data || !swp.key)
-    return (CE = CE_OOM, m);
+  // And avoid redundant dereferences.
+  const size_t m_cap = md->cap;
 
-  memcpy(swp.data, v, sizv);
-  memcpy(swp.key, k, sizk);
+  // Construct two buckets for shuffling values around. Use VLAs if possible.
+  bool swp_used, tmp_used;
+  bool swp_probe, tmp_probe;
+  #ifdef CIRCA_VLA
+    char  swp_data[sizv], tmp_data[sizv];
+    char  swp_key[sizk],  tmp_key[sizk];
+  #else
+    char *swp_data,      *tmp_data;
+    char *swp_key,       *tmp_key;
+  #endif
+  
+  swp_used = true;
+  swp_probe = 0;
+
+  // If we don't have VLAs, we'll have to malloc.
+  #ifndef CIRCA_VLA
+    swp_data = malloc(sizv);
+    swp_key  = malloc(sizk);
+    tmp_data = malloc(sizv);
+    tmp_key  = malloc(sizk);
+
+    if (!swp_data || !swp_key || !tmp_data || !tmp_key)
+      return (CE = CE_OOM, m);
+  #endif
+
+  // Copy the key and value into the swap bucket.
+  memcpy(swp_data, v, sizv);
+  memcpy(swp_key,  k, sizk);
 
   // Calculate the starting position using xxHash.
-  size_t hash = (sizeof(size_t) == 8) ? XXH64(k, sizk, 0)
-              : XXH32(k, sizk, 0);
-  size_t addr = hash % map(m)->cap;
+  const size_t hash = (sizeof(size_t) == 8) ? XXH64(k, sizk, 0)
+                    : XXH32(k, sizk, 0);
+  const size_t addr = hash % m_cap;
 
-  // Traverse the map in search of a position for `swp`.
   size_t i;
   bool found = false;
-  for (i = addr; i < map(m)->cap; i++) {
-    if (map(m)->buckets[i].key) {
-      if (!memcmp(map(m)->buckets[i].key, swp.key, sizk)) {
+  for (i = addr; i < m_cap; i++) {
+    if (md->used[i]) {
+      if (!memcmp(md->key + (i * sizk), swp_key, sizk)) {
         found = true;
         break;
-      } else if (map(m)->buckets[i].probe < swp.probe) {
-        struct map_bucket tmp;
-        tmp = map(m)->buckets[i];
-        map(m)->buckets[i] = swp;
-        swp = tmp;
+      } else if (md->probe[i] < swp_probe) {
+        // c := a
+        tmp_used  = md->used[i];
+        tmp_probe = md->probe[i];
+        memcpy(tmp_data, md->data + (i * sizv), sizv);
+        memcpy(tmp_key,  md->key + (i * sizk), sizk);
+        // a := b
+        md->used[i]  = swp_used;
+        md->probe[i] = swp_probe;
+        memcpy(md->data + (i * sizv), swp_data, sizv);
+        memcpy(md->key + (i * sizk), swp_key, sizk);
+        // b := c
+        swp_used  = tmp_used;
+        swp_probe = tmp_probe;
+        memcpy(swp_data, tmp_data, sizv);
+        memcpy(swp_key, tmp_key, sizk);
       }
     } else {
-      map(m)->len++;
+      md->len++;
       found = true;
       break;
     }
-    swp.probe++;
+    swp_probe++;
   }
 
-  // If found, place the swap bucket. Otherwise, recurse.
   if (found) {
-    free(map(m)->buckets[i].key);
-    free(map(m)->buckets[i].data);
-    map(m)->buckets[i] = swp;
+    md->probe[i] = swp_probe;
+    md->used[i]  = swp_used;
+    memcpy(md->data + (i * sizv), swp_data, sizv);
+    memcpy(md->key + (i * sizk),  swp_key,  sizk);
   } else {
-    m = map_realloc_(sizk, sizv, m, map(m)->cap + 1);
-    m = map_set_(sizk, sizv, m, swp.key, swp.data);
-    free(swp.key);
-    free(swp.data);
+    m = map_realloc_(sizk, sizv, m, m_cap + 1);
+    m = map_set_(sizk, sizv, m, swp_key, swp_data);
   }
+
+  #ifndef CIRCA_VLA
+    free(swp_data);
+    free(swp_key);
+    free(tmp_data);
+    free(tmp_key);
+  #endif
 
   return m;
 }
 
 bool map_has_(size_t sizk, size_t sizv, Map m, void *k) {
-  return map_get_(sizk, sizv, m, k) ? true
-       : (CE = CE_OK, false);
+  void *p = map_get_(sizk, sizv, m, k);
+  if (CE) {
+    if (CE == CE_OOB) {
+      CE = CE_OK;
+    }
+    return false;
+  } else {
+    return p != NULL;
+  }
 }
 
 void *map_get_(size_t sizk, size_t sizv, Map m, void *k) {
   ce_guard (!sizk || !sizv || !m || !k)
     return (CE = CE_ARG, NULL);
 
-  // Calculate the starting position using xxHash.
-  size_t hash = (sizeof(size_t) == 8) ? XXH64(k, sizk, 0)
-              : XXH32(k, sizk, 0);
-  size_t addr = hash % map(m)->cap;
+  struct map_data *md = map(m);
+  
+  const size_t m_cap = md->cap;
 
-  // Traverse the map for a match.
-  for (size_t i = addr; i < map(m)->cap; i++)
-    if (map(m)->buckets[i].key)
-      if (!memcmp(map(m)->buckets[i].key, k, sizk))
-        return map(m)->buckets[i].data;
+  const size_t hash = (sizeof(size_t) == 8) ? XXH64(k, sizk, 0)
+                    : XXH32(k, sizk, 0);
+  const size_t addr = hash % m_cap;
 
-  // If no match is found, throw an out of bounds exception.
+  for (size_t i = addr; i < m_cap; i++) {
+    if (md->used[i]) {
+      if (!memcmp(md->key + (i * sizk), k, sizk)) {
+        return md->data + (i * sizv);
+      }
+    } else {
+      return (CE = CE_OOB, NULL);
+    }
+  }
+
   return (CE = CE_OOB, NULL);
 }
 
@@ -107,64 +159,106 @@ Map map_alloc_(size_t sizk, size_t sizv, size_t cap) {
     return (CE = CE_ARG, NULL);
 
   cap = usz_primegt(cap);
-  struct map_data *md = calloc(sizeof(*md) + cap * sizeof(struct map_bucket), 1);
+ 
+  struct map_data *md = calloc(sizeof(*md) + cap * sizk, 1);
+
+  if (!md)
+    return (CE = CE_OOM, NULL);
+
+  md->used  = calloc(cap, 1);
+  md->probe = calloc(cap, sizeof(size_t));
+  md->data  = calloc(cap, sizv);
+
+  if (!md->probe || !md->data)
+    return (CE = CE_OOM, NULL);
+
   md->cap = cap;
-  return md->buckets;
+
+  return md->key;
 }
 
 Map map_realloc_(size_t sizk, size_t sizv, Map m, size_t cap) {
   ce_guard (!sizk || !sizv || !m || !cap)
-    return (CE = CE_ARG, m);
+    return (CE = CE_ARG, NULL);
 
-  // Allocate a temporary array of buckets.
-  struct map_bucket *bd = malloc(map(m)->len * sizeof(*bd));
-  if (!bd)
+  // Let's not call this function a million times, sounds good.
+  struct map_data *md = map(m);
+
+  // Calculate the size of the current map's fields.
+  const size_t m_cap   = md->cap;
+  const size_t m_data  = m_cap * sizv;
+  const size_t m_key   = m_cap * sizk;
+
+  // Construct a temporary "fake" map based on these sizes.
+  struct {
+    bool   *used;
+    char   *data;
+    char   *key;
+  } tmp = {
+    .used  = malloc(m_cap),
+    .data  = malloc(m_data),
+    .key   = malloc(m_key)
+  };
+
+  // If the allocation doesn't succeed, raise an OOM error.
+  if (!tmp.used || !tmp.data || !tmp.key)
     return (CE = CE_OOM, m);
 
-  // Load the map's buckets into the temporary bucket array.
-  for (size_t i = 0; i < map(m)->cap; i++)
-    if (map(m)->buckets[i].key)
-      *(bd++) = map(m)->buckets[i];
-  bd -= map(m)->len;
+  // If it did, however, load the map into the temporary "fake" map.
+  memcpy(tmp.used,  md->used,  m_cap);
+  memcpy(tmp.data,  md->data,  m_data);
+  memcpy(tmp.key,   md->key,   m_key);
 
-  // Reallocate the original map to be the new specified size.
-  cap = usz_primegt(cap);
-  struct map_data *md = realloc(map(m), sizeof(*md) + cap * sizeof(*bd));
+  // Calculate the size of the map's resized fields.
+  const size_t m2_cap   = usz_primegt(cap);
+  const size_t m2_probe = m2_cap * sizeof(size_t);
+  const size_t m2_data  = m2_cap * sizv;
+  const size_t m2_key   = m2_cap * sizk;
+  
+  // Reallocate the original map to the new sizes.
+  md = realloc(md, sizeof(*md) + m2_key);
+  
   if (!md)
     return (CE = CE_OOM, m);
-  m = md->buckets;
-  map(m)->cap = cap;
 
-  // Clear the map's memory out.
-  const size_t len = map(m)->len;
-  map(m)->len = 0;
-  memset(m, 0, cap * sizeof(*bd));
+  md->used  = realloc(md->used,  m2_cap);
+  md->probe = realloc(md->probe, m2_probe);
+  md->data  = realloc(md->data,  m2_data);
+  
+  if (!md->data || !md->probe || !md->data)
+    return (CE = CE_OOM, NULL);
 
-  // Load the temporary array of buckets back into the map.
-  for (size_t i = 0; i < len; i++) {
-    m = map_set_(sizk, sizv, m, bd[i].key, bd[i].data);
-    free(bd[i].data);
-    free(bd[i].key);
-  }
+  m = md->key;
+  md->cap = m2_cap;
 
-  // Free the temporary bucket data.
-  free(bd);
+  // Clear out the map's memory.
+  memset(md->used,  0, m2_cap);
+  memset(md->probe, 0, m2_probe);
+  memset(md->data,  0, m2_data);
+  memset(m,         0, m2_key);
+
+  // Load the data back into the map.
+  for (size_t i = 0; i < m_cap; i++)
+    if (tmp.used[i])
+      m = map_set_(sizk, sizv, m, tmp.key + (i * sizk), tmp.data + (i * sizv));
+
+  // Free the temporary "fake" map.
+  free(tmp.used);
+  free(tmp.data);
+  free(tmp.key);
 
   return m;
 }
 
 Map map_require_(size_t sizk, size_t sizv, Map m, size_t cap) {
-  ce_guard (!sizk || !sizv || !m || !cap)
-    return (CE = CE_ARG, m);
   return map(m)->cap < cap ? map_realloc_(sizk, sizv, m, cap) : m;
 }
 
 Map map_free_(Map m) {
   if (m) {
-    for (size_t i = 0; i < map(m)->cap; i++) {
-      free(map(m)->buckets[i].data);
-      free(map(m)->buckets[i].key);
-    }
+    free(map(m)->used);
+    free(map(m)->probe);
+    free(map(m)->data);
     free(map(m));
   }
   return NULL;

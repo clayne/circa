@@ -7,6 +7,7 @@
 #define CIRCA_SEQ_H
 
 #include "core.h"
+#include "slice.h"
 
 /*
 ** Dynamic sequences work by using a style of "fat pointers" where the data is
@@ -61,6 +62,10 @@ bool seq_has_(size_t siz, Seq s, size_t a);
 #define seq_get(S, A) seq_get_iso(typeof(*S), S, A)
 void *seq_get_(size_t siz, Seq s, size_t a);
 
+/*
+** Then some allocators:
+*/
+
 #define seq_alloc_iso(T, C) seq_alloc_(sizeof(T), C)
 #define seq_alloc(T, C) seq_alloc_iso(T, C)
 Seq seq_alloc_(size_t siz, size_t cap);
@@ -80,6 +85,10 @@ Seq seq_wrap_(size_t siz, size_t n, void *v);
 #define seq_free(S) (S) = seq_free_((S))
 Seq seq_free_(Seq s);
 
+/*
+** Some stack functions:
+*/
+
 #define seq_push_lit_iso(T, S, V) (S) = seq_push_(sizeof(T), (S), &(T){V})
 #define seq_push_lit(S, V) seq_push_lit_iso(typeof(*S), S, V)
 #define seq_push_iso(T, S, V) (S) = seq_push_(sizeof(T), (S), &(V))
@@ -91,6 +100,16 @@ Seq seq_push_(size_t siz, Seq s, void *v);
 #define seq_pop_iso(T, S) (*((T*) seq_pop_(sizeof(T), (S), 1)))
 #define seq_pop(S) seq_pop_iso(typeof(*S), S)
 void *seq_pop_(size_t siz, Seq s, size_t n);
+
+/*
+** And then comparisons.
+*/
+
+// TODO: Add proper macro signatures for these.
+
+bool seq_cmp_(size_t siz, Seq a, Seq b);
+bool seq_cmp_len_(size_t siz, Seq a, Seq b, size_t len);
+bool seq_cmp_slice_(size_t siz, Seq a, Slice sa, Seq b, Slice sb);
 
 /*
 ** Finally, there are some static function implementations.
@@ -190,4 +209,4 @@ do {                                       \
 } while (0)
 #define seq_do(S, F) seq_do_iso(typeof(*S), S, F)
 
-#endif /* CIRCA_SEQ_H */
+#endif // CIRCA_SEQ_H

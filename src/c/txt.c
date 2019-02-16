@@ -9,42 +9,6 @@
 ** String Operations
 */
 
-bool txt_cmp(Txt a, Txt b) {
-  ce_guard (!a || !b)
-    return (CE = CE_ARG, false);
-  const size_t a_len = txt(a)->len;
-  if (a_len != txt(b)->len)
-    return false;
-  for (size_t i = 0; i < a_len; i++)
-    if (a[i] != b[i])
-      return false;
-  return true;
-}
-
-bool txt_cmp_len(Txt a, Txt b, size_t len) {
-  ce_guard (!a || !b)
-    return (CE = CE_ARG, false);
-  if (len > txt(a)->len || len > txt(b)->len)
-    return (CE = CE_OOB, false);
-  for (size_t i = 0; i < len; i++)
-    if (a[i] != b[i])
-      return false;
-  return true;
-}
-
-bool txt_cmp_slice(Txt a, Slice sa, Txt b, Slice sb) {
-  ce_guard (!a || !b)
-    return (CE = CE_ARG, false);
-  if (!slice_in_len(sa, 0, txt(a)->len))
-    return (CE = CE_ARG, false);
-  if (!slice_in_len(sb, 0, txt(b)->len))
-    return (CE = CE_ARG, false);
-  for (size_t i = sa.le, j = sb.le; (i <= sa.ri) && (j <= sb.ri); i++, j++)
-    if (a[i] != b[j])
-      return false;
-  return true;
-}
-
 bool txt_cmp_slice_lit(Txt t, Slice s, char *c) {
   ce_guard (!t || !c)
     return (CE = CE_ARG, false);

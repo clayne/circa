@@ -12,6 +12,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#ifdef __STDC_VERSION__
+  #if __STDC_VERSION__ >= 199901L
+    #ifndef __STDC_NO_VLA__
+      #define CIRCA_VLA
+    #endif
+  #endif
+#endif
+
 enum circa_error {
   CE_OK  = 0,    // Everything is OK!
   CE_NOK = 1,    // A placeholder "Not OK" value for circa_retry.
