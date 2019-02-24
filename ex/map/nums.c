@@ -23,9 +23,9 @@ int main() {
   ce_critical
     m = map_alloc(Nums, Nums, 1);
   
-  map_set(m, a, b);
-  map_set(m, b, c);
-  map_set(m, c, a);
+  map_set(m, &a, &b);
+  map_set(m, &b, &c);
+  map_set(m, &c, &a);
  
   map_foreach(m, x, y)
     nums_print(x, y);

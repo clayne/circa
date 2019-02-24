@@ -24,9 +24,7 @@ typedef void *SeqMap;
 
 static inline struct seqmap_data *seqmap(SeqMap sm);
 
-#define seqmap_set_lit_iso(KT, VT, SM, K, V) (SM) = seqmap_set_(sizeof(KT), sizeof(VT), (SM), (K), &(VT){V})
-#define seqmap_set_lit(SM, K, V) seqmap_set_lit_iso(typeof(*(*SM->k)), typeof(*SM->v), SM, K, V)
-#define seqmap_set_iso(KT, VT, SM, K, V) (SM) = seqmap_set_(sizeof(KT), sizeof(VT), (SM), (K), &(V))
+#define seqmap_set_iso(KT, VT, SM, K, V) (SM) = seqmap_set_(sizeof(KT), sizeof(VT), (SM), (K), (V))
 #define seqmap_set(SM, K, V) seqmap_set_iso(typeof(*(*SM->k)), typeof(*SM->v), SM, K, V)
 SeqMap seqmap_set_(size_t sizk, size_t sizv, SeqMap sm, Seq k, void *v);
 

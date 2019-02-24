@@ -45,25 +45,15 @@ typedef void *Map;
 
 static inline struct map_data *map(Map m);
 
-#define map_set_litkv_iso(KT, VT, M, K, V) (M) = map_set_(sizeof(KT), sizeof(VT), (M), &(KT){K}, &(VT){V})
-#define map_set_litkv(M, K, V) map_set_litkv_iso(typeof(*M->k), typeof(*M->v), M, K, V)
-#define map_set_litk_iso(KT, VT, M, K, V) (M) = map_set_(sizeof(KT), sizeof(VT), (M), &(KT){K}, &(V))
-#define map_set_litk(M, K, V) map_set_litk_iso(typeof(*M->k), typeof(*M->v), M, K, V)
-#define map_set_litv_iso(KT, VT, M, K, V) (M) = map_set_(sizeof(KT), sizeof(VT), (M), &(K), &(VT){V})
-#define map_set_litv(M, K, V) map_set_litv_iso(typeof(*M->k), typeof(*M->v), M, K, V)
-#define map_set_iso(KT, VT, M, K, V) (M) = map_set_(sizeof(KT), sizeof(VT), (M), &(K), &(V))
+#define map_set_iso(KT, VT, M, K, V) (M) = map_set_(sizeof(KT), sizeof(VT), (M), (K), (V))
 #define map_set(M, K, V) map_set_iso(typeof(*M->k), typeof(*M->v), M, K, V)
 Map map_set_(size_t sizk, size_t sizv, Map m, void *k, void *v);
 
-#define map_has_litk_iso(KT, VT, M, K) map_has_(sizeof(KT), sizeof(VT), (M), &(KT){K})
-#define map_has_litk(M, K) map_has_litk_iso(typeof(*M->k), typeof(*M->v), M, K)
-#define map_has_iso(KT, VT, M, K) map_has_(sizeof(KT), sizeof(VT), (M), &(K))
+#define map_has_iso(KT, VT, M, K) map_has_(sizeof(KT), sizeof(VT), (M), (K))
 #define map_has(M, K) map_has_iso(typeof(*M->k), typeof(*M->v), M, K)
 bool map_has_(size_t sizk, size_t sizv, Map m, void *k);
 
-#define map_get_litk_iso(KT, VT, M, K) (*((VT*) map_get_(sizeof(KT), sizeof(VT), (M), &(KT){K})))
-#define map_get_litk(M, K) map_get_litk_iso(typeof(*M->k), typeof(*M->v), M, K)
-#define map_get_iso(KT, VT, M, K) (*((VT*) map_get_(sizeof(KT), sizeof(VT), (M), &(K))))
+#define map_get_iso(KT, VT, M, K) (*((VT*) map_get_(sizeof(KT), sizeof(VT), (M), (K))))
 #define map_get(M, K) map_get_iso(typeof(*M->k), typeof(*M->v), M, K)
 void *map_get_(size_t sizk, size_t sizv, Map m, void *k);
 
