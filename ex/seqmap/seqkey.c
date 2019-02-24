@@ -12,19 +12,19 @@ int main() {
     xs = seq_alloc(int, 1);
   
   for (int i = 0; i < 3; i++)
-    seq_set_lit(xs, i, i + 1);
+    seq_set(xs, i, &(int){i + 1});
 
   SeqMap(int, int) xss;
   
   ce_critical
     xss = seqmap_alloc(int, int, 1);
- 
-  seqmap_set_lit(xss, xs, 1);
+
+  seqmap_set(xss, xs, &(int){1});
   
   for (int i = 0; i < 3; i++)
-    seq_set(xs, i, i);
+    seq_set(xs, i, &i);
 
-  seqmap_set_lit(xss, xs, 2);
+  seqmap_set(xss, xs, &(int){1});
 
   printf("%i\n", seqmap_get(xss, xs));
 

@@ -16,7 +16,7 @@ int main() {
     xs = seq_alloc(int, 1);
 
   for (int i = 0; i < 10; i++)
-    seq_push(xs, i);
+    seq_push(xs, &i);
   
   seq_collapse(xs, add);
 

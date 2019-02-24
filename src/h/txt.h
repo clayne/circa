@@ -121,7 +121,7 @@ struct txt_data *txt(Txt t) {
 
 static inline
 void txt_clear(Txt t) {
-  return seq_clear_(1, t);
+  seq_clear_(1, t);
 }
 
 static inline

@@ -29,7 +29,7 @@ int main() {
     xs = seq_alloc(int, 10);
   
   for (int i = 0; i < (int) seq(xs)->cap; i++)
-    seq_push(xs, i);
+    seq_push(xs, &i);
 
   seq_apply(xs, sq);
   seq_keep(xs, odd);
