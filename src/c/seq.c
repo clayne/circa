@@ -91,6 +91,34 @@ Seq seq_free_(Seq s) {
 }
 
 /*
+** Sequence Operations
+*/
+
+Seq seq_cpy_(size_t siz, Seq a, Seq b) {
+  ce_guard (!siz || !a || !b)
+    return (CE = CE_ARG, a);
+  const size_t b_len = seq(b)->len;
+  a = seq_require_(siz, a, b_len);
+  if (CE)
+    return a;
+  seq(a)->len = b_len;
+  memcpy(a, b, b_len * siz);
+  return a;
+}
+
+Seq seq_cpy_slice_(size_t siz, Seq a, Seq b, Slice s) {
+  ce_guard (!siz || !a || !b || (s.ri < s.le) || (s.ri > seq(b)->len))
+    return (CE = CE_ARG, a);
+  const size_t s_len = s.ri - s.le + 1;
+  a = seq_require_(siz, a, s_len);
+  if (CE)
+    return a;
+  seq(a)->len = s_len;
+  memcpy(a, ((char*) b) + (s.le * siz), s_len * siz);
+  return a;
+}
+
+/*
 ** Stack Operations
 */
 

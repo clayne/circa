@@ -69,10 +69,21 @@ static inline Txt txt_realloc_(Txt t, size_t cap);
 #define txt_require(T, C) (T) = txt_require_((T), (C))
 static inline Txt txt_require_(Txt t, size_t cap);
 
+#define txt_lit(C) txt_wrap((C), strlen((C)))
 static inline Txt txt_wrap(char *c, size_t len);
 
 #define txt_free(T) (T) = txt_free_(T)
 static inline Txt txt_free_(Txt t);
+
+/*
+** Now for the main string functions, such as copying.
+*/
+
+#define txt_cpy(A, B) (A) = txt_cpy_((A), (B))
+Txt txt_cpy_(Txt a, Txt b);
+
+#define txt_cpy_slice(A, B, S) (A) = txt_cpy_slice_((A), (B), (S))
+Txt txt_cpy_slice_(Txt a, Txt b, Slice s);
 
 /*
 ** Next we have some stack functions, which allows us to easily append
@@ -91,8 +102,7 @@ static inline Txt txt_push_(Txt t, char v);
 static inline char txt_pop_(Txt t, size_t n);
 
 /*
-** Then there are our main string functions; comparison, upper, lower, checking
-** for nil or empty, etc.
+** Then there are the comparison functions:
 */
 
 static inline bool txt_cmp(Txt a, Txt b);

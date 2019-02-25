@@ -9,6 +9,34 @@
 ** String Operations
 */
 
+Txt txt_cpy_(Txt a, Txt b) {
+  ce_guard (!a || !b)
+    return (CE = CE_ARG, a);
+  const size_t b_len = txt(b)->len;
+  a = txt_require_(a, b_len + 1);
+  if (CE)
+    return a;
+  txt(a)->len = b_len;
+  memcpy(a, b, b_len);
+  a[b_len] = '\0';
+  return a;
+}
+
+Txt txt_cpy_slice_(Txt a, Txt b, Slice s) {
+  ce_guard (!a || !b || (s.ri < s.le) || (s.ri > txt(b)->len))
+    return (CE = CE_ARG, a);
+  const size_t s_len = s.ri - s.le + 1;
+  a = txt_require_(a, s_len + 1);
+  txt(a)->len = s_len;
+  memcpy(a, b + s.le, s_len);
+  a[s_len] = '\0';
+  return a;
+}
+
+/*
+** Comparison Operations
+*/
+
 bool txt_cmp_slice_lit(Txt t, Slice s, char *c) {
   ce_guard (!t || !c)
     return (CE = CE_ARG, false);
