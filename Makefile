@@ -52,6 +52,7 @@ ex: debug
 	$(CC) $(CFLAGS) $(DEBUG) -o nums.o   ex/map/nums.c      -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS) $(DEBUG) -o sum.o    ex/seq/sum.c       -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS) $(DEBUG) -o seqkey.o ex/seqmap/seqkey.c -lcirca $(LDFLAGS)
+	$(CC) $(CFLAGS) $(DEBUG) -o slice.o  ex/txt/slice.c     -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS) $(DEBUG) -o self.o   ex/txt/self.c      -lcirca $(LDFLAGS)
 	-@rm -rf *.a *.dSYM
 

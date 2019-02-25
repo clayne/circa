@@ -86,6 +86,18 @@ Seq seq_wrap_(size_t siz, size_t n, void *v);
 Seq seq_free_(Seq s);
 
 /*
+** And then for some core sequence functions, like copying.
+*/
+
+#define seq_cpy_iso(T, A, B) (A) = seq_cpy_(sizeof(T), (A), (B))
+#define seq_cpy(A, B) seq_cpy_iso(typeof(*A), A, B)
+Seq seq_cpy_(size_t siz, Seq a, Seq b);
+
+#define seq_cpy_slice_iso(T, A, B, S) (A) = seq_cpy_slice_(sizeof(T), (A), (B), (S))
+#define seq_cpy_slice(A, B, S) seq_cpy_slice_iso(typeof(*A), A, B, S)
+Seq seq_cpy_slice_(size_t siz, Seq a, Seq b, Slice s);
+
+/*
 ** Some stack functions:
 */
 
