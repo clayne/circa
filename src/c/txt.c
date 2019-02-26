@@ -9,28 +9,27 @@
 ** String Operations
 */
 
-Txt txt_cpy_(Txt a, Txt b) {
-  ce_guard (!a || !b)
-    return (CE = CE_ARG, a);
-  const size_t b_len = txt(b)->len;
-  a = txt_require_(a, b_len + 1);
+Txt txt_cpy_(Txt t, char *c, size_t len) {
+  ce_guard (!t || !c || !len)
+    return (CE = CE_ARG, t);
+  t = txt_require_(t, len + 1);
   if (CE)
-    return a;
-  txt(a)->len = b_len;
-  memcpy(a, b, b_len);
-  a[b_len] = '\0';
-  return a;
+    return t;
+  txt(t)->len = len;
+  memcpy(t, c, len);
+  t[len] = '\0';
+  return t;
 }
 
-Txt txt_cpy_slice_(Txt a, Txt b, Slice s) {
-  ce_guard (!a || !b || (s.ri < s.le) || (s.ri > txt(b)->len))
-    return (CE = CE_ARG, a);
+Txt txt_cpy_slice_(Txt t, char *c, Slice s) {
+  ce_guard (!t || !c || (s.ri < s.le))
+    return (CE = CE_ARG, t);
   const size_t s_len = s.ri - s.le + 1;
-  a = txt_require_(a, s_len + 1);
-  txt(a)->len = s_len;
-  memcpy(a, b + s.le, s_len);
-  a[s_len] = '\0';
-  return a;
+  t = txt_require_(t, s_len + 1);
+  txt(t)->len = s_len;
+  memcpy(t, c + s.le, s_len);
+  t[s_len] = '\0';
+  return t;
 }
 
 /*

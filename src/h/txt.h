@@ -79,11 +79,13 @@ static inline Txt txt_free_(Txt t);
 ** Now for the main string functions, such as copying.
 */
 
-#define txt_cpy(A, B) (A) = txt_cpy_((A), (B))
-Txt txt_cpy_(Txt a, Txt b);
+#define txt_cpy_len(T, C, L) (A) = txt_cpy_((A), (B), (L))
+#define txt_cpy_lit(T, C) txt_cpy_len(T, C, strlen(C))
+#define txt_cpy(T, C) txt_cpy_len(T, C, txt(C)->len)
+Txt txt_cpy_(Txt t, char *c, size_t len);
 
 #define txt_cpy_slice(A, B, S) (A) = txt_cpy_slice_((A), (B), (S))
-Txt txt_cpy_slice_(Txt a, Txt b, Slice s);
+Txt txt_cpy_slice_(Txt a, char *b, Slice s);
 
 /*
 ** Next we have some stack functions, which allows us to easily append
