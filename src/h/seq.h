@@ -111,6 +111,10 @@ Seq seq_push_(size_t siz, Seq s, void *v);
 #define seq_pop(S) seq_pop_iso(typeof(*S), S)
 void *seq_pop_(size_t siz, Seq s, size_t n);
 
+#define seq_pull_iso(T, S) (*((T*) seq_pull_(sizeof(T), (S))))
+#define seq_pull(S) seq_pull_iso(typeof(*S), S)
+void *seq_pull_(size_t siz, Seq s);
+
 /*
 ** And then comparisons.
 */

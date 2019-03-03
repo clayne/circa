@@ -50,7 +50,7 @@ void *seq_get_(size_t siz, Seq s, size_t a) {
 Seq seq_alloc_(size_t siz, size_t cap) {
   ce_guard (!siz || !cap)
     return (CE = CE_ARG, NULL);
-  struct seq_data *sd = malloc(sizeof(*sd) + cap * siz);
+  struct seq_data *sd = malloc(sizeof(*sd) + (cap + 1) * siz);
   if (!sd)
     return (CE = CE_OOM, NULL);
   sd->cap = cap;
@@ -71,7 +71,7 @@ Seq seq_realloc_(size_t siz, Seq s, size_t cap) {
   ce_guard (!siz || !s || !cap)
     return (CE = CE_ARG, s);
   struct seq_data *sd = seq(s);
-  sd = realloc(sd, sizeof(*sd) + cap * siz);
+  sd = realloc(sd, sizeof(*sd) + (cap + 1) * siz);
   if (!sd)
     return (CE = CE_OOM, s);
   sd->cap = cap;
@@ -136,6 +136,17 @@ void *seq_pop_(size_t siz, Seq s, size_t n) {
     return (CE = CE_OOB, s);
   seq(s)->len -= n;
   return ((char*) s) + (seq(s)->len - (n ? 0 : 1)) * siz;
+}
+
+void *seq_pull_(size_t siz, Seq s) {
+  ce_guard (!siz || !s)
+    return (CE = CE_ARG, s);
+  if (!seq(s)->len)
+    return (CE = CE_OOB, s);
+  void *restrict save = ((char*) s) + seq(s)->cap * siz;
+  memcpy(save, s, siz);
+  memmove(s, ((char*) s) + siz, seq(s)->len-- * siz);
+  return save;
 }
 
 /*
