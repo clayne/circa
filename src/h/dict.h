@@ -69,7 +69,7 @@ struct seqmap_data *dict(Dict d) {
 static inline
 Dict dict_set_(size_t siz, Dict d, char *k, void *v) {
   Txt t = txt_wrap(k, strlen(k));
-  d = seqmap_set_(1, siz, d, k, v);
+  d = seqmap_set_(1, siz, d, t, v);
   txt_free_(t);
   return d;
 }
@@ -77,7 +77,7 @@ Dict dict_set_(size_t siz, Dict d, char *k, void *v) {
 static inline
 bool dict_has_(size_t siz, Dict d, char *k) {
   Txt t = txt_wrap(k, strlen(k));
-  bool has = seqmap_has_(1, siz, d, k);
+  bool has = seqmap_has_(1, siz, d, t);
   txt_free_(t);
   return has;
 }
@@ -85,7 +85,7 @@ bool dict_has_(size_t siz, Dict d, char *k) {
 static inline
 void *dict_get_(size_t siz, Dict d, char *k) {
   Txt t = txt_wrap(k, strlen(k));
-  void *p = seqmap_get_(1, siz, d, k);
+  void *p = seqmap_get_(1, siz, d, t);
   txt_free_(t);
   return p;
 }
