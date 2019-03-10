@@ -23,9 +23,7 @@ typedef void *Dict;
 
 static inline struct seqmap_data *dict(Dict d);
 
-#define dict_set_litv_iso(T, D, K, V) (D) = dict_set_(sizeof(T), (D), (K), &(T){V})
-#define dict_set_litv(D, K, V) dict_set_litv_iso(typeof(*D->v), D, K, V)
-#define dict_set_iso(T, D, K, V) (D) = dict_set_(sizeof(T), (D), (K), &(V))
+#define dict_set_iso(T, D, K, V) (D) = dict_set_(sizeof(T), (D), (K), (V))
 #define dict_set(D, K, V) dict_set_iso(typeof(*D->v), D, K, V)
 static inline Dict dict_set_(size_t siz, Dict d, char *k, void *v);
 
