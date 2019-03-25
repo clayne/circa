@@ -277,12 +277,7 @@ uint8_t u8_ctz(uint8_t n) {
   #ifdef __GNUC__
     return (uint8_t) __builtin_ctzll(n);
   #else
-    n--;
-    n |= (n >> 1);
-    n |= (n >> 2);
-    n |= (n >> 4);
-    n++;
-    return n;
+    return u32_ctz(n); // TODO: 8-bit specific CTZ for higher speed.
   #endif
 }
 
@@ -291,13 +286,7 @@ uint8_t u16_ctz(uint16_t n) {
   #ifdef __GNUC__
     return (uint8_t) __builtin_ctzll(n);
   #else
-    n--;
-    n |= (n >> 1);
-    n |= (n >> 2);
-    n |= (n >> 4);
-    n |= (n >> 8);
-    n++;
-    return (uint8_t n);
+    return u32_ctz(n); // TODO: 16-bit specific CTZ for higher speed.
   #endif
 }
 
@@ -306,14 +295,15 @@ uint8_t u32_ctz(uint32_t n) {
   #ifdef __GNUC__
     return (uint8_t) __builtin_ctzll(n);
   #else
-    n--;
-    n |= (n >>  1);
-    n |= (n >>  2);
-    n |= (n >>  4);
-    n |= (n >>  8);
-    n |= (n >> 16);
-    n++;
-    return (uint8_t) n;  
+    uint8_t c = 32;
+    n &= -((int32_t) n);
+    c -= (n) ? 1 : 0;
+    c -= (n & 0x0000FFFF) ? 16 : 0;
+    c -= (n & 0x00FF00FF) ? 8  : 0;
+    c -= (n & 0x0F0F0F0F) ? 4  : 0;
+    c -= (n & 0x33333333) ? 2  : 0;
+    c -= (n & 0x55555555) ? 1  : 0;
+    return c;
   #endif
 }
 
@@ -322,15 +312,16 @@ uint8_t u64_ctz(uint64_t n) {
   #ifdef __GNUC__
     return (uint8_t) __builtin_ctzll(n);
   #else
-    n--;
-    n |= (n >>  1);
-    n |= (n >>  2);
-    n |= (n >>  4);
-    n |= (n >>  8);
-    n |= (n >> 16);
-    n |= (n >> 32);
-    n++;
-    return (uint8_t) n;
+    uint8_t c = 64;
+    n &= -((int64_t) n);
+    c -= (n) ? 1 : 0;
+    c -= (n & 0x00000000FFFFFFFF) ? 32 : 0;
+    c -= (n & 0x0000FFFF0000FFFF) ? 16 : 0;
+    c -= (n & 0x00FF00FF00FF00FF) ? 8  : 0;
+    c -= (n & 0x0F0F0F0F0F0F0F0F) ? 4  : 0;
+    c -= (n & 0x3333333333333333) ? 2  : 0;
+    c -= (n & 0x5555555555555555) ? 1  : 0;
+    return c;
   #endif
 }
 
