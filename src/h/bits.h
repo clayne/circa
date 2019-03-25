@@ -217,7 +217,7 @@ uint8_t u8_clz(uint8_t n) {
     n |= (n >> 1);
     n |= (n >> 2);
     n |= (n >> 4);
-    return u8_pop(n);
+    return u8_pop(~n);
   #endif
 }
 
@@ -230,7 +230,7 @@ uint8_t u16_clz(uint16_t n) {
     n |= (n >>  2);
     n |= (n >>  4);
     n |= (n >>  8);
-    return u16_pop(n);
+    return u16_pop(~n);
   #endif
 }
 
@@ -244,7 +244,7 @@ uint8_t u32_clz(uint32_t n) {
     n |= (n >>  4);
     n |= (n >>  8);
     n |= (n >> 16);
-    return u32_pop(n);
+    return u32_pop(~n);
   #endif
 }
 
@@ -259,13 +259,13 @@ uint8_t u64_clz(uint64_t n) {
     n |= (n >>  8);
     n |= (n >> 16);
     n |= (n >> 32);
-    return u64_pop(n);
+    return u64_pop(~n);
   #endif
 }
 
 static inline
 uint8_t usz_clz(size_t n) {
-    return (sizeof(size_t) == 8) ? u64_clz(n) : u32_clz(n);
+  return (sizeof(size_t) == 8) ? u64_clz(n) : u32_clz(n);
 }
 
 /*
