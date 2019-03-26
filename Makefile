@@ -59,7 +59,7 @@ ex: debug
 	-@rm -rf *.a *.dSYM
 
 test: debug
-	$(CC) $(CFLAGS) $(DEBUG) tests/test.c -L. -I. -Ilib/snow -DSNOW_ENABLED -o test.o -lcirca
+	$(CC) $(CFLAGS) $(DEBUG) tests/test.c -L. -I. -Ilib/snow -DSNOW_ENABLED -o test.o -lcirca -lm
 	-@rm -rf *.dSYM
 
 clean:

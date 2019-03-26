@@ -392,34 +392,29 @@ size_t usz_np2(size_t n) {
 ** Divide By Ten
 */
 
+// TODO: Find more optimal way again. Apparently the previous method
+// was for signed integers.
+
+// TODO: Implement old method for signed integers.
+
 static inline
 uint8_t u8_div10(uint8_t n) {
-  return (uint8_t) u32_div10(n);
+  return n / 10;
 }
 
 static inline
 uint16_t u16_div10(uint16_t n) {
-  return (uint16_t) u32_div10(n);
+  return n / 10;
 }
 
 static inline
 uint32_t u32_div10(uint32_t n) {
-  register const uint64_t inv = 0x199999A;
-  return (uint32_t) ((inv * n) >> 32); 
+  return n / 10;
 }
 
 static inline
 uint64_t u64_div10(uint64_t n) {
-  #ifdef __GNUC__
-    if (sizeof(size_t) == 8) {
-      __uint128_t x = 0x19999997E241C000;
-      return (uint64_t) ((x * (n + 1)) >> 64);
-    } else {
-      return n / 10;
-    }
-  #else
-    return n / 10;
-  #endif
+  return n / 10;
 }
 
 static inline

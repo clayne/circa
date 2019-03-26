@@ -3,8 +3,169 @@
 ** https://github.com/davidgarland/circa
 */
 
+#include <math.h>
 #include <circa.h>
 #include <snow/snow.h>
+
+describe (Bits) {
+  subdesc (pop) {
+    it ("u8_pop") {
+      uint8_t n = 1;
+      for (uint8_t i = 1; i <= 8; i++) {
+        assert(i == u8_pop(n), "Popcount should count number of 1 bits.");
+        n |= (n << 1);
+      }
+    }
+
+    it ("u16_pop") {
+      uint16_t n = 1;
+      for (uint8_t i = 1; i <= 16; i++) {
+        assert(i == u16_pop(n), "Popcount should count number of 1 bits.");
+        n |= (n << 1);
+      }
+    }
+
+    it ("u32_pop") {
+      uint32_t n = 1;
+      for (uint8_t i = 1; i <= 32; i++) {
+        assert(i == u32_pop(n), "Popcount should count number of 1 bits.");
+        n |= (n << 1);
+      }
+    }
+
+    it ("u64_pop") {
+      uint64_t n = 1;
+      for (uint8_t i = 1; i <= 64; i++) {
+        assert(i == u64_pop(n), "Popcount should count number of 1 bits.");
+        n |= (n << 1);
+      }
+    }
+  }
+
+  subdesc (clz) {
+    it ("u8_clz") {
+      uint8_t n = 1;
+      for (uint8_t i = 7; i > 0; i--) {
+        assert(i == u8_clz(n), "CLZ should count number of leading 0 bits.");
+        n <<= 1;
+      }
+    }
+
+    it ("u16_clz") {
+      uint16_t n = 1;
+      for (uint8_t i = 15; i > 0; i--) {
+        assert(i == u16_clz(n), "CLZ should count number of leading 0 bits.");
+        n <<= 1;
+      }
+    }
+
+    it ("u32_clz") {
+      uint32_t n = 1;
+      for (uint8_t i = 31; i > 0; i--) {
+        assert(i == u32_clz(n), "CLZ should count number of leading 0 bits.");
+        n <<= 1;
+      }
+    }
+
+    it ("u64_clz") {
+      uint64_t n = 1;
+      for (uint8_t i = 63; i > 0; i--) {
+        assert(i == u64_clz(n), "CLZ should count number of leading 0 bits.");
+        n <<= 1;
+      }
+    }
+  }
+
+  subdesc (ctz) {
+    it ("u8_ctz") {
+      uint8_t n = 1;
+      for (uint8_t i = 0; i < 8; i++) {
+        assert(i == u8_ctz(n), "CTZ should count number of trailing 0 bits.");
+        n <<= 1;
+      }
+    }
+
+    it ("u16_ctz") {
+      uint16_t n = 1;
+      for (uint8_t i = 0; i < 16; i++) {
+        assert(i == u16_ctz(n), "CTZ should count number of trailing 0 bits.");
+        n <<= 1;
+      }
+    }
+
+    it ("u32_ctz") {
+      uint32_t n = 1;
+      for (uint8_t i = 0; i < 32; i++) {
+        assert(i == u32_ctz(n), "CTZ should count number of trailing 0 bits.");
+        n <<= 1;
+      }
+    }
+
+    it ("u64_ctz") {
+      uint64_t n = 1;
+      for (uint8_t i = 0; i < 64; i++) {
+        assert(i == u64_ctz(n), "CTZ should count number of trailing 0 bits.");
+        n <<= 1;
+      }
+    }
+  }
+
+  subdesc (np2) {
+    it ("u8_np2") {
+      for (uint8_t i = 0; i < (1 << (8 - 1)); i++) {
+        assert(u8_np2(i) >= i, "NP2 should be >= the input.");
+        assert(u8_pop(u8_np2(i)) == 1, "NP2 should be a power of two.");
+      }
+    }
+
+    it ("u16_np2") {
+      for (uint16_t i = 0; i < (1 << (16 - 1)); i++) {
+        assert(u16_np2(i) >= i, "NP2 should be >= the input.");
+        assert(u16_pop(u16_np2(i)) == 1, "NP2 should be a power of two.");
+      }
+    }
+
+    it ("u32_np2") {
+      for (uint32_t i = 0; i < (1 << (16 - 1)); i++) {
+        assert(u32_np2(i) >= i, "NP2 should be >= the input.");
+        assert(u32_pop(u32_np2(i)) == 1, "NP2 should be a power of two.");
+      }
+    }
+
+    it ("u64_np2") {
+      for (uint64_t i = 0; i < (1 << (16 - 1)); i++) {
+        assert(u64_np2(i) >= i, "NP2 should be >= the input.");
+        assert(u64_pop(u64_np2(i)) == 1, "NP2 should be a power of two.");
+      }
+    }
+  }
+
+  subdesc (div10) {
+    it ("u8_div10") {
+      for (uint8_t i = 0; i < (1 << (8 - 1)); i++) {
+        assert(u8_div10(i) == (i / 10));
+      }
+    }
+    
+    it ("u16_div10") {
+      for (uint16_t i = 0; i < (1 << (16 - 1)); i++) {
+        assert(u16_div10(i) == (i / 10));
+      }
+    }
+
+    it ("u32_div10") {
+      for (uint32_t i = 0; i < (1 << (16 - 1)); i++) {
+        assert(u32_div10(i) == (i / 10));
+      }
+    }
+
+    it ("u64_div10") {
+      for (uint64_t i = 0; i < (1 << (16 - 1)); i++) {
+        assert(u64_div10(i) == (i / 10));
+      }
+    }
+  }
+}
 
 Seq(int) s;
 
