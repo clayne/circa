@@ -9,6 +9,22 @@
 #include "core.h"
 
 /*
+** A little macro to help us pick which builtin to use, courtesy of 
+** @craigbarnes.
+*/
+
+#ifdef __GNUC__
+  #define USE_BUILTIN(fn, arg)                                                 \
+    if (__builtin_types_compatible_p(__typeof__(arg), unsigned long long)) {   \
+      return (uint8_t) __builtin_ ## fn ## ll(arg);                            \
+    } else if (__builtin_types_compatible_p(__typeof__(arg), unsigned long)) { \
+      return (uint8_t) __builtin_ ## fn ## l(arg);                             \
+    } else if (__builtin_types_compatible_p(__typeof__(arg), unsigned int)) {  \
+      return (uint8_t) __builtin_ ## fn(arg);                                  \
+    }
+#endif
+
+/*
 ** Because we need a prime number as our capacity for `Dict` in order to have
 ** the best hash distribution, the solution used is to align an input number to
 ** the next highest power of two, get the 2's logarithm of that, and then get
@@ -169,18 +185,24 @@ static inline size_t   usz_round(size_t   n, size_t   m);
 
 static inline
 uint8_t u8_pop(uint8_t n) {
-  return u32_pop(n);
+  return u16_pop(n);
 }
 
 static inline
 uint8_t u16_pop(uint16_t n) {
-  return u32_pop(n);
+  #ifdef __GNUC__
+    return u32_pop(n);
+  #else
+    n -= ((n >> 1) & 0x5555);
+    n = (n & 0x3333) + ((n >> 2) & 0x3333);
+    return (((n + (n >> 4)) & 0x0F0F) * 0x0101) >> 8;
+  #endif
 }
 
 static inline
 uint8_t u32_pop(uint32_t n) {
   #ifdef __GNUC__
-    return (uint8_t) __builtin_popcount(n);
+    USE_BUILTIN(popcount, n);
   #else
     n -= ((n >> 1) & 0x55555555);
     n = (n & 0x33333333) + ((n >> 2) & 0x33333333);
@@ -191,7 +213,7 @@ uint8_t u32_pop(uint32_t n) {
 static inline
 uint8_t u64_pop(uint64_t n) {
   #ifdef __GNUC__
-    return (uint8_t) __builtin_popcountll(n);
+    USE_BUILTIN(popcount, n);
   #else
     n -= ((n >> 1) & 0x5555555555555555ULL);
     n = (n & 0x3333333333333333ULL) + ((n >> 2) & 0x3333333333333333ULL);
@@ -237,7 +259,7 @@ uint8_t u16_clz(uint16_t n) {
 static inline
 uint8_t u32_clz(uint32_t n) {
   #ifdef __GNUC__
-    return (uint8_t) __builtin_clzll(n) - (64 - 32);
+    USE_BUILTIN(clz, n);
   #else
     n |= (n >>  1);
     n |= (n >>  2);
@@ -251,7 +273,7 @@ uint8_t u32_clz(uint32_t n) {
 static inline
 uint8_t u64_clz(uint64_t n) {
   #ifdef __GNUC__
-    return (uint8_t) __builtin_clzll(n);
+    USE_BUILTIN(clz, n);
   #else
     n |= (n >>  1);
     n |= (n >>  2);
@@ -277,7 +299,13 @@ uint8_t u8_ctz(uint8_t n) {
   #ifdef __GNUC__
     return (uint8_t) __builtin_ctzll(n);
   #else
-    return u32_ctz(n); // TODO: 8-bit specific CTZ for higher speed.
+    uint8_t c = 8;
+    n &= -((int8_t) n);
+    c -= (n) ? 1 : 0;
+    c -= (n & 0x0F) ? 4 : 0;
+    c -= (n & 0x33) ? 2 : 0;
+    c -= (n & 0x55) ? 1 : 0;
+    return c;
   #endif
 }
 
@@ -286,14 +314,21 @@ uint8_t u16_ctz(uint16_t n) {
   #ifdef __GNUC__
     return (uint8_t) __builtin_ctzll(n);
   #else
-    return u32_ctz(n); // TODO: 16-bit specific CTZ for higher speed.
+    uint8_t c = 16;
+    n &= -((int16_t) n);
+    c -= (n) ? 1 : 0;
+    c -= (n & 0x00FF) ? 8 : 0;
+    c -= (n & 0x0F0F) ? 4 : 0;
+    c -= (n & 0x3333) ? 2 : 0;
+    c -= (n & 0x5555) ? 1 : 0;
+    return c;
   #endif
 }
 
 static inline
 uint8_t u32_ctz(uint32_t n) {
   #ifdef __GNUC__
-    return (uint8_t) __builtin_ctzll(n);
+    USE_BUILTIN(ctz, n);
   #else
     uint8_t c = 32;
     n &= -((int32_t) n);
@@ -310,7 +345,7 @@ uint8_t u32_ctz(uint32_t n) {
 static inline
 uint8_t u64_ctz(uint64_t n) {
   #ifdef __GNUC__
-    return (uint8_t) __builtin_ctzll(n);
+    USE_BUILTIN(ctz, n);
   #else
     uint8_t c = 64;
     n &= -((int64_t) n);

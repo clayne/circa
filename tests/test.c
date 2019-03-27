@@ -4,7 +4,9 @@
 */
 
 #include <math.h>
+#undef __GNUC__
 #include <circa.h>
+#define __GNUC__
 #include <snow/snow.h>
 
 describe (Bits) {
