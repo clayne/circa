@@ -233,6 +233,8 @@ size_t usz_pop(size_t n) {
 
 static inline
 uint8_t u8_clz(uint8_t n) {
+  ce_guard (!n)
+    return (CE = CE_ARG, 8);
   #ifdef __GNUC__
     return (uint8_t) __builtin_clzll(n) - (64 - 8);
   #else
@@ -245,6 +247,8 @@ uint8_t u8_clz(uint8_t n) {
 
 static inline
 uint8_t u16_clz(uint16_t n) {
+  ce_guard (!n)
+    return (CE = CE_ARG, 16);
   #ifdef __GNUC__
     return (uint8_t) __builtin_clzll(n) - (64 - 16);
   #else
@@ -258,6 +262,8 @@ uint8_t u16_clz(uint16_t n) {
 
 static inline
 uint8_t u32_clz(uint32_t n) {
+  ce_guard (!n)
+    return (CE = CE_ARG, 32);
   #ifdef __GNUC__
     USE_BUILTIN(clz, n);
   #else
@@ -272,6 +278,8 @@ uint8_t u32_clz(uint32_t n) {
 
 static inline
 uint8_t u64_clz(uint64_t n) {
+  ce_guard (!n)
+    return (CE = CE_ARG, 64);
   #ifdef __GNUC__
     USE_BUILTIN(clz, n);
   #else
@@ -296,6 +304,8 @@ uint8_t usz_clz(size_t n) {
 
 static inline
 uint8_t u8_ctz(uint8_t n) {
+  ce_guard (!n)
+    return (CE = CE_ARG, 8);
   #ifdef __GNUC__
     return (uint8_t) __builtin_ctzll(n);
   #else
@@ -311,6 +321,8 @@ uint8_t u8_ctz(uint8_t n) {
 
 static inline
 uint8_t u16_ctz(uint16_t n) {
+  ce_guard (!n)
+    return (CE = CE_ARG, 16);
   #ifdef __GNUC__
     return (uint8_t) __builtin_ctzll(n);
   #else
@@ -327,6 +339,8 @@ uint8_t u16_ctz(uint16_t n) {
 
 static inline
 uint8_t u32_ctz(uint32_t n) {
+  ce_guard (!n)
+    return (CE = CE_ARG, 32);
   #ifdef __GNUC__
     USE_BUILTIN(ctz, n);
   #else
@@ -344,6 +358,8 @@ uint8_t u32_ctz(uint32_t n) {
 
 static inline
 uint8_t u64_ctz(uint64_t n) {
+  ce_guard(!n)
+    return (CE = CE_ARG, 64);
   #ifdef __GNUC__
     USE_BUILTIN(ctz, n);
   #else
@@ -521,21 +537,29 @@ size_t usz_primegt(size_t n) {
 
 static inline
 uint16_t u8_round(uint8_t n, uint8_t m) {
+  ce_guard (!m)
+    return (CE = CE_ARG, n);
   return ((n + m - 1) / m) * m;
 }
 
 static inline
 uint32_t u16_round(uint16_t n, uint16_t m) {
+  ce_guard (!m)
+    return (CE = CE_ARG, n);
   return ((n + m - 1) / m) * m;
 }
 
 static inline
 uint64_t u32_round(uint32_t n, uint32_t m) {
+  ce_guard (!m)
+    return (CE = CE_ARG, n);
   return ((n + m - 1) / m) * m;
 }
 
 static inline
 uint64_t u64_round(uint64_t n, uint64_t m) {
+  ce_guard (!m)
+    return (CE = CE_ARG, n);
   return ((n + m - 1) / m) * m;
 }
 
