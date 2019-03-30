@@ -3,7 +3,7 @@
 ** https://github.com/davidgarland/circa
 */
 
-#include "../h/txt.h"
+#include "txt.h"
 
 /*
 ** String Operations

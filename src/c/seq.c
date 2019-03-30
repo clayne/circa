@@ -3,8 +3,8 @@
 ** https://github.com/davidgarland/circa
 */
 
-#include "../h/slice.h"
-#include "../h/seq.h"
+#include "slice.h"
+#include "seq.h"
 
 /*
 ** Accessors

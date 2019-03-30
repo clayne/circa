@@ -15,11 +15,10 @@
 #endif
 
 #define XXH_STATIC_LINKING_ONLY
-#include "../../lib/xxhash/xxhash.h"
+#include "xxhash.h"
 
-#include "../h/seq.h"
-
-#include "../h/map.h"
+#include "seq.h"
+#include "map.h"
 
 Map map_set_(size_t sizk, size_t sizv, Map m, void *k, void *v) {
   ce_guard (!sizk || !sizv || !m || !k || !v)

@@ -3,7 +3,7 @@
 ** https://github.com/davidgarland/circa
 */
 
-#include "../h/bits.h"
+#include "bits.h"
 
 uint32_t circa_primes[] = {
   2,       2,       5,       11,     // 1,       2,       4,       8

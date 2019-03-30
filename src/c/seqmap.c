@@ -4,9 +4,9 @@
 */
 
 #define XXH_STATIC_LINKING_ONLY
-#include "../../lib/xxhash/xxhash.h"
+#include "xxhash.h"
 
-#include "../h/seqmap.h"
+#include "seqmap.h"
 
 SeqMap seqmap_set_(size_t sizk, size_t sizv, SeqMap sm, Seq k, void *v) {
   ce_guard (!sizk || !sizv || !sm || !k || !v)

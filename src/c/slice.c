@@ -3,7 +3,7 @@
 ** https://github.com/davidgarland/circa
 */
 
-#include "../h/slice.h"
+#include "slice.h"
 
 Slice slice_lit(size_t le, size_t ri) {
   Slice s = {le, ri};

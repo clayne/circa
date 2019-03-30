@@ -1,7 +1,7 @@
 CC=clang
 CFLAGS=-pipe
 WFLAGS=-Weverything
-LDFLAGS=-I. -L.
+LDFLAGS=-Isrc/h -Ilib/xxhash -I. -L.
 
 BUILD=-O2 -DNDEBUG -fno-omit-frame-pointer
 FAST=-O3 -s -DNDEBUG -fomit-frame-pointer
