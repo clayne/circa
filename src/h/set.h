@@ -88,7 +88,10 @@ Set set_del_(size_t siz, Set e, void *k) {
 
 static inline
 bool set_has_(size_t siz, Set e, void *k) {
-  return map_has_(siz, 1, e, k);
+  if (map_has_(siz, 1, e, k))
+    return *(bool*) map_get_(siz, 1, e, k);
+  else
+    return false;
 }
 
 /*
