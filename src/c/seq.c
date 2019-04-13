@@ -62,6 +62,8 @@ Seq seq_wrap_(size_t siz, size_t a, void *v) {
   ce_guard (!siz || !a || !v)
     return (CE = CE_ARG, NULL);
   Seq s = seq_alloc_(siz, a);
+  if (CE)
+    return NULL;
   memcpy(s, v, a * siz);
   seq(s)->len = a;
   return s;
@@ -72,7 +74,7 @@ Seq seq_realloc_(size_t siz, Seq s, size_t cap) {
     return (CE = CE_ARG, s);
   struct seq_data *sd = seq(s);
   sd = realloc(sd, sizeof(*sd) + (cap + 1) * siz);
-  if (!sd)
+  if (!s)
     return (CE = CE_OOM, s);
   sd->cap = cap;
   return sd->data;
@@ -143,7 +145,7 @@ void *seq_pull_(size_t siz, Seq s) {
     return (CE = CE_ARG, s);
   if (!seq(s)->len)
     return (CE = CE_OOB, s);
-  void *restrict save = ((char*) s) + seq(s)->cap * siz;
+  void *save = ((char*) s) + seq(s)->cap * siz;
   memcpy(save, s, siz);
   memmove(s, ((char*) s) + siz, seq(s)->len-- * siz);
   return save;

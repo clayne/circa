@@ -31,28 +31,27 @@ Map map_set_(size_t sizk, size_t sizv, Map m, void *k, void *v) {
   const size_t m_cap = md->cap;
 
   // Construct two buckets for shuffling values around. Use VLAs if possible.
-  bool swp_used, tmp_used;
-  bool swp_probe, tmp_probe;
+  bool swp_used = true, tmp_used;
+  bool swp_probe = 0, tmp_probe;
   #ifdef CIRCA_VLA
     char  swp_data[sizv], tmp_data[sizv];
     char  swp_key[sizk],  tmp_key[sizk];
   #else
     char *swp_data,      *tmp_data;
     char *swp_key,       *tmp_key;
-  #endif
   
-  swp_used = true;
-  swp_probe = 0;
-
-  // If we don't have VLAs, we'll have to malloc.
-  #ifndef CIRCA_VLA
     swp_data = malloc(sizv);
     swp_key  = malloc(sizk);
     tmp_data = malloc(sizv);
     tmp_key  = malloc(sizk);
 
-    if (!swp_data || !swp_key || !tmp_data || !tmp_key)
+    if (!swp_data || !swp_key || !tmp_data || !tmp_key) {
+      free(swp_data);
+      free(swp_key);
+      free(tmp_data);
+      free(tmp_key);
       return (CE = CE_OOM, m);
+    }
   #endif
 
   // Copy the key and value into the swap bucket.
@@ -103,6 +102,15 @@ Map map_set_(size_t sizk, size_t sizv, Map m, void *k, void *v) {
     memcpy(md->key + (i * sizk),  swp_key,  sizk);
   } else {
     m = map_realloc_(sizk, sizv, m, m_cap + 1);
+    if (CE) {
+      #ifndef CIRCA_VLA
+        free(swp_data);
+        free(swp_key);
+        free(tmp_data);
+        free(tmp_key);
+      #endif
+      return m;
+    }
     m = map_set_(sizk, sizv, m, swp_key, swp_data);
   }
 
@@ -119,9 +127,8 @@ Map map_set_(size_t sizk, size_t sizv, Map m, void *k, void *v) {
 bool map_has_(size_t sizk, size_t sizv, Map m, void *k) {
   void *p = map_get_(sizk, sizv, m, k);
   if (CE) {
-    if (CE == CE_OOB) {
+    if (CE == CE_OOB)
       CE = CE_OK;
-    }
     return false;
   } else {
     return p != NULL;
@@ -168,8 +175,13 @@ Map map_alloc_(size_t sizk, size_t sizv, size_t cap) {
   md->probe = calloc(cap, sizeof(size_t));
   md->data  = calloc(cap, sizv);
 
-  if (!md->probe || !md->data)
+  if (!md->probe || !md->data) {
+    free(md->used);
+    free(md->probe);
+    free(md->data);
+    free(md);
     return (CE = CE_OOM, NULL);
+  }
 
   md->cap = cap;
 
@@ -200,8 +212,12 @@ Map map_realloc_(size_t sizk, size_t sizv, Map m, size_t cap) {
   };
 
   // If the allocation doesn't succeed, raise an OOM error.
-  if (!tmp.used || !tmp.data || !tmp.key)
+  if (!tmp.used || !tmp.data || !tmp.key) {
+    free(tmp.used);
+    free(tmp.data);
+    free(tmp.key);
     return (CE = CE_OOM, m);
+  }
 
   // If it did, however, load the map into the temporary "fake" map.
   memcpy(tmp.used,  md->used,  m_cap);
@@ -217,16 +233,40 @@ Map map_realloc_(size_t sizk, size_t sizv, Map m, size_t cap) {
   // Reallocate the original map to the new sizes.
   md = realloc(md, sizeof(*md) + m2_key);
   
-  if (!md)
+  if (!md) {
+    free(tmp.used);
+    free(tmp.data);
+    free(tmp.key);
     return (CE = CE_OOM, m);
+  }
 
   md->used  = realloc(md->used,  m2_cap);
-  md->probe = realloc(md->probe, m2_probe);
-  md->data  = realloc(md->data,  m2_data);
-  
-  if (!md->data || !md->probe || !md->data)
-    return (CE = CE_OOM, NULL);
 
+  if (!md->used) {
+    free(tmp.used);
+    free(tmp.data);
+    free(tmp.key);
+    return (CE = CE_OOM, m);
+  }
+
+  md->probe = realloc(md->probe, m2_probe);
+
+  if (!md->probe) {
+    free(tmp.used);
+    free(tmp.data);
+    free(tmp.key);
+    return (CE = CE_OOM, m);
+  }
+
+  md->data  = realloc(md->data,  m2_data);
+
+  if (!md->data) {
+    free(tmp.used);
+    free(tmp.data);
+    free(tmp.key);
+    return (CE = CE_OOM, m);
+  }
+  
   m = md->key;
   md->cap = m2_cap;
 

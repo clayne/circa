@@ -26,6 +26,8 @@ Txt txt_cpy_slice_(Txt t, char *c, Slice s) {
     return (CE = CE_ARG, t);
   const size_t s_len = s.ri - s.le + 1;
   t = txt_require_(t, s_len + 1);
+  if (CE)
+    return t;
   txt(t)->len = s_len;
   memcpy(t, c + s.le, s_len);
   t[s_len] = '\0';
@@ -57,6 +59,8 @@ Txt txt_read_(Txt t, FILE *fp) {
   size_t cap = (size_t) ftell(fp);
   rewind(fp); // TODO: Consider using fseek instead.
   txt_require(t, cap + 1);
+  if (CE)
+    return NULL;
   txt(t)->len = cap;
   fread(t, cap, 1, fp);
   rewind(fp); // TODO: Consider using fseek instead.
