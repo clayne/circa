@@ -14,6 +14,7 @@ int main() {
   FILE *self = fopen("ex/txt/self.c", "r");
   
   txt_read(buffer, self);
+  txt_cat_read(buffer, self);
   
   fclose(self);
   

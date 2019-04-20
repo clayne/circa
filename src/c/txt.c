@@ -56,15 +56,31 @@ Txt txt_read_(Txt t, FILE *fp) {
   ce_guard (!t || !fp)
     return (CE = CE_ARG, t);
   fseek(fp, 0, SEEK_END); // TODO: Error handling.
-  size_t cap = (size_t) ftell(fp);
+  size_t len = (size_t) ftell(fp);
   rewind(fp); // TODO: Consider using fseek instead.
-  txt_require(t, cap + 1);
+  txt_require(t, len + 1);
   if (CE)
-    return NULL;
-  txt(t)->len = cap;
-  fread(t, cap, 1, fp);
+    return t;
+  fread(t, len, 1, fp);
   rewind(fp); // TODO: Consider using fseek instead.
-  t[cap] = '\0';
+  txt(t)->len = len;
+  t[len] = '\0';
+  return t;
+}
+
+Txt txt_cat_read_(Txt t, FILE *fp) {
+  ce_guard (!t || !fp)
+    return (CE = CE_ARG, t);
+  fseek(fp, 0, SEEK_END); // TODO: Error handling.
+  size_t len = (size_t) ftell(fp);
+  rewind(fp); // TODO: Consider using fseek instead.
+  txt_require(t, seq(t)->len + len + 1);
+  if (CE)
+    return t;
+  fread(t + seq(t)->len, len, 1, fp);
+  rewind(fp);
+  txt(t)->len += len;
+  t[txt(t)->len] = '\0';
   return t;
 }
 

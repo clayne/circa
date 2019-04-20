@@ -120,6 +120,9 @@ bool txt_cmp_slice_lit(Txt t, Slice s, char *c);
 #define txt_read(T, F) (T) = txt_read_((T), (F))
 Txt txt_read_(Txt t, FILE *fp);
 
+#define txt_cat_read(T, F) (T) = txt_cat_read_((T), (F))
+Txt txt_cat_read_(Txt t, FILE *fp);
+
 void txt_write(Txt t, FILE *fp);
 
 /*
