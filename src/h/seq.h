@@ -148,6 +148,7 @@ struct seq_data *seq(Seq s) {
 /* Looping */
 
 #define seq_foreach_iso(T, S, V) \
+if (S) \
 for (size_t I = 0, J = 0; I < seq(S)->len; I++, J = 0) \
 for (T V = seq_get(S, I); J != 1; J = 1)
 #define seq_foreach(S, V) seq_foreach_iso(typeof(*S), S, V)
