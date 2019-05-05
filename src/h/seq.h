@@ -105,7 +105,7 @@ Seq seq_cpy_slice_(size_t siz, Seq a, Seq b, Slice s);
 #define seq_push(S, V) seq_push_iso(typeof(*S), S, V)
 Seq seq_push_(size_t siz, Seq s, void *v);
 
-#define seq_tos_ptr_iso(T, S) seq_pop_(sizeof(T), (S), 0)
+#define seq_tos_ptr_iso(T, S) ((T*) seq_pop_(sizeof(T), (S), 0))
 #define seq_tos_ptr(S) seq_tos_ptr_iso(typeof(*S), S)
 #define seq_tos_iso(T, S) (*((T*) seq_pop_(sizeof(T), (S), 0)))
 #define seq_tos(S) seq_tos_iso(typeof(*S), S)
