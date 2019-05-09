@@ -6,7 +6,7 @@
 #include "txt.h"
 
 /*
-** String Operations
+** String Functions
 */
 
 Txt txt_cpy_(Txt t, char *c, size_t len) {
@@ -34,8 +34,60 @@ Txt txt_cpy_slice_(Txt t, char *c, Slice s) {
   return t;
 }
 
+/* VPRINTF() macro courtesy of @craigbarnes. */
+
+#ifdef __GNUC__
+  #define VPRINTF(X) __attribute__((__format__(__printf__, (X), 0)))
+#else
+  #define VPRINTF(X)
+#endif
+
+static inline VPRINTF(2)
+Txt txt_fmt__(Txt t, const char *fmt, va_list ap) {
+  va_list ap2;
+  va_copy(ap2, ap);
+  size_t len = vsnprintf(NULL, 0, fmt, ap2);
+  va_end(ap2);
+  txt_require(t, len + 1);
+  size_t written = vsnprintf(t, len + 1, fmt, ap);
+  txt(t)->len = written;
+  if (written != len)
+    CE = CE_FMT;
+  return t;
+}
+
+Txt txt_fmt_(Txt t, const char *fmt, ...) {
+  va_list ap;
+  va_start(ap, fmt);
+  t = txt_fmt__(t, fmt, ap);
+  va_end(ap);
+  return t;
+}
+
+static inline VPRINTF(2)
+Txt txt_cat_fmt__(Txt t, const char *fmt, va_list ap) {
+  va_list ap2;
+  va_copy(ap2, ap);
+  size_t len = vsnprintf(NULL, 0, fmt, ap2);
+  va_end(ap2);
+  txt_require(t, txt(t)->len + len + 1);
+  size_t written = vsnprintf(t + txt(t)->len, len + 1, fmt, ap);
+  txt(t)->len += written;
+  if (written != len)
+    CE = CE_FMT;
+  return t;
+}
+
+Txt txt_cat_fmt_(Txt t, const char *fmt, ...) {
+  va_list ap;
+  va_start(ap, fmt);
+  t = txt_cat_fmt__(t, fmt, ap);
+  va_end(ap);
+  return t;
+}
+
 /*
-** Comparison Operations
+** Comparison Functions
 */
 
 bool txt_cmp_slice_lit(Txt t, Slice s, char *c) {
@@ -49,7 +101,7 @@ bool txt_cmp_slice_lit(Txt t, Slice s, char *c) {
 }
 
 /*
-** IO Operations
+** IO Functions
 */
 
 Txt txt_read_(Txt t, FILE *fp) {

@@ -71,6 +71,12 @@ Txt txt_cpy_(Txt t, char *c, size_t len);
 #define txt_cpy_slice(T, C, S) (T) = txt_cpy_slice_((T), (C), (S))
 Txt txt_cpy_slice_(Txt t, char *c, Slice s);
 
+#define txt_fmt(T, FMT, ...) (T) = txt_fmt_((T), (FMT), __VA_ARGS__)
+Txt txt_fmt_(Txt t, const char *fmt, ...);
+
+#define txt_cat_fmt(T, FMT, ...) (T) = txt_cat_fmt_((T), (FMT), __VA_ARGS__)
+Txt txt_cat_fmt_(Txt t, const char *fmt, ...);
+
 /*
 ** Stack Functions
 */
@@ -178,7 +184,7 @@ char txt_pop_(Txt t, size_t n) {
 }
 
 /*
-** String Functions Implementation
+** Comparison Functions Implementation
 */
 
 static inline
