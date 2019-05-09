@@ -31,7 +31,7 @@ SeqMap seqmap_set_(size_t sizk, size_t sizv, SeqMap sm, Seq k, void *v) {
     if (!swp_data || !tmp_data) {
       free(swp_data);
       free(tmp_data);
-      return (CE = CE_OOM, m);
+      return (CE = CE_OOM, sm);
     }
   #endif
 
