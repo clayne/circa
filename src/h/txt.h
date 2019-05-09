@@ -15,6 +15,18 @@
 #include "seq.h"
 
 /*
+** Macros
+*/
+
+/* Macro given by @craigbarnes. */
+
+#ifdef __GNUC__
+  #define PRINTF(X) __attribute__((__format__(__printf__, (X), (X + 1))))
+#else
+  #define PRINTF(X)
+#endif
+
+/*
 ** Type Definitions
 */
 
@@ -72,10 +84,10 @@ Txt txt_cpy_(Txt t, char *c, size_t len);
 Txt txt_cpy_slice_(Txt t, char *c, Slice s);
 
 #define txt_fmt(T, FMT, ...) (T) = txt_fmt_((T), (FMT), __VA_ARGS__)
-Txt txt_fmt_(Txt t, const char *fmt, ...);
+PRINTF(2) Txt txt_fmt_(Txt t, const char *fmt, ...);
 
 #define txt_cat_fmt(T, FMT, ...) (T) = txt_cat_fmt_((T), (FMT), __VA_ARGS__)
-Txt txt_cat_fmt_(Txt t, const char *fmt, ...);
+PRINTF(2) Txt txt_cat_fmt_(Txt t, const char *fmt, ...);
 
 /*
 ** Stack Functions
@@ -210,5 +222,11 @@ bool txt_cmp_slice(Txt a, Slice sa, Txt b, Slice sb) {
 for (size_t I = 0, J = 0; I < txt(T)->len; I++, J = 0) \
 for (char V = txt_get(T, I); J != 1; J = 1)
 #define txt_foreach(T, V) txt_foreach_iso(T, V)
+
+/*
+** Macro Wrap-Up
+*/
+
+#undef PRINTF
 
 #endif // CIRCA_TXT_H

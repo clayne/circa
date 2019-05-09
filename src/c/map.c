@@ -113,6 +113,30 @@ Map map_set_(size_t sizk, size_t sizv, Map m, void *k, void *v) {
   return m;
 }
 
+bool map_del_(size_t sizk, size_t sizv, Map m, void *k) {
+  struct map_data *md = map(m);
+
+  const size_t m_cap = md->cap;
+
+  const size_t hash = (sizeof(size_t) == 8) ? XXH64(k, sizk, 0)
+                    : XXH32(k, sizk, 0);
+  const size_t addr = hash % m_cap;
+
+  for (size_t i = addr; i < m_cap; i++) {
+    if (md->used[i]) {
+      if (!memcmp(md->key + (i * sizk), k, sizk)) {
+        for (; i < m_cap; i++) {
+          // TODO: Backwards shift algorithm.
+        }
+      }
+    } else {
+      return false;
+    }
+  }
+
+  return false;
+}
+
 bool map_has_(size_t sizk, size_t sizv, Map m, void *k) {
   void *p = map_get_(sizk, sizv, m, k);
   if (CE) {
