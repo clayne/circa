@@ -6,6 +6,10 @@
 #ifndef CIRCA_BITS_H
 #define CIRCA_BITS_H
 
+/*
+** Dependencies
+*/
+
 #include "core.h"
 
 /*
@@ -117,26 +121,6 @@ static inline uint64_t u64_np2(uint64_t n);
 static inline size_t   usz_np2(size_t   n);
 
 /*
-** Next there's a trick for fast division by 10, taken from MSVC.
-**
-** Essentially what it does is multiply the divisor by a very close
-** approximation of 1/10 * 2^32, then removing 2^32 via a bit shift.
-** This approximation is `0x1999999A`.
-**
-** The 64-bit version works the same way, but 1/10 * 2^64 instead. This means
-** that it relies upon 128 bit integers to work, so it first has to check for
-** GNU C support and that the host system is 64 bit.
-** The approximation is `0x19999997E241C000`. This notably fits in 64 bits, but
-** the result of the multiplication will not.
-*/
-
-static inline uint8_t   u8_div10(uint8_t  n);
-static inline uint16_t u16_div10(uint16_t n);
-static inline uint32_t u32_div10(uint32_t n);
-static inline uint64_t u64_div10(uint64_t n);
-static inline size_t   usz_div10(size_t   n);
-
-/*
 ** Then we have ceil10, which aligns a number to the nearest higher multiple
 ** of 10. This works by doing `10 * div10(n + 9)`.
 */
@@ -173,11 +157,6 @@ static inline uint16_t  u8_round(uint8_t  n, uint8_t  m);
 static inline uint32_t u16_round(uint16_t n, uint16_t m);
 static inline uint64_t u32_round(uint32_t n, uint32_t m);
 static inline size_t   usz_round(size_t   n, size_t   m);
-
-/*
-** Because all of these functions are static, we have to implement them here.
-** So you can see the exact implementations below.
-*/
 
 /*
 ** Binary Popcount
@@ -440,61 +419,27 @@ size_t usz_np2(size_t n) {
 }
 
 /*
-** Divide By Ten
-*/
-
-// TODO: Find more optimal way again. Apparently the previous method
-// was for signed integers.
-
-// TODO: Implement old method for signed integers.
-
-static inline
-uint8_t u8_div10(uint8_t n) {
-  return n / 10;
-}
-
-static inline
-uint16_t u16_div10(uint16_t n) {
-  return n / 10;
-}
-
-static inline
-uint32_t u32_div10(uint32_t n) {
-  return n / 10;
-}
-
-static inline
-uint64_t u64_div10(uint64_t n) {
-  return n / 10;
-}
-
-static inline
-size_t usz_div10(size_t n) {
-  return (sizeof(size_t) == 8) ? u64_div10(n) : u32_div10(n);
-}
-
-/*
 ** Round Up To Nearest Ten
 */
 
 static inline
 uint16_t u8_ceil10(uint8_t n) {
-  return 10 * u8_div10(n + 9);
+  return 10 * ((n + 9) / 10);
 }
 
 static inline
 uint32_t u16_ceil10(uint16_t n) {
-  return 10 * u16_div10(n + 9);
+  return 10 * ((n + 9) / 10);
 }
 
 static inline
 uint64_t u32_ceil10(uint32_t n) {
-  return 10 * u32_div10(n + 9);
+  return 10 * ((n + 9) / 10);
 }
 
 static inline
 uint64_t u64_ceil10(uint64_t n) {
-  return 10 * u64_div10(n + 9);
+  return 10 * ((n + 9) / 10);
 }
 
 static inline

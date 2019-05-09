@@ -6,14 +6,15 @@
 #ifndef CIRCA_SEQ_H
 #define CIRCA_SEQ_H
 
+/*
+** Dependencies
+*/
+
 #include "core.h"
 #include "slice.h"
 
 /*
-** Dynamic sequences work by using a style of "fat pointers" where the data is
-** stored in an address that preceeds the data stored by the array portion.
-** This can be seen below; there is `cap` for capacity, `len` for the length,
-** and `data` as a flexible array member to be used for the type-generic array.
+** Type Definitions
 */
 
 struct seq_data {
@@ -22,24 +23,11 @@ struct seq_data {
   char data[];
 };
 
-/*
-** Because macros are run during preprocessing, they actually don't take up any
-** namespace as far as variables and types are concerned. This means we can have
-** a type named `Seq` and a macro named `Seq(T)` without any conflict; only if
-** it sees parenthesis will it be checked as a macro.
-*/
-
 #define Seq(T) T*
 typedef Seq(void) Seq;
 
 /*
-** Now we define our accessor functions. Note how the raw forms of the functions
-** have a trailing underscore-- this will become a recurring pattern. The macros
-** exist to make the functions more ergonomic, avoiding the need for idioms such
-** as setting the sequence to the return value of the function, like you might
-** see in a library such as Antirez's SDS. Additionally, you'll see there are
-** `_iso` variants of functions-- these are for ISO-compliant standard C with
-** no GNU extensions.
+** Accessors
 */
 
 static inline struct seq_data *seq(Seq s);
@@ -61,7 +49,7 @@ bool seq_has_(size_t siz, Seq s, size_t a);
 void *seq_get_(size_t siz, Seq s, size_t a);
 
 /*
-** Then some allocators:
+** Allocators
 */
 
 #define seq_alloc_iso(T, C) seq_alloc_(sizeof(T), C)
@@ -86,7 +74,7 @@ Seq seq_wrap_(size_t siz, size_t n, void *v);
 Seq seq_free_(Seq s);
 
 /*
-** And then for some core sequence functions, like copying.
+** Sequence Functions
 */
 
 #define seq_cpy_iso(T, A, B) (A) = seq_cpy_(sizeof(T), (A), (B))
@@ -98,7 +86,7 @@ Seq seq_cpy_(size_t siz, Seq a, Seq b);
 Seq seq_cpy_slice_(size_t siz, Seq a, Seq b, Slice s);
 
 /*
-** Some stack functions:
+** Stack Functions
 */
 
 #define seq_push_iso(T, S, V) (S) = seq_push_(sizeof(T), (S), (V))
@@ -118,10 +106,8 @@ void *seq_pop_(size_t siz, Seq s, size_t n);
 void *seq_pull_(size_t siz, Seq s);
 
 /*
-** And then comparisons.
+** Comparison Functions
 */
-
-// TODO: Add proper macro signatures for these.
 
 #define seq_cmp_iso(T, A, B) seq_cmp_(sizeof(T), (A), (B))
 #define seq_cmp(A, B) seq_cmp_iso(typeof(*A), A, B)
@@ -131,11 +117,12 @@ bool seq_cmp_(size_t siz, Seq a, Seq b);
 #define seq_cmp_len(A, B, L) seq_cmp_len_iso(typeof(*A), A, B, L)
 bool seq_cmp_len_(size_t siz, Seq a, Seq b, size_t len);
 
-#define seq_cmp_slice_iso(T, A, SA, B, SB)
+#define seq_cmp_slice_iso(T, A, SA, B, SB) seq_cmp_slice_(sizeof(T), (A), (SA), (B), (SB))
+#define seq_cmp_slice(A, SA, B, SB) seq_cmp_slice_iso(typeof(*A), A, SA, B, SB)
 bool seq_cmp_slice_(size_t siz, Seq a, Slice sa, Seq b, Slice sb);
 
 /*
-** Finally, there are some static function implementations.
+** Accessors Implementation
 */
 
 static inline
@@ -144,18 +131,14 @@ struct seq_data *seq(Seq s) {
 }
 
 /*
-** And now we can make some nice iteration macros.
+** Iterators
 */
-
-/* Looping */
 
 #define seq_foreach_iso(T, S, V) \
 if (S) \
 for (size_t I = 0, J = 0; I < seq(S)->len; I++, J = 0) \
 for (T V = seq_get(S, I); J != 1; J = 1)
 #define seq_foreach(S, V) seq_foreach_iso(typeof(*S), S, V)
-
-/* Translatory */
 
 #define seq_map_iso(T, A, F, B)              \
 do {                                         \
@@ -189,8 +172,6 @@ do {                                       \
 } while (0)
 #define seq_reduce(A, F, B) seq_reduce_iso(typeof(*B), A, F, B)
 
-/* In-Place */
-
 #define seq_apply_iso(T, S, F)               \
 do {                                         \
   T FV;                                      \
@@ -223,8 +204,6 @@ do {                              \
   seq_set_iso(T, S, 0, &VAL);     \
 } while (0)
 #define seq_collapse(S, F) seq_collapse_iso(typeof(*S), S, F)
-
-/* Side Effectful */
 
 #define seq_do_iso(T, S, F)                \
 do {                                       \

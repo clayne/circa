@@ -6,11 +6,19 @@
 #ifndef CIRCA_CORE_H
 #define CIRCA_CORE_H
 
+/*
+** Dependencies
+*/
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+/*
+** Macros
+*/
 
 #ifdef __STDC_VERSION__
   #if __STDC_VERSION__ >= 199901L
@@ -19,6 +27,14 @@
     #endif
   #endif
 #endif
+
+#ifdef __TINYC__
+  #define _Thread_local
+#endif
+
+/*
+** Error Constructs
+*/
 
 enum circa_error {
   CE_OK  = 0,    // Everything is OK!
@@ -31,10 +47,6 @@ enum circa_error {
 };
 
 extern _Thread_local enum circa_error CE;
-
-#ifdef __TINYC__
-  #define _Thread_local
-#endif
 
 static const char *const restrict CE_MSG[] = {
   [CE_OK]         = "CE_OK: Everything is O-K.",
@@ -59,9 +71,5 @@ for (int I = 0; I < 1; I++, CE && (CE != CE_NOK) && printf("[%s:%s:%i] circa_deb
 #else
   #define ce_guard(...) if (0)
 #endif
-
-// TODO: Do this separately from the core header. It's not nice to do this.
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wcomma"
 
 #endif // CIRCA_CORE_H

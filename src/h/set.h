@@ -6,20 +6,23 @@
 #ifndef CIRCA_SET_H
 #define CIRCA_SET_H
 
+/*
+** Dependencies
+*/
+
 #include "core.h"
 #include "bits.h"
 #include "map.h"
 
 /*
-** Under the hood `Set(T)` is just `Map(T, bool)`, so the type definitions
-** reflect that.
+** Type Definitions
 */
 
 #define Set(T) Map(T, bool)
 typedef void *Set;
 
 /*
-** And now we need some accessors.
+** Accessors
 */
 
 static inline struct map_data *set(Set e);
@@ -41,7 +44,7 @@ static inline Set set_del_(size_t siz, Set e, void *k);
 static inline bool set_has_(size_t siz, Set e, void *k);
 
 /*
-** Then some allocators.
+** Allocators
 */
 
 #define set_alloc_iso(T, C) set_alloc_(sizeof(T), (C))
@@ -61,7 +64,7 @@ static inline Set set_require_(size_t siz, Set e, size_t cap);
 static inline Set set_free_(Set e);
 
 /*
-** Accessors
+** Accessors Implementation
 */
 
 static inline
@@ -95,7 +98,7 @@ bool set_has_(size_t siz, Set e, void *k) {
 }
 
 /*
-** Allocators
+** Allocators Implementation
 */
 
 static inline

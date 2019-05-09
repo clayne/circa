@@ -10,15 +10,14 @@
 #include "txt.h"
 
 /*
-** Under the hood `Dict(T)` is just `SeqMap(char, T)`, so the type definitions
-** reflect that.
+** Type Definitions
 */
 
 #define Dict(T) SeqMap(char, T)
 typedef void *Dict;
 
 /*
-** And now we need accessors.
+** Accessors
 */
 
 static inline struct seqmap_data *dict(Dict d);
@@ -36,7 +35,7 @@ static inline bool dict_has_(size_t siz, Dict d, char *k);
 static inline void *dict_get_(size_t siz, Dict d, char *k);
 
 /*
-** And some allocators to build the dictionaries.
+** Allocators
 */
 
 #define dict_alloc_iso(T, C) dict_alloc_(sizeof(T), (C))
@@ -56,10 +55,11 @@ static inline Dict dict_require_(size_t siz, Dict d, size_t cap);
 static inline Dict dict_free_(Dict d);
 
 /*
-** And now we just wrap the accessors from SeqMap with some changes.
-** TODO: Find some way of getting around this constant Txt allocation.
-**       It's definitely not cheap.
+** Accessors Implementation
 */
+
+// TODO: Find some way of getting around this constant Txt allocation.
+//       It's definitely not cheap.
 
 static inline
 struct seqmap_data *dict(Dict d) {
@@ -91,7 +91,7 @@ void *dict_get_(size_t siz, Dict d, char *k) {
 }
 
 /*
-** Same with the allocators.
+** Allocators Implementation
 */
 
 static inline

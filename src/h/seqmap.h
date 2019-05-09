@@ -6,10 +6,18 @@
 #ifndef CIRCA_SEQMAP_H
 #define CIRCA_SEQMAP_H
 
+/*
+** Dependencies
+*/
+
 #include "core.h"
 #include "bits.h"
 #include "seq.h"
 #include "map.h"
+
+/*
+** Type Definitions
+*/
 
 struct seqmap_data {
   size_t  cap;
@@ -21,6 +29,10 @@ struct seqmap_data {
 
 #define SeqMap(K, V) Map(Seq(K), V)
 typedef void *SeqMap;
+
+/*
+** Accessors
+*/
 
 static inline struct seqmap_data *seqmap(SeqMap sm);
 
@@ -35,6 +47,10 @@ bool seqmap_has_(size_t sizk, size_t sizv, SeqMap sm, Seq k);
 #define seqmap_get_iso(KT, VT, SM, K) (*((VT*) seqmap_get_(sizeof(KT), sizeof(VT), (SM), (K))))
 #define seqmap_get(SM, K) seqmap_get_iso(typeof(*(*SM->k)), typeof(*SM->v), SM, K)
 void *seqmap_get_(size_t sizk, size_t sizv, SeqMap sm, Seq k);
+
+/*
+** Allocators
+*/
 
 #define seqmap_alloc_iso(KT, VT, C) seqmap_alloc_(sizeof(KT), sizeof(VT), (C))
 #define seqmap_alloc(KT, VT, C) seqmap_alloc_iso(KT, VT, C)
@@ -51,6 +67,10 @@ SeqMap seqmap_require_(size_t sizk, size_t sizv, SeqMap sm, size_t cap);
 #define seqmap_free_iso(KT, VT, SM) (SM) = seqmap_free_((SM))
 #define seqmap_free(SM) seqmap_free_iso(_, _, SM)
 SeqMap seqmap_free_(SeqMap sm);
+
+/*
+** Accessors Implementation
+*/
 
 static inline
 struct seqmap_data *seqmap(SeqMap sm) {

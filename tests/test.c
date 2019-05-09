@@ -143,32 +143,6 @@ describe (Bits) {
       }
     }
   }
-
-  subdesc (div10) {
-    it ("u8_div10") {
-      for (uint8_t i = 0; i < (1 << (8 - 1)); i++) {
-        assert(u8_div10(i) == (i / 10));
-      }
-    }
-    
-    it ("u16_div10") {
-      for (uint16_t i = 0; i < (1 << (16 - 1)); i++) {
-        assert(u16_div10(i) == (i / 10));
-      }
-    }
-
-    it ("u32_div10") {
-      for (uint32_t i = 0; i < (1 << (16 - 1)); i++) {
-        assert(u32_div10(i) == (i / 10));
-      }
-    }
-
-    it ("u64_div10") {
-      for (uint64_t i = 0; i < (1 << (16 - 1)); i++) {
-        assert(u64_div10(i) == (i / 10));
-      }
-    }
-  }
 }
 
 Seq(int) s;

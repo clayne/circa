@@ -6,20 +6,23 @@
 #ifndef CIRCA_SEQSET_H
 #define CIRCA_SEQSET_H
 
+/*
+** Dependencies
+*/
+
 #include "core.h"
 #include "bits.h"
 #include "seqmap.h"
 
 /*
-** Under the hood `SeqSet(T)` is just `SeqMap(T, bool)`, so the type definitions
-** reflect that.
+** Type Definitions
 */ 
 
 #define SeqSet(T) SeqMap(T, bool)
 typedef void *SeqSet;
 
 /*
-** And then we need accessors.
+** Accessors
 */
 
 static inline struct seqmap_data *seqset(SeqSet se);
@@ -41,7 +44,7 @@ static inline SeqSet seqset_del_(size_t siz, SeqSet se, Seq k);
 static inline bool seqset_has_(size_t siz, SeqSet se, Seq k);
 
 /*
-** And then some allocators.
+** Allocators
 */
 
 #define seqset_alloc_iso(T, C) seqset_alloc_(sizeof(T), (C))
@@ -61,7 +64,7 @@ static inline SeqSet seqset_require_(size_t siz, SeqSet se, size_t cap);
 static inline SeqSet seqset_free_(SeqSet se);
 
 /*
-** Accessors
+** Accessors Implementation
 */
 
 static inline
@@ -95,7 +98,7 @@ bool seqset_has_(size_t siz, SeqSet se, Seq k) {
 }
 
 /*
-** Allocators
+** Allocators Implementation
 */
 
 static inline

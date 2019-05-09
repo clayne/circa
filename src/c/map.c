@@ -3,17 +3,6 @@
 ** https://github.com/davidgarland/circa
 */
 
-#ifdef __clang__
-  #pragma clang diagnostic push
-  #pragma clang diagnostic ignored "-Wused-but-marked-unused"
-  #pragma clang diagnostic push
-  #pragma clang diagnostic ignored "-Wbad-function-cast"
-  #pragma clang diagnostic push
-  #pragma clang diagnostic ignored "-Wdisabled-macro-expansion"
-  #pragma clang diagnostic push
-  #pragma clang diagnostic ignored "-Wpadded"
-#endif
-
 #define XXH_STATIC_LINKING_ONLY
 #include "xxhash.h"
 
@@ -302,10 +291,3 @@ Map map_free_(Map m) {
   }
   return NULL;
 }
-
-#ifdef __clang__
-  #pragma clang diagnostic pop
-  #pragma clang diagnostic pop
-  #pragma clang diagnostic pop
-  #pragma clang diagnostic pop
-#endif
