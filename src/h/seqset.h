@@ -35,9 +35,9 @@ static inline SeqSet seqset_add_(size_t siz, SeqSet se, Seq k);
 #define seqset_rem(SE, K) seqset_rem_iso(typeof(*(*E->k)), SE, K)
 static inline SeqSet seqset_rem_(size_t siz, SeqSet se, Seq k);
 
-#define seqset_del_iso(T, SE, K) (SE) = seqset_del_(sizeof(T), (SE), (K))
+#define seqset_del_iso(T, SE, K) seqset_del_(sizeof(T), (SE), (K))
 #define seqset_del(SE, K) seqset_del_iso(typeof(*(*E->k)), SE, K)
-static inline SeqSet seqset_del_(size_t siz, SeqSet se, Seq k);
+static inline bool seqset_del_(size_t siz, SeqSet se, Seq k);
 
 #define seqset_has_iso(T, SE, K) seqset_has_(sizeof(T), (SE), (K))
 #define seqset_has(SE, K) seqset_has_iso(typeof(*(*E->k)), SE, K)
@@ -74,19 +74,17 @@ struct seqmap_data *seqset(SeqSet se) {
 
 static inline
 SeqSet seqset_add_(size_t siz, SeqSet se, Seq k) {
-  static bool seqset_add_true = true;
-  return seqmap_set_(siz, 1, se, k, &seqset_add_true);
+  return seqmap_set_(siz, 1, se, k, &(bool){true});
 }
 
 static inline
 SeqSet seqset_rem_(size_t siz, SeqSet se, Seq k) {
-  static bool seqset_add_false = false;
-  return seqmap_set_(siz, 1, se, k, &seqset_add_false);
+  return seqmap_set_(siz, 1, se, k, &(bool){false});
 }
 
 static inline
-SeqSet seqset_del_(size_t siz, SeqSet se, Seq k) {
-  return seqset_rem_(siz, se, k); // TODO: Remap to seqmap_del once implemented.
+bool seqset_del_(size_t siz, SeqSet se, Seq k) {
+  return seqmap_del_(siz, 1, se, k);
 }
 
 static inline
