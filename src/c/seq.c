@@ -77,6 +77,7 @@ Seq seq_realloc_(size_t siz, Seq s, size_t cap) {
   if (!s)
     return (CE = CE_OOM, s);
   sd->cap = cap;
+  sd->len = (sd->len > sd->cap) ? sd->cap : sd->len;
   return sd->data;
 }
 
