@@ -50,6 +50,7 @@ compare:
 
 ex: debug
 	$(CC) $(CFLAGS) $(DEBUG) -o nums.o    ex/map/nums.c      -lcirca $(LDFLAGS)
+	$(CC) $(CFLAGS) $(DEBUG) -o del.o     ex/map/del.c       -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS) $(DEBUG) -o sum.o     ex/seq/sum.c       -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS) $(DEBUG) -o queue.o   ex/seq/queue.c     -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS) $(DEBUG) -o seqkey.o  ex/seqmap/seqkey.c -lcirca $(LDFLAGS)

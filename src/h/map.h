@@ -40,7 +40,7 @@ static inline struct map_data *map(Map m);
 Map map_set_(size_t sizk, size_t sizv, Map m, void *k, void *v);
 
 #define map_del_iso(KT, VT, M, K) map_del_(sizeof(KT), sizeof(VT), (M), (K))
-#define map_del(M, K) map_del_iso(typeof(*M->K), typeof(*M->v), M, K)
+#define map_del(M, K) map_del_iso(typeof(*M->k), typeof(*M->v), M, K)
 bool map_del_(size_t sizk, size_t sizv, Map m, void *k);
 
 #define map_has_iso(KT, VT, M, K) map_has_(sizeof(KT), sizeof(VT), (M), (K))

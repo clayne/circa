@@ -114,7 +114,7 @@ Map map_set_(size_t sizk, size_t sizv, Map m, void *k, void *v) {
 }
 
 bool map_del_(size_t sizk, size_t sizv, Map m, void *k) {
-  struct map_data *md = map(m);
+  struct map_data *const md = map(m);
 
   const size_t m_cap = md->cap;
 
@@ -125,9 +125,22 @@ bool map_del_(size_t sizk, size_t sizv, Map m, void *k) {
   for (size_t i = addr; i < m_cap; i++) {
     if (md->used[i]) {
       if (!memcmp(md->key + (i * sizk), k, sizk)) {
-        for (; i < m_cap; i++) {
-          // TODO: Backwards shift algorithm.
+        map(m)->len--;
+        md->used[i] = false;
+        md->probe[i] = 0;
+        for (i++; i < m_cap; i++) {
+          // If the current bucket is not used or is a root, return.
+          if (!md->used[i] || md->probe[i] == 0)
+            return true;
+          // Move the current bucket into the last bucket.
+          md->probe[i - 1] = md->probe[i] - 1;
+          md->data[i - 1] = md->data[i];
+          memcpy(md->key + sizk * (i - 1), md->key + sizk * i, sizk);
+          // Make the current bucket appear unused.
+          md->used[i]  = false;
+          md->probe[i] = 0;
         }
+        return true;
       }
     } else {
       return false;
