@@ -58,14 +58,14 @@ Seq seq_alloc_(size_t siz, size_t cap) {
   return sd->data;
 }
 
-Seq seq_wrap_(size_t siz, size_t a, void *v) {
-  ce_guard (!siz || !a || !v)
+Seq seq_wrap_(size_t siz, size_t n, void *v) {
+  ce_guard (!siz || !n || !v)
     return (CE = CE_ARG, NULL);
-  Seq s = seq_alloc_(siz, a);
+  Seq s = seq_alloc_(siz, n);
   if (CE)
     return NULL;
-  memcpy(s, v, a * siz);
-  seq(s)->len = a;
+  memcpy(s, v, n * siz);
+  seq(s)->len = n;
   return s;
 }
 

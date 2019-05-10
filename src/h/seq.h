@@ -70,6 +70,7 @@ Seq seq_require_(size_t siz, Seq s, size_t cap);
 #define seq_wrap(N, V) seq_wrap_iso(typeof(*V), N, V)
 Seq seq_wrap_(size_t siz, size_t n, void *v);
 
+#define seq_free_iso(T, S) seq_free(S)
 #define seq_free(S) (S) = seq_free_((S))
 Seq seq_free_(Seq s);
 
