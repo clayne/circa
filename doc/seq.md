@@ -75,8 +75,8 @@ This function clears a sequence.
 #### seq_set
 
 ```C
-Seq seq_set_iso(Type T, Seq(T) s, size_t a, T *v);
-Seq seq_set(Seq(T) s, size_t a, T *v);
+void seq_set_iso(Type T, Seq(T) s, size_t a, T *v);
+void seq_set(Seq(T) s, size_t a, T *v);
 
 Seq seq_set_(size_t siz, Seq s, size_t a, void *v);
 ```
