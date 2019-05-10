@@ -210,5 +210,129 @@ Seq seq_free_(Seq s);
 Frees the memory used by a sequence.
 
 ```C
+Seq(int) xs = seq_alloc(int, 10); // Allocate a sequence of 10 integers.
+seq_free(xs);                     // Free the sequence.
+```
+
+### Sequence Functions
+
+#### seq_cpy
+
+```C
+void seq_cpy_iso(Type T, Seq(T) a, Seq(T) b);
+void seq_cpy(Seq(T) a, Seq(T) b);
+
+Seq seq_cpy_(size_t siz, Seq a, Seq b);
+```
+
+Copies the contents of sequence `b` into sequence `a`.
+
+If the internal `seq_require` fails, `CE_OOM` will be thrown.
+
+```C
+Seq(int) as = seq_alloc(int, 10);
+for (int i = 0; i < 10; i++)
+  seq_push(as, &i);
+
+Seq(int) bs = seq_alloc(int, 1);
+seq_cpy(bs, as);
+
+seq_foreach(bs, b)
+  printf("%i\n", b);
+
+seq_free(bs);
+seq_free(as);
+```
+
+#### seq_cpy_slice
+
+```C
+void seq_cpy_slice_iso(Type T, Seq(T) a, Seq(T) b, Slice s);
+void seq_cpy_slice(Seq(T) a, Seq(T) b, Slice s);
+
+Seq seq_cpy_slice_(size_t siz, Seq a, Seq b, Slice s);
+```
+
+Copies a slice of sequence `b` into sequence `a`.
+
+If the internal `seq_require` fails, `CE_OOM` will be thrown.
+
+```C
+// TODO
+```
+
+### Stack Functions
+
+#### seq_push
+
+```C
+void seq_push_iso(Type T, Seq(T) s, T *v);
+void seq_push(Seq(T) s, T *v);
+
+Seq seq_push_(size_t siz, Seq s, void *v);
+```
+
+Pushes the value `v` onto the sequence `s`.
+
+Note that `v` is a pointer. If you must push a literal, it may be done like so,
+for example:
+
+```C
+seq_push(xs, &(int){5});
+```
+
+If the internal `seq_require` fails, `CE_OOM` will be thrown.
+
+```C
+Seq(int) xs = seq_alloc(int, 10);
+
+for (int i = 0; i < 10; i++)
+  seq_push(xs, &i);
+
+seq_foreach(xs, x)
+  printf("%i\n", x);
+```
+
+#### seq_pop / seq_tos / seq_tos_ptr
+
+```C
+T *seq_tos_ptr_iso(Type T, Seq(T) s);
+T *seq_tos_ptr(Seq(T) s);
+
+T seq_tos_iso(Type T, Seq(T) s);
+T seq_tos(Seq(T) s);
+
+T seq_pop_iso(Type T, Seq(T) s);
+T seq_pop(Seq(T) s);
+
+void *seq_pop_(size_t siz, Seq s, size_t n);
+```
+
+`seq_tos_ptr` yields a pointer to the top of the stack. It is shorthand for
+`s + (seq(s)->len - 1)`.
+
+`seq_tos` yields the top value of the stack. It is shorthand for
+`s[seq(s)->len - 1]`.
+
+`seq_pop` pops the top value off of the stack.
+
+If the length of the sequence is 0, `CE_OOB` will be thrown when using `seq_tos_ptr`.
+
+```C
+// TODO
+```
+
+#### seq_pull
+
+```C
+T seq_pull_iso(Type T, Seq(T) s);
+T seq_pull(Seq(T) s);
+
+void *seq_pull_(size_t siz, Seq s);
+```
+
+This function pulls the bottom value from a queue.
+
+```
 // TODO
 ```
