@@ -14,6 +14,17 @@ int main() {
   printf("%s: %i\n", "orange", dict_get(d, "orange"));
   printf("%s: %i\n", "apple", dict_get(d, "apple"));
 
+  printf("before orange deleted:\n");
+
+  dict_foreach(d, k, v)
+    printf("%s: %i\n", k, v);
+
+  dict_del(d, "orange");
+  printf("after orange deleted:\n");
+
+  dict_foreach(d, k, v)
+    printf("%s: %i\n", k, v);
+
   dict_free(d);
 
   return 0;

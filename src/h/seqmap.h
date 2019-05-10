@@ -40,6 +40,10 @@ static inline struct seqmap_data *seqmap(SeqMap sm);
 #define seqmap_set(SM, K, V) seqmap_set_iso(typeof(*(*SM->k)), typeof(*SM->v), SM, K, V)
 SeqMap seqmap_set_(size_t sizk, size_t sizv, SeqMap sm, Seq k, void *v);
 
+#define seqmap_del_iso(KT, VT, SM, K) seqmap_del_(sizeof(KT), sizeof(VT), (SM), (K))
+#define seqmap_del(SM, K) seqmap_del_iso(typeof(*(*SM->k)), typeof(*SM->v), SM, K)
+bool seqmap_del_(size_t sizk, size_t sizv, SeqMap sm, Seq k);
+
 #define seqmap_has_iso(KT, VT, SM, K) seqmap_has_(sizeof(KT), sizeof(VT), (SM), (K))
 #define seqmap_has(SM, K) seqmap_has_iso(typeof(*(*SM->k)), typeof(*SM->v), SM, K)
 bool seqmap_has_(size_t sizk, size_t sizv, SeqMap sm, Seq k);

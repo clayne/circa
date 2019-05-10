@@ -110,6 +110,43 @@ SeqMap seqmap_set_(size_t sizk, size_t sizv, SeqMap sm, Seq k, void *v) {
   return sm;
 }
 
+bool seqmap_del_(size_t sizk, size_t sizv, SeqMap sm, Seq k) {
+  struct seqmap_data *const smd = seqmap(sm);
+
+  const size_t sm_cap = smd->cap;
+
+  const size_t hash = (sizeof(size_t) == 8) ? XXH64(k, seq(k)->len * sizk, 0)
+                    : XXH32(k, seq(k)->len * sizk, 0);
+  const size_t addr = hash % sm_cap;
+
+  for (size_t i = addr; i < sm_cap; i++) {
+    if (smd->key[i]) {
+      if (seq_cmp_(sizk, smd->key[i], k)) {
+        smd->len--;
+        seq_free(smd->key[i]);
+        smd->probe[i] = 0;
+        for (i++; i < sm_cap; i++) {
+          // If the current bucket is not used or is a root, return.
+          if (!smd->key[i] || smd->probe[i] == 0)
+            return true;
+          // Move the current bucket into the last bucket.
+          smd->probe[i - 1] = smd->probe[i] - 1;
+          memcpy(smd->data + sizv * (i - 1), smd->data + sizv * i, sizv);
+          smd->key[i - 1] = smd->key[i];
+          // Make the current bucket appear unused.
+          smd->key[i] = NULL;
+          smd->probe[i] = 0;
+        }
+        return true;
+      }
+    } else {
+      return false;
+    }
+  }
+
+  return false;
+}
+
 bool seqmap_has_(size_t sizk, size_t sizv, SeqMap sm, Seq k) {
   void *p = seqmap_get_(sizk, sizv, sm, k);
   if (CE) {

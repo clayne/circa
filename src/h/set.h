@@ -35,9 +35,9 @@ static inline Set set_add_(size_t siz, Set e, void *k);
 #define set_rem(E, K) set_rem_iso(typeof(*(*E->k)), E, K)
 static inline Set set_rem_(size_t siz, Set e, void *k);
 
-#define set_del_iso(T, E, K) (E) = set_del_(sizeof(T), (E), (K))
+#define set_del_iso(T, E, K) set_del_(sizeof(T), (E), (K))
 #define set_del(E, K) set_del_iso(typeof(*(*E->k)), E, K)
-static inline Set set_del_(size_t siz, Set e, void *k);
+static inline bool set_del_(size_t siz, Set e, void *k);
 
 #define set_has_iso(T, E, K) set_has_(sizeof(T), (E), (K))
 #define set_has(E, K) set_has_iso(typeof(*(*E->k)), E, K)
@@ -74,19 +74,17 @@ struct map_data *set(Set e) {
 
 static inline
 Set set_add_(size_t siz, Set e, void *k) {
-  static bool set_add_true = true;
-  return map_set_(siz, 1, e, k, &set_add_true);
+  return map_set_(siz, 1, e, k, &(bool){true});
 }
 
 static inline
 Set set_rem_(size_t siz, Set e, void *k) {
-  static bool set_add_false = false;
-  return map_set_(siz, 1, e, k, &set_add_false);
+  return map_set_(siz, 1, e, k, &(bool){false});
 }
 
 static inline
-Set set_del_(size_t siz, Set e, void *k) {
-  return set_rem_(siz, e, k); // TODO: Remap to map_del once implemented.
+bool set_del_(size_t siz, Set e, void *k) {
+  return map_del_(siz, 1, e, k);
 }
 
 static inline

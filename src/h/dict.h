@@ -30,6 +30,10 @@ static inline Dict dict_set_(size_t siz, Dict d, char *k, void *v);
 #define dict_has(D, K) dict_has_iso(typeof(*D->v), D, K)
 static inline bool dict_has_(size_t siz, Dict d, char *k);
 
+#define dict_del_iso(T, D, K) dict_del_(sizeof(T), (D), (K))
+#define dict_del(D, K) dict_del_iso(typeof(*D->v), D, K)
+static inline bool dict_del_(size_t siz, Dict d, char *k);
+
 #define dict_get_iso(T, D, K) (*((T*) dict_get_(sizeof(T), (D), (K))))
 #define dict_get(D, K) dict_get_iso(typeof(*D->v), D, K)
 static inline void *dict_get_(size_t siz, Dict d, char *k);
@@ -83,6 +87,14 @@ bool dict_has_(size_t siz, Dict d, char *k) {
 }
 
 static inline
+bool dict_del_(size_t siz, Dict d, char *k) {
+  Txt t = txt_wrap(k, strlen(k));
+  bool del = seqmap_del_(1, siz, d, t);
+  txt_free_(t);
+  return del;
+}
+
+static inline
 void *dict_get_(size_t siz, Dict d, char *k) {
   Txt t = txt_wrap(k, strlen(k));
   void *p = seqmap_get_(1, siz, d, t);
@@ -113,5 +125,16 @@ static inline
 Dict dict_free_(Dict d) {
   return seqmap_free_(d);
 }
+
+/*
+** Iterators
+*/
+
+#define dict_foreach_iso(TK, TV, D, K, V) \
+for (size_t I = 0, J = 0; I < dict(D)->cap; I++, J = 0) \
+if (dict(D)->key[I]) \
+for (TK K = *(TK*) (dict(D)->key + I); J != 1; J = 1) \
+for (TV V = *(TV*) (dict(D)->data + (I * sizeof(TV))); J != 1; J = 1)
+#define dict_foreach(D, K, V) dict_foreach_iso(typeof(*D->k), typeof(*D->v), D, K, V)
 
 #endif // CIRCA_DICT_H

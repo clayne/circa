@@ -125,7 +125,7 @@ bool map_del_(size_t sizk, size_t sizv, Map m, void *k) {
   for (size_t i = addr; i < m_cap; i++) {
     if (md->used[i]) {
       if (!memcmp(md->key + (i * sizk), k, sizk)) {
-        map(m)->len--;
+        md->len--;
         md->used[i] = false;
         md->probe[i] = 0;
         for (i++; i < m_cap; i++) {
