@@ -22,11 +22,38 @@ void seq_clear_(size_t siz, Seq s) {
 Seq seq_set_(size_t siz, Seq s, size_t a, void *v) {
   ce_guard (!siz || !s || !v)
     return (CE = CE_ARG, s);
+
   s = seq_require_(siz, s, a + 1);
+  
   if (seq(s)->len < a + 1)
     seq(s)->len = a + 1;
+  
   memcpy(((char*) s) + a * siz, v, siz);
+  
   return s;
+}
+
+Seq seq_ins_(size_t siz, Seq s, size_t a, void *v) {
+  ce_guard (!siz || !s | !v)
+    return (CE = CE_ARG, s);
+  // TODO: a u#_max function would be kinda nice
+  register const size_t len_a = seq(s)->len + 1;
+  register const size_t len_b = a + 1;
+  register const size_t len = len_a > len_b ? len_a : len_b;
+  seq(s)->len = len;
+  s = seq_require_(siz, s, len);
+  memmove(s + siz * (a + 1), s + siz * a, siz * (seq(s)->len - a));
+  memcpy(s + siz * a, v, siz);
+  return s;
+}
+
+bool seq_del_(size_t siz, Seq s, size_t a) {
+  ce_guard (!siz || !s)
+    return (CE = CE_ARG, s);
+  if (a >= seq(s)->len)
+    return false;
+  memmove(s + siz * (a - 1), s + siz * a, siz * (seq(s)->len - a - 1));
+  return true;
 }
 
 bool seq_has_(size_t siz, Seq s, size_t a) {

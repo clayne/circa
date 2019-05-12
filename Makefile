@@ -53,6 +53,7 @@ ex: debug
 	$(CC) $(CFLAGS) $(DEBUG) -o del.o     ex/map/del.c       -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS) $(DEBUG) -o sum.o     ex/seq/sum.c       -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS) $(DEBUG) -o queue.o   ex/seq/queue.c     -lcirca $(LDFLAGS)
+	$(CC) $(CFLAGS) $(DEBUG) -o insdel.o  ex/seq/insdel.c    -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS) $(DEBUG) -o seqkey.o  ex/seqmap/seqkey.c -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS) $(DEBUG) -o slice.o   ex/txt/slice.c     -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS) $(DEBUG) -o self.o    ex/txt/self.c      -lcirca $(LDFLAGS)

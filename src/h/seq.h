@@ -40,6 +40,14 @@ void seq_clear_(size_t siz, Seq s);
 #define seq_set(S, A, V) seq_set_iso(typeof(*S), S, A, V)
 Seq seq_set_(size_t siz, Seq s, size_t a, void *v);
 
+#define seq_ins_iso(T, S, A, V) (S) = seq_ins_(sizeof(T), (S), (A), (V))
+#define seq_ins(S, A, V) seq_ins_iso(typeof(*S), S, A, V)
+Seq seq_ins_(size_t siz, Seq s, size_t a, void *v);
+
+#define seq_del_iso(T, S, A) seq_del_(sizeof(T), (S), (A))
+#define seq_del(S, A) seq_del_iso(typeof(*S), (S), (A))
+bool seq_del_(size_t siz, Seq s, size_t a);
+
 #define seq_has_iso(T, S, A) seq_has_(sizeof(T), (S), (A))
 #define seq_has(S, A) seq_has_iso(typeof(*S), S, A)
 bool seq_has_(size_t siz, Seq s, size_t a);
