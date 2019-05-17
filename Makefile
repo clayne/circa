@@ -68,3 +68,21 @@ test: debug
 clean:
 	-@cd lib/xxhash && $(MAKE) -s clean >/dev/null
 	-@rm -rf *.o *.s *.out *.a *.dSYM src/h/*.gch libcirca-build libcirca-fast libcirca-small libcirca-debug
+
+# Updates
+
+refresh_snow:
+	git remote add -f snow https://github.com/mortie/snow
+	git subtree add --prefix lib/snow snow master --squash
+
+refresh_xxhash:
+	git remote add -f xxhash https://github.com/Cyan4973/xxHash
+	git subtree add --prefix lib/xxhash xxhash master --squash
+
+update_snow:
+	git fetch snow master
+	git subtree pull --prefix lib/snow snow master --squash
+
+update_xxhash:
+	git fetch xxhash master
+	git subtree pull --prefix lib/xxhash xxhash master --squash
