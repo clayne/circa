@@ -31,6 +31,7 @@
 #define describe(name) __attribute__((unused)) static void _snow_unused_##name()
 #define subdesc(...) while (0)
 #define it(...) while (0)
+#define test(...) while (0)
 #define defer(...)
 #define before_each(...) while (0)
 #define after_each(...) while (0)
@@ -63,26 +64,35 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/time.h>
-#include <sys/wait.h>
 #include <setjmp.h>
 #include <unistd.h>
 #include <stdint.h>
 
 #ifdef __MINGW32__
 # ifndef SNOW_USE_FNMATCH
-# define SNOW_USE_FNMATCH 0
+#  define SNOW_USE_FNMATCH 0
+# endif
+# ifndef SNOW_USE_FORK
+#  define SNOW_USE_FORK 0
 # endif
 #else
 # ifndef SNOW_USE_FNMATCH
-# define SNOW_USE_FNMATCH 1
+#  define SNOW_USE_FNMATCH 1
+# endif
+# ifndef SNOW_USE_FORK
+#  define SNOW_USE_FORK 1
 # endif
 #endif
 
-#if SNOW_USE_FNMATCH == 1
+#if SNOW_USE_FNMATCH != 0
 #include <fnmatch.h>
 #endif
 
-#define SNOW_VERSION "2.3.0"
+#if SNOW_USE_FORK != 0
+#include <sys/wait.h>
+#endif
+
+#define SNOW_VERSION "2.3.1"
 
 // Eventually, I want to re-implement optional explanation arguments
 // for assert macros to make this unnecessary.
@@ -191,8 +201,8 @@ static void _snow_arr_reset(struct _snow_arr *arr) {
  * Snow Core
  */
 
-void snow_break();
-void snow_rerun_failed();
+void snow_break(void);
+void snow_rerun_failed(void);
 
 enum {
 	_SNOW_OPT_VERSION,
@@ -236,13 +246,13 @@ struct _snow_desc {
 };
 
 struct _snow_desc_func {
-	char *name;
-	void (*func)();
+	const char *name;
+	void (*func)(void);
 };
 
 struct _snow {
 	int exit_code;
-	char *filename;
+	const char *filename;
 	int linenum;
 
 	struct _snow_arr desc_funcs;
@@ -252,6 +262,8 @@ struct _snow {
 	struct _snow_opt opts[_SNOW_OPT_LAST];
 
 	int in_case;
+	int in_before_each;
+	int in_after_each;
 	int rerunning_case;
 	struct {
 		int success;
@@ -322,7 +334,7 @@ static char *_snow_spaces(int depth) {
 
 #ifndef SNOW_DUMMY_TIMER
 __attribute__((unused))
-static double _snow_now() {
+static double _snow_now(void) {
 	if (!_snow.opts[_SNOW_OPT_TIMER].boolval)
 		return 0;
 
@@ -332,7 +344,7 @@ static double _snow_now() {
 }
 #else
 __attribute__((unused))
-static double _snow_now() {
+static double _snow_now(void) {
 	static double time;
 	time += 1000;
 	return time;
@@ -359,7 +371,7 @@ static void _snow_print_timer(double start_time) {
 }
 
 __attribute__((unused))
-static void _snow_print_case_begin() {
+static void _snow_print_case_begin(void) {
 	if (_snow.opts[_SNOW_OPT_QUIET].boolval) return;
 	char *spaces = _snow_spaces(_snow.desc_stack.length - 1);
 
@@ -388,7 +400,7 @@ static void _snow_print_case_begin() {
 }
 
 __attribute__((unused))
-static void _snow_print_case_success() {
+static void _snow_print_case_success(void) {
 	if (_snow.opts[_SNOW_OPT_QUIET].boolval) return;
 	char *spaces = _snow_spaces(_snow.desc_stack.length - 1);
 
@@ -416,7 +428,7 @@ static void _snow_print_case_success() {
 }
 
 __attribute__((unused))
-static char *_snow_print_case_failure() {
+static char *_snow_print_case_failure(void) {
 	char *spaces = _snow_spaces(_snow.desc_stack.length - 1);
 
 	if (_snow.print.need_cr)
@@ -463,13 +475,13 @@ static void _snow_print_desc_begin_index(size_t index) {
 }
 
 __attribute__((unused))
-static void _snow_print_desc_begin() {
+static void _snow_print_desc_begin(void) {
 	if (_snow.opts[_SNOW_OPT_QUIET].boolval) return;
 	_snow_print_desc_begin_index(_snow.desc_stack.length - 1);
 }
 
 __attribute__((unused))
-static void _snow_print_desc_end() {
+static void _snow_print_desc_end(void) {
 	if (_snow.opts[_SNOW_OPT_QUIET].boolval) return;
 	char *spaces = _snow_spaces(_snow.desc_stack.length - 1);
 
@@ -532,7 +544,7 @@ static void _snow_print_desc_end() {
 	} while (0)
 
 __attribute__((unused))
-static void _snow_init() {
+static void _snow_init(void) {
 	_snow_inited = 1;
 	memset(&_snow, 0, sizeof(_snow));
 	_snow.exit_code = EXIT_SUCCESS;
@@ -603,7 +615,7 @@ static void _snow_desc_begin(const char *name) {
 
 			// Use fnmatch to do glob matching if that's enabled,
 			// otherwise just compare with strcmp
-#if SNOW_USE_FNMATCH == 1
+#if SNOW_USE_FNMATCH != 0
 			int fm = fnmatch(pattern, desc.full_name, 0);
 			matched = fm == 0;
 			error = !matched && fm != FNM_NOMATCH;
@@ -634,7 +646,7 @@ static void _snow_desc_begin(const char *name) {
 }
 
 __attribute__((unused))
-static void _snow_desc_end() {
+static void _snow_desc_end(void) {
 	if (_snow.current_desc->printed && !_snow.opts[_SNOW_OPT_LIST].boolval)
 		_snow_print_desc_end();
 
@@ -671,8 +683,11 @@ static void _snow_desc_end() {
 		_snow_print_case_begin(); \
 		_snow.current_desc->num_tests += 1; \
 		if (_snow.current_desc->has_before_jmp) { \
-			if (setjmp(_snow.current_case.before_jmp_ret) == 0) \
+			if (setjmp(_snow.current_case.before_jmp_ret) == 0) { \
+				_snow.in_before_each = 1; \
 				longjmp(_snow.current_desc->before_jmp, 1); \
+			} \
+			_snow.in_before_each = 0; \
 		} \
 		/* Set jump point which _snow_case_end */ \
 		/* (and each defer) will jump back to */ \
@@ -685,8 +700,11 @@ static void _snow_desc_end() {
 			} \
 			/* Run after_each */ \
 			if (_snow.current_desc->has_after_jmp) { \
-				if (setjmp(_snow.current_case.after_jmp_ret) == 0) \
+				if (setjmp(_snow.current_case.after_jmp_ret) == 0) { \
+					_snow.in_after_each = 1; \
 					longjmp(_snow.current_desc->after_jmp, 1); \
+				} \
+				_snow.in_after_each = 0; \
 			} \
 			/* Either re-run or just go back */ \
 			int should_rerun = _snow.opts[_SNOW_OPT_RERUN_FAILED].boolval && \
@@ -694,8 +712,11 @@ static void _snow_desc_end() {
 			if (should_rerun) { \
 				/* Run before_each again */ \
 				if (_snow.current_desc->has_before_jmp) { \
-					if (setjmp(_snow.current_case.before_jmp_ret) == 0) \
-					longjmp(_snow.current_desc->before_jmp, 1); \
+					if (setjmp(_snow.current_case.before_jmp_ret) == 0) { \
+						_snow.in_before_each = 1; \
+						longjmp(_snow.current_desc->before_jmp, 1); \
+					} \
+					_snow.in_before_each = 0; \
 				} \
 				/* Actually re-run */ \
 				_snow.rerunning_case = 1; \
@@ -742,7 +763,7 @@ static void _snow_case_defer_push(jmp_buf jmp) {
  * Will jump back to _snow_case_begin.
  */
 __attribute__((unused))
-static void _snow_case_defer_jmp() {
+static void _snow_case_defer_jmp(void) {
 	longjmp(_snow.current_case.defer_jmp_ret, 1);
 }
 
@@ -751,7 +772,7 @@ static void _snow_case_defer_jmp() {
  * Will jump back to _snow_case_begin.
  */
 __attribute__((unused))
-static void _snow_before_each_end() {
+static void _snow_before_each_end(void) {
 	longjmp(_snow.current_case.before_jmp_ret, 1);
 }
 
@@ -760,7 +781,7 @@ static void _snow_before_each_end() {
  * Will jump back to _snow_case_begin.
  */
 __attribute__((unused))
-static void _snow_after_each_end() {
+static void _snow_after_each_end(void) {
 	longjmp(_snow.current_case.after_jmp_ret, 1);
 }
 
@@ -932,8 +953,8 @@ static int snow_main_function(int argc, char **argv) {
 
 	// If --gdb was passed, re-run under GDB
 	if (_snow.opts[_SNOW_OPT_GDB].boolval) {
-#ifdef __MINGW32__
-		fprintf(stderr, "Running under GDB is not supported with mingw.");
+#if SNOW_USE_FORK == 0
+		fprintf(stderr, "Can't run GDB, because SNOW_USE_FORK is 0.");
 		_snow.exit_code = EXIT_FAILURE;
 		goto cleanup;
 #else
@@ -1101,6 +1122,7 @@ cleanup:
 		struct _snow_desc_func df = { #name, &snow_test_##name }; \
 		_snow_arr_push(&_snow.desc_funcs, &df); \
 	} \
+	__attribute__((optnone)) \
 	static void snow_test_##name()
 
 #define subdesc(name) \
@@ -1131,18 +1153,18 @@ cleanup:
 
 #define before_each() \
 	_snow.current_desc->has_before_jmp = 1; \
-	int _snow_run_before_each = setjmp(_snow.current_desc->before_jmp); \
+	setjmp(_snow.current_desc->before_jmp); \
 	for ( \
 			int _snow_before_each_done = 0; \
-			_snow_before_each_done == 0 && _snow_run_before_each; \
+			_snow_before_each_done == 0 && _snow.in_before_each; \
 			(_snow_before_each_done = 1, _snow_before_each_end()))
 
 #define after_each() \
 	_snow.current_desc->has_after_jmp = 1; \
-	int _snow_run_after_each = setjmp(_snow.current_desc->after_jmp); \
+	setjmp(_snow.current_desc->after_jmp); \
 	for ( \
 			int _snow_after_each_done = 0; \
-			_snow_after_each_done == 0 && _snow_run_after_each; \
+			_snow_after_each_done == 0 && _snow.in_after_each; \
 			(_snow_after_each_done = 1, _snow_after_each_end()))
 
 #define fail(...) \
@@ -1151,11 +1173,14 @@ cleanup:
 		snow_fail(__VA_ARGS__); \
 	} while (0)
 
-#define snow_main() \
+#define snow_main_decls \
 	void snow_break() {} \
 	void snow_rerun_failed() {} \
 	struct _snow _snow; \
-	int _snow_inited = 0; \
+	int _snow_inited = 0
+
+#define snow_main() \
+	snow_main_decls; \
 	int main(int argc, char **argv) { \
 		return snow_main_function(argc, argv); \
 	} \
@@ -1168,7 +1193,7 @@ cleanup:
 #define assert(x, expl...) \
 	do { \
 		snow_fail_update(); \
-		char *explanation = "" expl; \
+		const char *explanation = "" expl; \
 		if (!(x)) \
 			_snow_fail_expl(explanation, "Assertion failed: %s", #x); \
 	} while (0)
@@ -1180,8 +1205,8 @@ cleanup:
 #define _snow_define_assertfunc(name, type, pattern) \
 	__attribute__((unused)) \
 	static int _snow_assert_##name( \
-			int invert, char *explanation, \
-			type a, char *astr, type b, char *bstr) { \
+			int invert, const char *explanation, \
+			const type a, const char *astr, const type b, const char *bstr) { \
 		int eq = (a) == (b); \
 		if (!eq && !invert) \
 			_snow_fail_expl(explanation, \
@@ -1200,8 +1225,8 @@ _snow_define_assertfunc(ptr, void *, "%p")
 
 __attribute__((unused))
 static int _snow_assert_str(
-		int invert, char *explanation,
-		char *a, char *astr, char *b, char *bstr) {
+		int invert, const char *explanation,
+		const char *a, const char *astr, const char *b, const char *bstr) {
 	int eq = strcmp(a, b) == 0;
 	if (!eq && !invert)
 		_snow_fail_expl(explanation,
@@ -1216,8 +1241,8 @@ static int _snow_assert_str(
 
 __attribute__((unused))
 static int _snow_assert_buf(
-		int invert, char *explanation,
-		void *a, char *astr, void *b, char *bstr, size_t size)
+		int invert, const char *explanation,
+		const void *a, const char *astr, const void *b, const char *bstr, size_t size)
 {
 	int eq = memcmp(a, b, size) == 0;
 	if (!eq && !invert) {
@@ -1236,9 +1261,9 @@ static int _snow_assert_fake(int invert, ...) {
 	return -1;
 }
 
-// In mingw, size_t is compatible with unsigned int, and
+// In mingw and on ARM, size_t is compatible with unsigned int, and
 // ssize_t is compatible with int
-#ifdef __MINGW32__
+#if(__SIZEOF_SIZE_T__ == __SIZEOF_INT__)
 #define _snow_generic_assert(x) \
 	_Generic((x), \
 		float: _snow_assert_dbl, \
@@ -1311,7 +1336,7 @@ static int _snow_assert_fake(int invert, ...) {
 #define asserteq_any(a, b, expl...) \
 	do { \
 		snow_fail_update(); \
-		char *explanation = "" expl; \
+		const char *explanation = "" expl; \
 		_Pragma("GCC diagnostic push") \
 		_Pragma("GCC diagnostic ignored \"-Wpragmas\"") \
 		_Pragma("GCC diagnostic ignored \"-Wpointer-arith\"") \
@@ -1372,7 +1397,7 @@ static int _snow_assert_fake(int invert, ...) {
 #define assertneq_any(a, b, expl...) \
 	do { \
 		snow_fail_update(); \
-		char *explanation = "" expl; \
+		const char *explanation = "" expl; \
 		_Pragma("GCC diagnostic push") \
 		_Pragma("GCC diagnostic ignored \"-Wpragmas\"") \
 		_Pragma("GCC diagnostic ignored \"-Wpointer-arith\"") \
@@ -1395,7 +1420,7 @@ static int _snow_assert_fake(int invert, ...) {
 #define asserteq(a, b, expl...) \
 	do { \
 		snow_fail_update(); \
-		char *explanation = "" expl; \
+		const char *explanation = "" expl; \
 		int ret = _snow_generic_assert(b)( \
 			0, explanation, (a), #a, (b), #b); \
 		if (ret < 0) { \
@@ -1410,7 +1435,7 @@ static int _snow_assert_fake(int invert, ...) {
 #define assertneq(a, b, expl...) \
 	do { \
 		snow_fail_update(); \
-		char *explanation = "" expl; \
+		const char *explanation = "" expl; \
 		int ret = _snow_generic_assert(b)( \
 			1, explanation, (a), #a, (b), #b); \
 		if (ret < 0) { \
