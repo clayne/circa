@@ -50,8 +50,7 @@ SeqMap seqmap_set_(size_t sizk, size_t sizv, SeqMap sm, Seq k, void *v) {
   }
 
   // Calculate the starting position using xxHash.
-  const size_t hash = (sizeof(size_t) == 8) ? XXH64(k, seq(k)->len * sizk, 0)
-                    : XXH32(k, seq(k)->len * sizk, 0);
+  const size_t hash = XXH3_64bits(k, seq(k)->len * sizk);
   const size_t addr = hash % smd->cap;
   
   size_t i;
@@ -115,8 +114,7 @@ bool seqmap_del_(size_t sizk, size_t sizv, SeqMap sm, Seq k) {
 
   const size_t sm_cap = smd->cap;
 
-  const size_t hash = (sizeof(size_t) == 8) ? XXH64(k, seq(k)->len * sizk, 0)
-                    : XXH32(k, seq(k)->len * sizk, 0);
+  const size_t hash = XXH3_64bits(k, seq(k)->len * sizk);
   const size_t addr = hash % sm_cap;
 
   for (size_t i = addr; i < sm_cap; i++) {
@@ -166,8 +164,7 @@ void *seqmap_get_(size_t sizk, size_t sizv, SeqMap sm, Seq k) {
 
   const size_t sm_cap = smd->cap;
 
-  const size_t hash = (sizeof(size_t) == 8) ? XXH64(k, seq(k)->len * sizk, 0)
-                    : XXH32(k, seq(k)->len * sizk, 0);
+  const size_t hash = XXH3_64bits(k, seq(k)->len * sizk);
   const size_t addr = hash % sm_cap;
 
   for (size_t i = addr; i < sm_cap; i++) {

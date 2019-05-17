@@ -48,8 +48,7 @@ Map map_set_(size_t sizk, size_t sizv, Map m, void *k, void *v) {
   memcpy(swp_key,  k, sizk);
 
   // Calculate the starting position using xxHash.
-  const size_t hash = (sizeof(size_t) == 8) ? XXH64(k, sizk, 0)
-                    : XXH32(k, sizk, 0);
+  const size_t hash = XXH3_64bits(k, sizk);
   const size_t addr = hash % m_cap;
 
   size_t i;
@@ -118,8 +117,7 @@ bool map_del_(size_t sizk, size_t sizv, Map m, void *k) {
 
   const size_t m_cap = md->cap;
 
-  const size_t hash = (sizeof(size_t) == 8) ? XXH64(k, sizk, 0)
-                    : XXH32(k, sizk, 0);
+  const size_t hash = XXH3_64bits(k, sizk);
   const size_t addr = hash % m_cap;
 
   for (size_t i = addr; i < m_cap; i++) {
@@ -169,8 +167,7 @@ void *map_get_(size_t sizk, size_t sizv, Map m, void *k) {
   
   const size_t m_cap = md->cap;
 
-  const size_t hash = (sizeof(size_t) == 8) ? XXH64(k, sizk, 0)
-                    : XXH32(k, sizk, 0);
+  const size_t hash = XXH3_64bits(k, sizk);
   const size_t addr = hash % m_cap;
 
   for (size_t i = addr; i < m_cap; i++) {
