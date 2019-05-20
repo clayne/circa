@@ -85,6 +85,7 @@ SeqMap seqmap_set_(size_t sizk, size_t sizv, SeqMap sm, Seq k, void *v) {
   if (found) {
     smd->probe[i] = swp_probe;
     memcpy(smd->data + (i * sizv), swp_data, sizv);
+    seq_free(smd->key[i]);
     smd->key[i] = swp_key;
   } else {
     sm = seqmap_realloc_(sizk, sizv, sm, sm_cap + 1);
