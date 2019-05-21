@@ -1,4 +1,5 @@
 # The Circa Library Set
+# NOTE: This is undergoing a rewrite in the rewrite branch. I would again not recommend using this.
 ## NOTE: The API is subject to change at any time presently. This is not a stable, commercial-grade library.
 
 Circa aims to help GNU or ISO C99-and-up programs handle dynamically allocated
