@@ -12,7 +12,7 @@
 
 /* Circa */
 
-#include <config.h>
+#include "config.h"
 
 /*
 ** Compiler Checks & Patches

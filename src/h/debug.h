@@ -10,9 +10,14 @@
 ** Dependencies
 */
 
+/* Standard */
+
+#include <stdlib.h>
+#include <stdio.h>
+
 /* Circa */
 
-#include <core.h>
+#include "core.h"
 
 /*
 ** Macros
@@ -31,6 +36,7 @@
   } while(0)
   #define circa_log(MSG) circa_log_(__FILE__, __func__, __LINE__, MSG)
 #else
+  #define circa_log_(FILE, FUNC, LINE, MSG)
   #define circa_log(MSG)
 #endif
 
@@ -56,6 +62,23 @@ typedef enum {
 
 CIRCA_EXTERN _Thread_local CircaError CE;
 
-CIRCA_EXTERN const char *const restrict CE_MSG[CE_LENGTH];
+CIRCA_EXTERN char *const restrict CE_MSG[CE_LENGTH];
+
+/*
+** Function Declarations
+*/
+
+#define circa_throw(E) circa_throw_(__FILE__, __func__, __LINE__, (E))
+static inline void circa_throw_(const char *file, const char *func, size_t line, CircaError ce);
+
+/*
+** Function Definitions
+*/
+
+static inline
+void circa_throw_(const char *file, const char *func, size_t line, CircaError ce) {
+  CE = ce;
+  circa_log_(file, func, line, CE_MSG[ce]);
+}
 
 #endif // CIRCA_DEBUG_H

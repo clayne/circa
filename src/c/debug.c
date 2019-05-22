@@ -7,7 +7,7 @@
 
 CIRCA_STATIC _Thread_local CircaError CE;
 
-CIRCA_STATIC const char *const restrict CE_MSG[CE_LENGTH] = {
+CIRCA_STATIC char *const restrict CE_MSG[CE_LENGTH] = {
   [CE_OK] = "CE_OK: Everything is OK.",
   [CE_NOK] = "CE_NOK: Placeholder value.",
   [CE_ARG] = "CE_ARG: Bad argument.",
