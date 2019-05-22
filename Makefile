@@ -1,5 +1,6 @@
 CC=cc
-CFLAGS=-pipe -std=c11
+WFLAGS=-pedantic -Wall
+CFLAGS=$(WFLAGS) -pipe -std=c11
 LDFLAGS=-Isrc/h -I. -L.
 
 CFLAGS_FAST= $(CFLAGS) -O3 -s -DNDEBUG
@@ -7,6 +8,8 @@ CFLAGS_SMALL=$(CFLAGS) -Os -s -DNDEBUG
 CFLAGS_BUILD=$(CFLAGS) -O2    -fno-omit-frame-pointer
 CFLAGS_DEBUG=$(CFLAGS) -Og -g -fno-omit-frame-pointer
 CFLAGS_SANITIZED=$(CFLAGS_DEBUG) -fsanitize=undefined -fsanitize=address -fsanitize=leak
+
+CFLAGS_EX=-std=gnu11 -Wno-everything
 
 #
 # Build Options
@@ -44,22 +47,22 @@ sanitized:
 #
 
 examples: debug
-	$(CC) $(CFLAGS_DEBUG) ex/seq.c -lcirca $(LDFLAGS)
+	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) ex/seq.c -lcirca $(LDFLAGS)
 
 examples_sanitized: sanitized
-	$(CC) $(CFLAGS_SANITIZED) ex/seq.c -lcirca $(LDFLAGS)
+	$(CC) $(CFLAGS_SANITIZED) $(CFLAGS_EX) ex/seq.c -lcirca $(LDFLAGS)
 
 examples_header:
-	$(CC) $(CFLAGS_DEBUG) -DCIRCA_HEADER_ONLY ex/seq.c $(LDFLAGS)
+	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) -DCIRCA_HEADER_ONLY ex/seq.c $(LDFLAGS)
 
 test: debug
-	$(CC) $(CFLAGS_DEBUG) tests/test.c -I. -L. -Ilib/snow -DSNOW_ENABLED -o test.o -lcirca -lm
+	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) tests/test.c -I. -L. -Ilib/snow -DSNOW_ENABLED -o test.o -lcirca -lm
 
 test_sanitized: sanitized
-	$(CC) $(CFLAGS_SANITIZED) tests/test.c -I. -L. -Ilib/snow -DSNOW_ENABLED -o test.o -lcirca -lm
+	$(CC) $(CFLAGS_SANITIZED) $(CFLAGS_EX) tests/test.c -I. -L. -Ilib/snow -DSNOW_ENABLED -o test.o -lcirca -lm
 
 test_header:
-	$(CC) $(CFLAGS_DEBUG) -DCIRCA_HEADER_ONLY tests/test.c -I. -L. -Ilib/snow -DSNOW_ENABLED -o test.o -lm
+	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) -DCIRCA_HEADER_ONLY tests/test.c -I. -L. -Ilib/snow -DSNOW_ENABLED -o test.o -lm
 
 #
 # Cleanup
@@ -67,5 +70,4 @@ test_header:
 
 clean:
 	-@rm -f $(BIN) *.o *.out *.a *.so
-
 

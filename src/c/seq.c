@@ -26,7 +26,7 @@ Seq seq_set_(size_t siz, Seq s, size_t a, void *v) {
   circa_guard (!siz || !s || !v)
     return (circa_throw(CE_ARG), NULL);
   s = seq_require_(siz, s, a + 1);
-  memcpy(s + siz * a, v, siz);
+  memcpy(((char*) s) + siz * a, v, siz);
   if (seq(s)->len < a + 1)
     seq(s)->len = a + 1;
   return s;

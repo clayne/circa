@@ -34,7 +34,7 @@
   do { \
     printf("[circa] %s: In %s on line %zu: %s", FILE, FUNC, LINE, MSG); \
   } while(0)
-  #define circa_log(MSG) circa_log_(__FILE__, __func__, __LINE__, MSG)
+  #define circa_log(MSG) circa_log_(__FILE__, __func__, (size_t) __LINE__, MSG)
 #else
   #define circa_log_(FILE, FUNC, LINE, MSG)
   #define circa_log(MSG)
