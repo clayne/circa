@@ -3,7 +3,7 @@
 ** https://github.com/davidgarland/circa
 */
 
-#include <debug.h>
+#include "../h/debug.h"
 
 CIRCA_STATIC _Thread_local CircaError CE;
 

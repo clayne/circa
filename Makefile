@@ -43,6 +43,9 @@ examples: debug
 test: debug
 	$(CC) $(CFLAGS_DEBUG) tests/test.c -I. -L. -Ilib/snow -DSNOW_ENABLED -o test.o -lcirca -lm
 
+test_header:
+	$(CC) $(CFLAGS_DEBUG) -DCIRCA_HEADER_ONLY tests/test.c -I. -L. -Ilib/snow -DSNOW_ENABLED -o test.o -lm
+
 #
 # Cleanup
 #

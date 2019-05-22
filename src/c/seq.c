@@ -13,9 +13,9 @@
 
 /* Circa */
 
-#include <core.h>
-#include <debug.h>
-#include <seq.h>
+#include "../h/core.h"
+#include "../h/debug.h"
+#include "../h/seq.h"
 
 /*
 ** Acessors

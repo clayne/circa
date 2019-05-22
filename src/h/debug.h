@@ -81,4 +81,12 @@ void circa_throw_(const char *file, const char *func, size_t line, CircaError ce
   circa_log_(file, func, line, CE_MSG[ce]);
 }
 
+/*
+** Header Only Mode
+*/
+
+#ifdef CIRCA_HEADER_ONLY
+  #include "../c/debug.c"
+#endif
+
 #endif // CIRCA_DEBUG_H

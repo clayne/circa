@@ -130,4 +130,12 @@ do {                                       \
 
 // TODO: seq_foldl and seq_foldr
 
+/*
+** Header-Only Mode
+*/
+
+#ifdef CIRCA_HEADER_ONLY
+  #include "../c/seq.c"
+#endif
+
 #endif // CIRCA_SEQ_H
