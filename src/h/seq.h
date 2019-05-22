@@ -41,7 +41,7 @@ typedef Seq(void) Seq;
 
 /* Accessors */
 
-static inline CIRCA_PURE SeqData *seq(CIRCA_NONNULL Seq s);
+static inline CIRCA_PURE CIRCA_NONNULL(1) SeqData *seq(Seq s);
 
 #define seq_set_iso(T, S, A, V) (S) = seq_set_(sizeof(T), (S), (A), (V))
 #define seq_set(S, A, V) seq_set_iso(typeof(*S), S, A, V)
@@ -99,8 +99,8 @@ CIRCA void *seq_pop_(size_t siz, Seq s, size_t n);
 ** Function Implementations
 */
 
-static inline CIRCA_PURE
-SeqData *seq(CIRCA_NONNULL Seq s) {
+static inline CIRCA_PURE CIRCA_NONNULL(1)
+SeqData *seq(Seq s) {
   return ((SeqData*) s) - 1;
 }
 

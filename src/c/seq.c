@@ -116,6 +116,16 @@ Seq seq_cpy_(size_t siz, Seq dst, Seq src) {
 
 CIRCA CIRCA_RETURNS
 Seq seq_cpy_slice_(size_t siz, Seq dst, Seq src, Slice slice) {
+  circa_guard (!siz || !dst || !src)
+    return (circa_throw(CE_ARG), dst);
+  const size_t len = slice.ri - slice.le + 1;
+  dst = seq_require_(siz, dst, len);
+  if (CE) {
+    circa_log("seq_require failed.");
+    return dst;
+  }
+  seq(dst)->len = len;
+  memcpy(dst, ((char*) src) + (slice.le * siz), len * siz);
   return dst;
 }
 

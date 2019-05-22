@@ -42,10 +42,10 @@
   #define CIRCA_ATTR(...)
 #endif
 
-#define CIRCA_PURE    CIRCA_ATTR(const)
-#define CIRCA_NONNULL CIRCA_ATTR(nonnull)
-#define CIRCA_RETURNS CIRCA_ATTR(warn_unused_result)
-#define CIRCA_ALLOCS  CIRCA_ATTR(malloc) CIRCA_RETURNS
+#define CIRCA_PURE         CIRCA_ATTR(const)
+#define CIRCA_NONNULL(...) CIRCA_ATTR(nonnull(__VA_ARGS__))
+#define CIRCA_RETURNS      CIRCA_ATTR(warn_unused_result)
+#define CIRCA_ALLOCS       CIRCA_ATTR(malloc) CIRCA_RETURNS
 
 #ifdef CIRCA_HEADER_ONLY
   #define CIRCA_EXTERN static
