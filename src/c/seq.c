@@ -62,7 +62,6 @@ Seq seq_alloc_(size_t siz, size_t cap) {
 CIRCA CIRCA_RETURNS
 Seq seq_realloc_(size_t siz, Seq s, size_t cap) {
   circa_guard (!siz || !s || !cap) {
-    printf("siz, s, cap: %zu, %zu, %zu", siz, (size_t) s, cap);
     return (circa_throw(CE_ARG), s);
   }
 
@@ -85,7 +84,12 @@ Seq seq_require_(size_t siz, Seq s, size_t cap) {
   circa_guard (!siz || !s || !cap)
     return (circa_throw(CE_ARG), s);
 
-  return (cap > seq(s)->cap) ? seq_realloc_(siz, s, cap + CIRCA_SEQ_PREALLOC) : s;
+  s = (cap > seq(s)->cap) ? seq_realloc_(siz, s, cap + CIRCA_SEQ_PREALLOC) : s;
+  
+  if (CE)
+    circa_log("call to seq_realloc failed.");
+  
+  return s;
 }
 
 CIRCA CIRCA_RETURNS
