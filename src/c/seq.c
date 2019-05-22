@@ -144,7 +144,7 @@ Seq seq_push_(size_t siz, Seq s, void *v) {
   return seq_set_(siz, s, seq(s)->len, v);
 }
 
-CIRCA CIRCA_RETURNS
+CIRCA
 void *seq_pop_(size_t siz, Seq s, size_t n) {
   circa_guard (!siz || !s)
     return (circa_throw(CE_ARG), s);
@@ -152,4 +152,32 @@ void *seq_pop_(size_t siz, Seq s, size_t n) {
     return (circa_throw(CE_OOB), s);
   seq(s)->len -= n;
   return ((char*) s) + (seq(s)->len - (n ? 0 : 1)) * siz;
+}
+
+CIRCA
+void *seq_pull_(size_t siz, Seq s) {
+  circa_guard (!siz || !s)
+    return (circa_throw(CE_ARG), s);
+  if (!seq(s)->len)
+    return (circa_throw(CE_OOB), s);
+
+  #ifdef CIRCA_VLA
+    char tmp[siz];
+  #else
+    char *tmp = NULL;
+    tmp = malloc(siz);
+    if (!tmp)
+      return (circa_throw(CE_OOM), s);
+  #endif
+
+  memcpy(tmp, s, siz);
+  memmove(s, ((char*) s) + siz, seq(s)->len-- * siz);
+  void *save = ((char*) s) + seq(s)->len * siz;
+  memcpy(save, tmp, siz);
+
+  #ifndef CIRCA_VLA
+    free(tmp);
+  #endif
+
+  return save;
 }
