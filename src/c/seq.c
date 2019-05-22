@@ -102,6 +102,24 @@ Seq seq_free_(size_t siz, Seq s) {
 }
 
 /*
+** Sequence Operations
+*/
+
+CIRCA CIRCA_RETURNS
+Seq seq_cpy_(size_t siz, Seq dst, Seq src) {
+  circa_guard (!siz || !dst || !src)
+    return (circa_throw(CE_ARG), dst);
+  dst = seq_require_(siz, dst, seq(src)->len);
+  memcpy(dst, src, seq(src)->len * siz);
+  return dst;
+}
+
+CIRCA CIRCA_RETURNS
+Seq seq_cpy_slice_(size_t siz, Seq dst, Seq src, Slice slice) {
+  return dst;
+}
+
+/*
 ** Stack Operations
 */
 

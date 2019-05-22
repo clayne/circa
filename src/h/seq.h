@@ -19,6 +19,8 @@
 /* Circa */
 
 #include "core.h"
+#include "debug.h"
+#include "slice.h"
 
 /*
 ** Type Definitions
@@ -68,6 +70,16 @@ CIRCA CIRCA_RETURNS Seq seq_require_(size_t siz, Seq s, size_t cap);
 #define seq_free_iso(T, S) (S) = seq_free_(sizeof(T), (S))
 #define seq_free(S) seq_free_iso(typeof(*S), S)
 CIRCA CIRCA_RETURNS Seq seq_free_(size_t siz, Seq s);
+
+/* Sequence Operations */
+
+#define seq_cpy_iso(T, DST, SRC) (DST) = seq_cpy_(sizeof(T), (DST), (SRC))
+#define seq_cpy(DST, SRC) seq_cpy_iso(typeof(*DST), DST, SRC)
+CIRCA CIRCA_RETURNS Seq seq_cpy_(size_t siz, Seq dst, Seq src);
+
+#define seq_cpy_slice_iso(T, DST, SRC, SLICE) (DST) = seq_cpy_slice_(sizeof(T), (DST), (SRC), (SLICE))
+#define seq_cpy_slice(DST, SRC, SLICE) seq_cpy_slice_iso(typeof(*DST), DST, SRC, SLICE)
+CIRCA CIRCA_RETURNS Seq seq_cpy_slice_(size_t siz, Seq dst, Seq src, Slice slice);
 
 /* Stack Operations */
 
