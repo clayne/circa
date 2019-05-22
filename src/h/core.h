@@ -26,7 +26,7 @@
   #error "Circa requires at least C11 to function properly."
 #endif
 
-#ifdef __TINYCC
+#ifdef __TINYC__
   #ifndef _Thread_local
     #define _Thread_local
   #endif

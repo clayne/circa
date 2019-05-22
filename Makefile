@@ -1,5 +1,5 @@
-CC=gcc
-CFLAGS=-pipe
+CC=cc
+CFLAGS=-pipe -std=c11
 LDFLAGS=-Isrc/h -I. -L.
 
 CFLAGS_FAST= $(CFLAGS) -O3 -s -DNDEBUG
