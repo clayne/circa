@@ -1,7 +1,7 @@
 CC=cc
 WFLAGS=-pedantic -Wall
 CFLAGS=$(WFLAGS) -pipe -std=c11
-LDFLAGS=-Isrc/h -I. -L.
+LDFLAGS=-I. -L.
 
 CFLAGS_FAST= $(CFLAGS) -O3 -s -DNDEBUG
 CFLAGS_SMALL=$(CFLAGS) -Os -s -DNDEBUG
