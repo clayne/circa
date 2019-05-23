@@ -18,7 +18,7 @@
 #include "../h/seq.h"
 
 /*
-** Acessors
+** Accessors
 */
 
 CIRCA
@@ -45,7 +45,7 @@ void *seq_get_(size_t siz, Seq s, size_t a) {
 
 CIRCA CIRCA_ALLOCS
 Seq seq_alloc_(size_t siz, size_t cap) {
-  circa_guard(!siz || !cap)
+  circa_guard (!siz || !cap)
     return (circa_throw(CE_ARG), NULL);
 
   SeqData *sd = CIRCA_MALLOC(sizeof(*sd) + cap * siz);
@@ -180,4 +180,40 @@ void *seq_pull_(size_t siz, Seq s) {
   #endif
 
   return save;
+}
+
+/*
+** Comparison Operations
+*/
+
+CIRCA
+bool seq_cmp_(size_t siz, Seq a, Seq b) {
+  circa_guard (!siz || !a || !b)
+    return (circa_throw(CE_ARG), false);
+  if (seq(a)->len != seq(b)->len)
+    return false;
+  return !memcmp(a, b, seq(a)->len * siz);
+}
+
+CIRCA
+bool seq_cmp_len_(size_t siz, Seq a, Seq b, size_t len) {
+  circa_guard (!siz || !a || !b)
+    return (circa_throw(CE_ARG), false);
+  if (len > seq(a)->len || len > seq(b)->len)
+    return (circa_throw(CE_OOB), false);
+  return !memcmp(a, b, seq(a)->len * siz);
+}
+
+CIRCA
+bool seq_cmp_slice_(size_t siz, Seq a, Slice sa, Seq b, Slice sb) {
+  circa_guard (!siz || !a || !b)
+    return (circa_throw(CE_ARG), false);
+  if (!slice_in_len(sa, 0, seq(a)->len))
+    return (circa_throw(CE_OOB), false);
+  if (!slice_in_len(sb, 0, seq(b)->len))
+    return (circa_throw(CE_OOB), false);
+  for (size_t i = sa.le, j = sb.le; (i <= sa.ri) && (j <= sb.ri); i++, j++)
+    if (memcmp(((char*) a) + siz * i, ((char*) b) + siz * j, siz))
+      return false;
+  return true;
 }
