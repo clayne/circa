@@ -28,6 +28,12 @@ typedef Seq(char) Txt;
 
 static inline SeqData *txt(Txt t);
 
+#define txt_set(S, A, V) (S) = txt_set_((S), (A), (V))
+CIRCA CIRCA_RETURNS Txt txt_set_(Txt t, size_t a, char c);
+
+#define txt_get(S, A) txt_get_((S), (A))
+CIRCA char txt_get_(Txt t, size_t a);
+
 /* Allocators */
 
 #define txt_alloc(C) txt_alloc_((C))
@@ -44,7 +50,7 @@ CIRCA CIRCA_RETURNS Txt txt_free_(Txt t);
 
 /* Sequence Operations */
 
-#define txt_push(S, C) (S) = txt_push_((S), (C))
+#define txt_push(S, V) (S) = txt_push_((S), (V))
 CIRCA CIRCA_RETURNS Txt txt_push_(Txt t, char c);
 
 /* Stack Operations */
@@ -57,5 +63,45 @@ static inline
 SeqData *txt(Txt t) {
   return seq(t);
 }
+
+/*
+** Iterator Macros
+*/
+
+#define txt_foreach(S, V)                              \
+for (size_t I = 0, J = 0; I < seq(S)->len; I++, J = 0) \
+for (char V = txt_get(S, I); J != 1; J = 1)
+
+#define txt_keep(S, F)               \
+do {                                 \
+  size_t LEN = txt(S)->len;          \
+  char V;                            \
+  for (size_t I = 0; I < LEN; I++) { \
+    V = txt_get_iso(S, I);           \
+    if (F(V)) txt_push(S, V);        \
+  }                                  \
+  txt(S)->len -= LEN;                \
+  memcpy(S, S + LEN, txt(T)->len);   \
+} while (0)
+
+#define txt_apply(S, F)                    \
+do {                                       \
+  for (size_t I = 0; I < txt(S)->len; I++) \
+    txt_set(S, I, F(txt_get(S, I)));       \
+} while (0)
+
+#define txt_do(S, F)                       \
+do {                                       \
+  for (size_t I = 0; I < txt(S)->len; I++) \
+    F(txt_get(S, I));                      \
+} while (0)
+
+/*
+** Header-Only Mode
+*/
+
+#ifdef CIRCA_HEADER_ONLY
+  #include "../c/txt.c"
+#endif
 
 #endif // CIRCA_TXT_H
