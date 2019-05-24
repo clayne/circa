@@ -7,3 +7,4 @@
 #include "src/h/bits.h"
 #include "src/h/seq.h"
 #include "src/h/txt.h"
+#include "src/h/map.h"

@@ -119,6 +119,8 @@ do {                                       \
     F(txt_get(S, I));                      \
 } while (0)
 
+// TODO: txt_foldl and txt_foldr
+
 /*
 ** Header-Only Mode
 */
