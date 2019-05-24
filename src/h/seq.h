@@ -97,7 +97,7 @@ CIRCA void *seq_pop_(size_t siz, Seq s, size_t n);
 
 #define seq_pull_iso(T, S) seq_pull_(sizeof(T), (S))
 #define seq_pull(S) seq_pull_iso(typeof(*S), S)
-void *seq_pull_(size_t siz, Seq s);
+CIRCA void *seq_pull_(size_t siz, Seq s);
 
 /*
 ** Function Implementations
