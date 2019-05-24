@@ -41,7 +41,7 @@ char txt_get_(Txt t, size_t a) {
 
 CIRCA CIRCA_ALLOCS
 Txt txt_alloc_(size_t cap) {
-  SeqData *sd = calloc(sizeof(*sd) + cap, 1);
+  SeqData *sd = CIRCA_CALLOC(sizeof(*sd) + cap, 1);
   if (!sd)
     return (circa_throw(CE_OOM), NULL);
   sd->cap = cap;
@@ -54,7 +54,7 @@ Txt txt_realloc_(Txt t, size_t cap) {
     return (circa_throw(CE_ARG), t);
   if (cap < txt(t)->cap)
     memset(t + cap, 0, txt(t)->cap - cap);
-  SeqData *sd = realloc(txt(t), sizeof(*sd) + cap);
+  SeqData *sd = CIRCA_REALLOC(txt(t), sizeof(*sd) + cap);
   if (!sd)
     return (circa_throw(CE_OOM), t);
   if (cap > sd->cap)
