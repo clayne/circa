@@ -21,18 +21,3 @@ extra costs.
 ## Examples
 
 *WIP*
-
----
-
-## Features
-
-- Nice debugging features like `ce_debug` to see what went wrong, and `CE` for handling.
-- Fast, portable implementations of integer operations like CLZ and CTZ.
-- A simple Slice type for indexing ranges of sequences and strings simply.
-- Dynamic, generic sequences via `Seq(T)`.
-- Dynamic ASCII strings via `Txt`, reusing the binary interface of `Seq(T)`.
-- Dynamic, generic maps via `Map(K, V)` using Robin Hood Hashing, xxHash, and a custom prime number lookup function.
-- Dynamic, generic maps of seq keys via `SeqMap(K, V)` with the same algorithms as `Map(K, V)`.
-- Dynamic, generic dictionaries via `Dict(T)`, reusing the binary interface of `SeqMap(K, V)`.
-- Dynamic, generic sets via `Seq(T)`, reusing the binary interface of `Map(K, V)`.
-- Dynamic, generic sets of seq keys via `SeqSet(K, V)`, reusing the binary interface of `SeqMap(K, V)`.
