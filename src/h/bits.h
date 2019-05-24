@@ -13,10 +13,12 @@
 /* Standard */
 
 #include <stdint.h>
+#include <stdlib.h>
 
 /* Circa */
 
 #include "config.h"
+#include "debug.h"
 
 /*
 ** Macros
@@ -37,13 +39,13 @@
 #endif
 
 /*
-** Globals
+** Global Declarations
 */
 
 // To put this as simply as possible: Generating prime numbers every time we want
 // a new map capacity seems annoying, so instead there's a table.
 
-extern uint32_t circa_primes[24];
+CIRCA_EXTERN uint32_t circa_primes[24];
 
 /*
 ** Function Declarations
@@ -377,5 +379,9 @@ static inline
 size_t usz_primegt(size_t n) {
   return (sizeof(size_t) == 8) ? u64_primegt(n) : u32_primegt(n);
 }
+
+#ifdef CIRCA_HEADER_ONLY
+  #include "../c/bits.c"
+#endif
 
 #endif // CIRCA_BITS_H
