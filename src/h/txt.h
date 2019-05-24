@@ -50,10 +50,31 @@ CIRCA CIRCA_RETURNS Txt txt_free_(Txt t);
 
 /* Sequence Operations */
 
+#define txt_cpy(DST, SRC) (DST) = txt_cpy_((DST), (SRC))
+CIRCA CIRCA_RETURNS Txt txt_cpy_(Txt dst, Txt src);
+
+#define txt_cpy_slice(DST, SRC, SLICE) (DST) = txt_cpy_slice_((DST), (SRC), (SLICE))
+CIRCA CIRCA_RETURNS Txt txt_cpy_slice_(Txt dst, Txt src, Slice slice);
+
+/* Stack Operations */
+
 #define txt_push(S, V) (S) = txt_push_((S), (V))
 CIRCA CIRCA_RETURNS Txt txt_push_(Txt t, char c);
 
-/* Stack Operations */
+#define txt_tos(S) txt_pop_((S), 0)
+#define txt_pop(S) txt_pop_((S), 1)
+CIRCA char txt_pop_(Txt t, size_t n);
+
+#define txt_pull(S) txt_pull_((S))
+CIRCA char txt_pull_(Txt t);
+
+/* Comparison Operations */
+
+#define txt_cmp(A, B) txt_cmp_((A), (B))
+CIRCA bool txt_cmp_(Txt a, Txt b);
+
+#define txt_cmp_slice(A, SA, B, SB) txt_cmp_slice_((A), (SA), (B), (SB))
+CIRCA bool txt_cmp_slice_(Txt a, Slice sa, Txt b, Slice sb);
 
 /*
 ** Function Definitions
