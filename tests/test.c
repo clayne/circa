@@ -41,7 +41,7 @@ describe (Seq) {
       seq_require(xs, 6);
       assert(!CE, "No error should be thrown after requirement.");
       assert(xs, "Sequence shouldn't be NULL after requirement.");
-      assert(seq(xs)->cap > 5, "Sequence capacity should increase after larger requirement.");
+      assert(seq(xs)->cap >= 6, "Sequence capacity should increase after larger requirement.");
     }
 
     it ("seq_free") {
@@ -51,6 +51,46 @@ describe (Seq) {
       seq_free(xs);
       assert(!CE, "No error should be thrown after double freeing.");
       assert(!xs, "Sequence should remain NULL after double freeing.");
+    }
+  }
+}
+
+Txt t;
+
+describe (Txt) {
+  subdesc (Allocators) {
+    it ("txt_alloc") {
+      t = txt_alloc(10);
+      assert(!CE, "No error should be thrown after alocation.");
+      assert(t, "Text shouldn't be NULL after allocation.");
+      assert(txt(t)->cap == 10, "Text capacity should be set after alloc.");
+    }
+
+    it ("txt_realloc") {
+      txt_realloc(t, 5);
+      assert(!CE, "No error should be thrown after reallocation.");
+      assert(t, "Text shouldn't be NULL after reallocation.");
+      assert(txt(t)->cap == 5, "Text capacity should be set after realloc.");
+    }
+
+    it ("txt_require") {
+      txt_require(t, 3);
+      assert(!CE, "No error should be thrown after requirement.");
+      assert(t, "Text shouldn't be NULL after requirement.");
+      assert(txt(t)->cap == 5, "Text capacity shouldn't change after smaller requirement.");
+      txt_require(t, 6);
+      assert(!CE, "No error should be thrown after requirement.");
+      assert(t, "Text shouldn't be NULL after requirement.");
+      assert(txt(t)->cap >= 6, "Text capacity should increase after larger requirement.");
+    }
+
+    it ("txt_free") {
+      txt_free(t);
+      assert(!CE, "No error should be thrown after freeing.");
+      assert(!t, "Text should be NULL after freeing.");
+      txt_free(t);
+      assert(!CE, "No error should be thrown after double freeing.");
+      assert(!t, "Text should be NULL after double freeing.");
     }
   }
 }

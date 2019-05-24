@@ -59,6 +59,8 @@ CIRCA CIRCA_RETURNS Txt txt_push_(Txt t, char c);
 ** Function Definitions
 */
 
+/* Accessors */
+
 static inline
 SeqData *txt(Txt t) {
   return seq(t);
