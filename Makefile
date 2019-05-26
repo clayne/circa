@@ -56,12 +56,15 @@ sanitized: deps
 
 examples: debug
 	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) ex/seq.c -o seq.o -lcirca $(LDFLAGS)
+	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) ex/map.c -o map.o -lcirca $(LDFLAGS)
 
 examples_sanitized: sanitized
 	$(CC) $(CFLAGS_SANITIZED) $(CFLAGS_EX) ex/seq.c -o seq.o -lcirca $(LDFLAGS)
+	$(CC) $(CFLAGS_SANITIZED) $(CFLAGS_EX) ex/map.c -o map.o -lcirca $(LDFLAGS)
 
 examples_header:
 	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) -DCIRCA_HEADER_ONLY ex/seq.c -o seq.o $(LDFLAGS)
+	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) -DCIRCA_HEADER_ONLY ex/map.c -o map.o $(LDFLAGS)
 
 test: debug
 	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) -fPIC tests/test.c -I. -L. -Ilib/snow -DSNOW_ENABLED -o test.o -lcirca -lm

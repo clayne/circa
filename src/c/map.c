@@ -32,7 +32,7 @@ Map map_set_(size_t sizk, size_t sizv, Map m, void *k, void *v) {
   circa_guard (!sizk || !sizv || !m || !k || !v)
     return (circa_throw(CE_ARG), m);
 
-  intmax_t swp_probe = -1, tmp_probe;
+  intmax_t swp_probe = 0, tmp_probe;
 
   #ifdef CIRCA_VLA
     char swp_data[sizv], tmp_data[sizv];
@@ -221,8 +221,8 @@ Map map_realloc_(size_t sizk, size_t sizv, Map m, size_t cap) {
 
   // Set pointers to parts of the pool for temporary storage.
   size_t *probe = pool;
-  void   *key   = probe + m_probe_len;
-  void   *data  = key   +   m_key_len;
+  char   *key   = ((char*) probe) + m_probe_len;
+  char   *data  = key   +   m_key_len;
 
   // Copy the map's members into the pool.
   memcpy(probe, map(m)->probe, m_probe_len);
@@ -252,7 +252,7 @@ Map map_realloc_(size_t sizk, size_t sizv, Map m, size_t cap) {
 
   md->data = realloc(md->data, m2_data_len);
   
-  if (!md->probe) {
+  if (!md->data) {
     CIRCA_FREE(pool);
     return (circa_throw(CE_OOM), m);
   }
@@ -261,10 +261,17 @@ Map map_realloc_(size_t sizk, size_t sizv, Map m, size_t cap) {
   md->cap = m2_cap;
 
   // Clear out the map's memory.
-  memset(md->probe, 0, m2_probe_len);
+  for (size_t i = 0; i < m2_cap; i++)
+    md->probe[i] = -1;
   memset(m, 0, m2_key_len);
   memset(md->data, 0, m2_data_len);
 
+  // Re-insert the members into the map.
+  for (size_t i = 0; i < m_cap; i++)
+    if (probe[i] != -1)
+      m = map_set_(sizk, sizv, m, key + (i * sizk), data + (i * sizv));
+
+  // Free the memory pool.
   CIRCA_FREE(pool);
 
   return m;

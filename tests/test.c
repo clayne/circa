@@ -109,6 +109,11 @@ describe (Map) {
 
     it ("map_free") {
       map_free(m);
+      assert(!CE, "No error should be thrown after freeing.");
+      assert(!m, "Map should be NULL after freeing.");
+      map_free(m);
+      assert(!CE, "No error should be thrown after double freeing.");
+      assert(!m, "Map should remain NULL after double freeing.");
     }
   }
 }
