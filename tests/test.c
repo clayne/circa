@@ -95,4 +95,22 @@ describe (Txt) {
   }
 }
 
+Map(int, int) m;
+
+describe (Map) {
+  subdesc (Allocators) {
+    it ("map_alloc") {
+      m = map_alloc(int, int, 1);
+      assert(!CE, "No error should be thrown after allocation.");
+      assert(m, "Map shouldn't be NULL after allocation.");
+      assert(map(m)->cap > 0, "Map capacity shouldn't be 0.");
+      assert(map(m)->len == 0, "Map length should be 0.");
+    }
+
+    it ("map_free") {
+      map_free(m);
+    }
+  }
+}
+
 snow_main();

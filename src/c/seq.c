@@ -99,7 +99,7 @@ Seq seq_free_(size_t siz, Seq s) {
 
   if (s) {
     memset(seq(s), 0, sizeof(*seq(s)) + seq(s)->cap * siz);
-    free(seq(s));
+    CIRCA_FREE(seq(s));
   }
 
   return NULL;
@@ -165,7 +165,7 @@ void *seq_pull_(size_t siz, Seq s) {
     char tmp[siz];
   #else
     char *tmp = NULL;
-    tmp = malloc(siz);
+    tmp = CIRCA_MALLOC(siz);
     if (!tmp)
       return (circa_throw(CE_OOM), s);
   #endif
@@ -176,7 +176,7 @@ void *seq_pull_(size_t siz, Seq s) {
   memcpy(save, tmp, siz);
 
   #ifndef CIRCA_VLA
-    free(tmp);
+    CIRCA_FREE(tmp);
   #endif
 
   return save;
