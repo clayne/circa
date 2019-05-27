@@ -118,4 +118,27 @@ describe (Map) {
   }
 }
 
+Set(int) e;
+
+describe (Set) {
+  subdesc (Allocators) {
+    it ("set_alloc") {
+      e = set_alloc(int, 1);
+      assert(!CE, "No error should be thrown after allocation.");
+      assert(e, "Set shouldn't be NULL after allocation.");
+      assert(set(e)->cap > 0, "Set capacity shouldn't be 0.");
+      assert(set(e)->len == 0, "Set length should be 0.");
+    }
+
+    it ("set_free") {
+      set_free(e);
+      assert(!CE, "No error should be thronw after freeing.");
+      assert(!e, "Set should be NULL after freeing.");
+      set_free(e);
+      assert(!CE, "No error should be thrown after double freeing.");
+      assert(!e, "Set should remain NULL after double freeing.");
+    }
+  }
+}
+
 snow_main();

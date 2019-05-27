@@ -57,6 +57,7 @@ sanitized: deps
 examples: debug
 	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) ex/seq.c -o seq.o -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) ex/map.c -o map.o -lcirca $(LDFLAGS)
+	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) ex/set.c -o set.o -lcirca $(LDFLAGS)
 
 examples_sanitized: sanitized
 	$(CC) $(CFLAGS_SANITIZED) $(CFLAGS_EX) ex/seq.c -o seq.o -lcirca $(LDFLAGS)

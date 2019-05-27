@@ -8,3 +8,4 @@
 #include "src/h/seq.h"
 #include "src/h/txt.h"
 #include "src/h/map.h"
+#include "src/h/set.h"

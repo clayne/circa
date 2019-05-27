@@ -220,7 +220,7 @@ Map map_realloc_(size_t sizk, size_t sizv, Map m, size_t cap) {
     return (circa_throw(CE_OOM), m);
 
   // Set pointers to parts of the pool for temporary storage.
-  size_t *probe = pool;
+  size_t *probe = (size_t*) pool;
   char   *key   = ((char*) probe) + m_probe_len;
   char   *data  = key   +   m_key_len;
 
@@ -285,7 +285,7 @@ Map map_require_(size_t sizk, size_t sizv, Map m, size_t cap) {
 CIRCA CIRCA_RETURNS
 Map map_free_(size_t sizk, size_t sizv, Map m) {
   if (m) {
-    // Zero out freed memory for security. We don't bother with probe count/
+    // Zero out freed memory for security. We don't bother with probe count.
     memset(m, 0, map(m)->cap * sizk);
     memset(map(m)->data, 0, map(m)->cap * sizv);
 
