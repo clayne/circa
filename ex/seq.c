@@ -11,7 +11,7 @@ int main() {
   for (int i = 0; i < 10; i++)
     seq_push(xs, &i);
 
-  seq_keep(xs, it & 1); // Keep only the odd numbers.
+  seq_filter(xs, it & 1); // Keep only the odd numbers.
 
   seq_map(xs, it * it); // Square every number.
 

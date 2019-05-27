@@ -117,7 +117,7 @@ for (size_t I = 0, J = 0; I < seq(S)->len; I++, J = 0) \
 for (T V = seq_get_iso(T, S, I); J != 1; J = 1)
 #define seq_foreach(S, V) seq_foreach_iso(typeof(*S), S, V)
 
-#define seq_keep_iso(T, S, EXPR)                                     \
+#define seq_filter_iso(T, S, EXPR)                                   \
 do {                                                                 \
   size_t LEN = seq(S)->len;                                          \
   T it;                                                              \
@@ -128,25 +128,16 @@ do {                                                                 \
   seq(S)->len -= LEN;                                                \
   memcpy(S, ((char*) S) + LEN * sizeof(T), seq(S)->len * sizeof(T)); \
 } while(0)
-#define seq_keep(S, F) seq_keep_iso(typeof(*S), S, F)
+#define seq_filter(S, F) seq_filter_iso(typeof(*S), S, F)
 
 #define seq_map_iso(T, S, EXPR)               \
 do {                                          \
   for (size_t I = 0; I < seq(S)->len; I++) {  \
     T it = seq_get_iso(T, (S), (I));          \
-    seq_set_iso(T, S, I, &(T){EXPR});      \
+    seq_set_iso(T, S, I, &(T){EXPR});         \
   }                                           \
 } while (0)
 #define seq_map(S, F) seq_map_iso(typeof(*S), S, F)
-
-#define seq_do_iso(T, S, EXPR)               \
-do {                                         \
-  for (size_t I = 0; I < seq(S)->len; I++) { \
-    T it = seq_get_iso(T, (S), (I));         \
-    EXPR;                                    \
-  }                                          \
-} while (0)
-#define seq_do(S, F) seq_do_iso(typeof(*S), S, F)
 
 // TODO: seq_foldl and seq_foldr
 
