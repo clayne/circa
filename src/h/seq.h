@@ -117,30 +117,34 @@ for (size_t I = 0, J = 0; I < seq(S)->len; I++, J = 0) \
 for (T V = seq_get_iso(T, S, I); J != 1; J = 1)
 #define seq_foreach(S, V) seq_foreach_iso(typeof(*S), S, V)
 
-#define seq_keep_iso(T, S, F)                                        \
+#define seq_keep_iso(T, S, EXPR)                                     \
 do {                                                                 \
   size_t LEN = seq(S)->len;                                          \
-  T V;                                                               \
+  T it;                                                              \
   for (size_t I = 0; I < LEN; I++) {                                 \
-    V = seq_get_iso(T, S, I);                                        \
-    if (F(V)) seq_push_iso(T, S, &V);                                \
+    it = seq_get_iso(T, S, I);                                       \
+    if (EXPR) seq_push_iso(T, S, &it);                               \
   }                                                                  \
   seq(S)->len -= LEN;                                                \
   memcpy(S, ((char*) S) + LEN * sizeof(T), seq(S)->len * sizeof(T)); \
 } while(0)
 #define seq_keep(S, F) seq_keep_iso(typeof(*S), S, F)
 
-#define seq_apply_iso(T, S, F)                       \
-do {                                                 \
-  for (size_t I = 0; I < seq(S)->len; I++)           \
-    seq_set_iso(T, S, I, &(T){F(seq_get_iso(T, (S), (I)))});  \
+#define seq_map_iso(T, S, EXPR)               \
+do {                                          \
+  for (size_t I = 0; I < seq(S)->len; I++) {  \
+    T it = seq_get_iso(T, (S), (I));          \
+    seq_set_iso(T, S, I, &(T){EXPR});      \
+  }                                           \
 } while (0)
-#define seq_apply(S, F) seq_apply_iso(typeof(*S), S, F)
+#define seq_map(S, F) seq_map_iso(typeof(*S), S, F)
 
-#define seq_do_iso(T, S, F)                \
-do {                                       \
-  for (size_t I = 0; I < seq(S)->len; I++) \
-    F(seq_get_iso(T, (S), (I)));           \
+#define seq_do_iso(T, S, EXPR)               \
+do {                                         \
+  for (size_t I = 0; I < seq(S)->len; I++) { \
+    T it = seq_get_iso(T, (S), (I));         \
+    EXPR;                                    \
+  }                                          \
 } while (0)
 #define seq_do(S, F) seq_do_iso(typeof(*S), S, F)
 
