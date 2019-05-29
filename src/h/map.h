@@ -96,7 +96,7 @@ MapData *map(Map m) {
 for (size_t I = 0, J = 0; I < map(M)->cap; I++, J = 0) \
 if (map(M)->probe[I] != -1) \
 for (TK K = *(TK*) (map(M)->key  + (I * sizeof(TK))); J != 1; J = 1) \
-for (TK V = *(TV*) (map(M)->data + (I * sizeof(TV))); J != 1; J = 1)
+for (TV V = *(TV*) (map(M)->data + (I * sizeof(TV))); J != 1; J = 1)
 #define map_foreach(M, K, V) map_foreach_iso(typeof((M)->k), typeof((M)->v), M, K, V)
 
 /*

@@ -76,4 +76,15 @@ SeqMapData *seqmap(SeqMap sm) {
   return ((SeqMapData*) sm) - 1;
 }
 
+/*
+** Iterators
+*/
+
+#define seqmap_foreach_iso(TK, TV, SM, K, V) \
+for (size_t I = 0, J = 0; I < seqmap(SM)->cap; I++, J = 0) \
+if (seqmap(SM)->probe[I] != -1) \
+for (Seq(TK) K = seqmap(SM)->key[I]; J != 1; J = 1) \
+for (TV V = *(TV*) (seqmap(SM)->data + (I * sizeof(TV))); J != 1; J = 1)
+#define seqmap_foreach(SM, K, V) seqmap_foreach_iso(typeof((SM)->k), typeof((SM)->v), SM, K, V)
+
 #endif // CIRCA_SEQ_H
