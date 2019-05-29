@@ -132,11 +132,32 @@ describe (Set) {
 
     it ("set_free") {
       set_free(e);
-      assert(!CE, "No error should be thronw after freeing.");
+      assert(!CE, "No error should be thrown after freeing.");
       assert(!e, "Set should be NULL after freeing.");
       set_free(e);
       assert(!CE, "No error should be thrown after double freeing.");
       assert(!e, "Set should remain NULL after double freeing.");
+    }
+  }
+}
+
+SeqMap(int, int) sm;
+
+describe (SeqMap) {
+  subdesc (Allocators) {
+    it ("seqmap_alloc") {
+      sm = seqmap_alloc(int, int, 1);
+      assert(!CE, "No error should be thrown after allocation.");
+      assert(sm, "SeqMap shouldn't be NULL after allocation.");
+    }
+
+    it ("seqmap_free") {
+      seqmap_free(sm);
+      assert(!CE, "No error should be thrown after freeing.");
+      assert(!sm, "SeqMap should be NULL after freeing.");
+      seqmap_free(sm);
+      assert(!CE, "No error should be thrown after double freeing.");
+      assert(!sm, "SeqMap should remain NULL after double freeing.");
     }
   }
 }

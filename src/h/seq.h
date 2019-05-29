@@ -55,9 +55,18 @@ CIRCA void *seq_get_(size_t siz, Seq s, size_t a);
 
 /* Allocators */
 
-#define seq_alloc_iso(T, C) seq_alloc_(sizeof(T), (C))
+#define seq_alloc_iso(T, C) ((T*) seq_alloc_(sizeof(T), (C)))
 #define seq_alloc(T, C) seq_alloc_iso(T, C)
 CIRCA CIRCA_ALLOCS Seq seq_alloc_(size_t siz, size_t cap);
+
+#define seq_wrap_iso(T, V, C) ((T*) seq_wrap_(sizeof(T), (V), (C)))
+#define seq_wrap(V, C) seq_wrap_iso(typeof(*V), V, C)
+#define seq_from_iso(T, S) seq_wrap_iso(T, S, seq(S)->len)
+#define seq_from(S) seq_from_iso(typeof(*S), S)
+#define seq_lit_iso(T, ...) seq_wrap_(sizeof(T), &(T){__VA_ARGS__}, sizeof((&(T){__VA_ARGS__})) / sizeof(T))
+#define FST(X, ...) X
+#define seq_lit(...) seq_lit_iso(typeof(FST(__VA_ARGS__)), __VA_ARGS__)
+CIRCA CIRCA_ALLOCS Seq seq_wrap_(size_t siz, void *v, size_t cap);
 
 #define seq_realloc_iso(T, S, C) (S) = seq_realloc_(sizeof(T), (S), (C))
 #define seq_realloc(S, C) seq_realloc_iso(typeof(*S), (S), (C))
@@ -95,9 +104,23 @@ CIRCA CIRCA_RETURNS Seq seq_push_(size_t siz, Seq s, void *v);
 #define seq_tos(S) seq_tos_iso(typeof(*S), S)
 CIRCA void *seq_pop_(size_t siz, Seq s, size_t n);
 
-#define seq_pull_iso(T, S) seq_pull_(sizeof(T), (S))
+#define seq_pull_iso(T, S) ((T*) seq_pull_(sizeof(T), (S)))
 #define seq_pull(S) seq_pull_iso(typeof(*S), S)
 CIRCA void *seq_pull_(size_t siz, Seq s);
+
+/* Comparison Functions */
+
+#define seq_cmp_iso(T, A, B) seq_cmp_(sizeof(T), (A), (B))
+#define seq_cmp(A, B) seq_cmp_iso(typeof(*A), A, B)
+CIRCA bool seq_cmp_(size_t siz, Seq a, Seq b);
+
+#define seq_cmp_len_iso(T, A, B, L) seq_cmp_len_(sizeof(T), (A), (B), (L))
+#define seq_cmp_len(A, B, L) seq_cmp_len_iso(typeof(*A), A, B, L)
+CIRCA bool seq_cmp_len_(size_t siz, Seq a, Seq b, size_t len);
+
+#define seq_cmp_slice_iso(T, A, SA, B, SB) seq_cmp_len_(sizeof(T), (A), (SA), (B), (SB))
+#define seq_cmp_slice(A, SA, B, SB) seq_cmp_slice_iso(typeof(*A), A, SA, B, SB)
+CIRCA bool seq_cmp_slice_(size_t siz, Seq a, Slice sa, Seq b, Slice sb);
 
 /*
 ** Function Implementations
@@ -148,5 +171,6 @@ do {                                          \
 #ifdef CIRCA_HEADER_ONLY
   #include "../c/seq.c"
 #endif
+
 
 #endif // CIRCA_SEQ_H

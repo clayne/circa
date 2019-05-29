@@ -38,7 +38,7 @@ Map map_set_(size_t sizk, size_t sizv, Map m, void *k, void *v) {
     char swp_data[sizv], tmp_data[sizv];
     char swp_key[sizk],  tmp_key[sizk];
   #else
-    void *pool = CIRCA_MALLOC((sizv * 2) + (sizk * 2));
+    char *pool = CIRCA_MALLOC((sizv * 2) + (sizk * 2));
 
     if (!pool)
       return (circa_throw(CE_OOM), m);
@@ -115,9 +115,10 @@ bool map_del_(size_t sizk, size_t sizv, Map m, void *k) {
         for (i++; i < map(m)->cap; i++) {
           if (map(m)->probe[i] <= 0)
             return true;
+
           map(m)->probe[i - 1] = map(m)->probe[i] - 1;
-          map(m)->data[i - 1] = map(m)->data[i];
-          memcpy(map(m)->key + sizk * (i - 1), map(m)->key + sizk * i, sizk);
+          memcpy(map(m)->data + sizv * (i - 1), map(m)->data + sizv * i, sizv);
+          memcpy(map(m)->key + sizk * (i - 1), map(m)->key + sizk * i, sizk); 
           map(m)->probe[i] = -1;
         }
         return true;
@@ -142,9 +143,9 @@ bool map_has_(size_t sizk, size_t sizv, Map m, void *k) {
       CE = CE_OK;
     circa_log("caught CE_OOB from map_get; no worries.");
     return false;
-  } else {
-    return p != NULL;
   }
+  
+  return p != NULL;
 }
 
 CIRCA
@@ -176,27 +177,24 @@ Map map_alloc_(size_t sizk, size_t sizv, size_t cap) {
   circa_guard (!sizk || !sizv || !cap)
     return (circa_throw(CE_ARG), NULL);
 
-  // Align the capacity to a prime number.
   cap = usz_primegt(cap);
 
-  // 
   MapData *md = CIRCA_CALLOC(sizeof(*md) + cap * sizk, 1);
 
   if (!md)
     return (circa_throw(CE_OOM), NULL);
 
   md->probe = CIRCA_MALLOC(cap * sizeof(*md->probe));
-
-  for (size_t i = 0; i < cap; i++)
-    md->probe[i] = -1;
-
-  md->data  = CIRCA_CALLOC(cap, sizv);
+  md->data  = CIRCA_MALLOC(cap * sizv);
 
   if (!md->probe || !md->data) { 
     CIRCA_FREE(md->probe);
     CIRCA_FREE(md->data);
     return (circa_throw(CE_OOM), NULL);
   }
+
+  for (size_t i = 0; i < cap; i++)
+    md->probe[i] = -1;
 
   md->cap = cap;
 
@@ -243,14 +241,14 @@ Map map_realloc_(size_t sizk, size_t sizv, Map m, size_t cap) {
     return (circa_throw(CE_OOM), m);
   }
 
-  md->probe = realloc(md->probe, m2_probe_len);
+  md->probe = CIRCA_REALLOC(md->probe, m2_probe_len);
 
   if (!md->probe) {
     CIRCA_FREE(pool);
     return (circa_throw(CE_OOM), m);
   }
 
-  md->data = realloc(md->data, m2_data_len);
+  md->data = CIRCA_REALLOC(md->data, m2_data_len);
   
   if (!md->data) {
     CIRCA_FREE(pool);
@@ -271,7 +269,6 @@ Map map_realloc_(size_t sizk, size_t sizv, Map m, size_t cap) {
     if (probe[i] != -1)
       m = map_set_(sizk, sizv, m, key + (i * sizk), data + (i * sizv));
 
-  // Free the memory pool.
   CIRCA_FREE(pool);
 
   return m;
@@ -294,5 +291,6 @@ Map map_free_(size_t sizk, size_t sizv, Map m) {
     CIRCA_FREE(map(m)->data);
     CIRCA_FREE(map(m));
   }
+
   return NULL;
 }

@@ -59,11 +59,20 @@ Seq seq_alloc_(size_t siz, size_t cap) {
   return sd->data;
 }
 
+CIRCA CIRCA_ALLOCS
+Seq seq_wrap_(size_t siz, void *v, size_t cap) {
+  circa_guard (!siz || !v || !cap)
+    return (circa_throw(CE_ARG), NULL);
+  Seq s = seq_alloc_(siz, cap);
+  memcpy(s, v, cap * siz); // FIXME: examples_sanitized halts here for seq_lit; why?
+  seq(s)->len = cap;
+  return s;
+}
+
 CIRCA CIRCA_RETURNS
 Seq seq_realloc_(size_t siz, Seq s, size_t cap) {
-  circa_guard (!siz || !s || !cap) {
+  circa_guard (!siz || !s || !cap)
     return (circa_throw(CE_ARG), s);
-  }
 
   if (cap < seq(s)->cap)
     memset(((char*) s) + cap * siz, 0, seq(s)->cap - cap);

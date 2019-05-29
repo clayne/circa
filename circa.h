@@ -9,3 +9,4 @@
 #include "src/h/txt.h"
 #include "src/h/map.h"
 #include "src/h/set.h"
+#include "src/h/seqmap.h"
