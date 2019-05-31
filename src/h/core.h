@@ -33,6 +33,12 @@
 #endif
 
 /*
+** Macros
+*/
+
+#define CIRCA_FST(X, ...) X
+
+/*
 ** Portable Attributes
 */
 

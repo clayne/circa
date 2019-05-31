@@ -61,6 +61,8 @@ Seq seq_alloc_(size_t siz, size_t cap) {
 
 CIRCA CIRCA_ALLOCS
 Seq seq_wrap_(size_t siz, void *v, size_t cap) {
+  printf("wrap siz: %zu\n", siz);
+  printf("wrap cap: %zu\n", cap);
   circa_guard (!siz || !v || !cap)
     return (circa_throw(CE_ARG), NULL);
   Seq s = seq_alloc_(siz, cap);
@@ -119,11 +121,16 @@ Seq seq_free_(size_t siz, Seq s) {
 */
 
 CIRCA CIRCA_RETURNS
-Seq seq_cpy_(size_t siz, Seq dst, Seq src) {
+Seq seq_cpy_(size_t siz, Seq dst, void *src, size_t cap) {
   circa_guard (!siz || !dst || !src)
     return (circa_throw(CE_ARG), dst);
-  dst = seq_require_(siz, dst, seq(src)->len);
-  memcpy(dst, src, seq(src)->len * siz);
+  dst = seq_require_(siz, dst, cap);
+  if (CE) {
+    circa_log("seq_require failed.");
+    return dst;
+  }
+  memcpy(dst, src, cap * siz);
+  seq(dst)->len = cap;
   return dst;
 }
 

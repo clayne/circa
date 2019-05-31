@@ -64,8 +64,7 @@ CIRCA CIRCA_ALLOCS Seq seq_alloc_(size_t siz, size_t cap);
 #define seq_from_iso(T, S) seq_wrap_iso(T, S, seq(S)->len)
 #define seq_from(S) seq_from_iso(typeof(*S), S)
 #define seq_lit_iso(T, ...) ((T*) seq_wrap_(sizeof(T), &(T[]){__VA_ARGS__}, sizeof((T[]){__VA_ARGS__}) / sizeof(T)))
-#define FST(X, ...) X
-#define seq_lit(...) seq_lit_iso(typeof(FST(__VA_ARGS__)), __VA_ARGS__)
+#define seq_lit(...) seq_lit_iso(typeof(CIRCA_FST(__VA_ARGS__)), __VA_ARGS__)
 CIRCA CIRCA_ALLOCS Seq seq_wrap_(size_t siz, void *v, size_t cap);
 
 #define seq_realloc_iso(T, S, C) (S) = seq_realloc_(sizeof(T), (S), (C))
@@ -82,9 +81,11 @@ CIRCA CIRCA_RETURNS Seq seq_free_(size_t siz, Seq s);
 
 /* Sequence Operations */
 
-#define seq_cpy_iso(T, DST, SRC) (DST) = seq_cpy_(sizeof(T), (DST), (SRC))
+#define seq_cpy_lit_iso(T, DST, ...) (DST) = seq_cpy_(sizeof(T), (DST), &(T[]){__VA_ARGS__}, sizeof((T[]){__VA_ARGS__}) / sizeof(T))
+#define seq_cpy_lit(DST, ...) seq_cpy_lit_iso(typeof(*DST), DST, __VA_ARGS__)
+#define seq_cpy_iso(T, DST, SRC) (DST) = seq_cpy_(sizeof(T), (DST), (SRC), seq(SRC)->len)
 #define seq_cpy(DST, SRC) seq_cpy_iso(typeof(*DST), DST, SRC)
-CIRCA CIRCA_RETURNS Seq seq_cpy_(size_t siz, Seq dst, Seq src);
+CIRCA CIRCA_RETURNS Seq seq_cpy_(size_t siz, Seq dst, void *src, size_t cap);
 
 #define seq_cpy_slice_iso(T, DST, SRC, SLICE) (DST) = seq_cpy_slice_(sizeof(T), (DST), (SRC), (SLICE))
 #define seq_cpy_slice(DST, SRC, SLICE) seq_cpy_slice_iso(typeof(*DST), DST, SRC, SLICE)

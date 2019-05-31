@@ -32,7 +32,7 @@
 #ifdef CIRCA_LOG
   #define circa_log_(FILE, FUNC, LINE, MSG) \
   do { \
-    printf("[circa] %s: In %s on line %zu: %s", FILE, FUNC, LINE, MSG); \
+    printf("[circa] %s: In %s on line %zu: %s\n", FILE, FUNC, LINE, MSG); \
   } while(0)
   #define circa_log(MSG) circa_log_(__FILE__, __func__, (size_t) __LINE__, MSG)
 #else
