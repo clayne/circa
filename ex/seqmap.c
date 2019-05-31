@@ -17,6 +17,8 @@ int main() {
     seqmap_set(sm, xs, &(int){3});
   seq_free(xs);
 
+  puts("foo");
+
   seqmap_foreach(sm, ks, v) {
     seq_foreach(ks, k) {
       printf("%i ", k);

@@ -81,8 +81,10 @@ SeqMap seqmap_set_(size_t sizk, size_t sizv, SeqMap sm, Seq k, void *v) {
     seqmap(sm)->key[i] = swp_key;
   } else {
     sm = seqmap_realloc_(sizk, sizv, sm, seqmap(sm)->cap + 1);
-    if (!CE)
+    if (!CE) {
+      printf("seqmap_set key len: %zu\n", seq(swp_key)->len);
       sm = seqmap_set_(sizk, sizv, sm, swp_key, swp_data);
+    }
     swp_key = seq_free_(sizk, swp_key);
   }
 
@@ -213,8 +215,8 @@ SeqMap seqmap_realloc_(size_t sizk, size_t sizv, SeqMap sm, size_t cap) {
 
   // Set pointers to parts of the pool for temporary storage.
   size_t *probe = (size_t*) pool;
-  char   *key   = ((char*) probe) + sm_probe_len;
-  char   *data  = key + sm_key_len;
+  Seq    *key   = ((Seq*) (((char*) probe) + sm_probe_len));
+  char   *data  = ((char*) key) + sm_key_len;
 
   // Copy the map's members into the pool.
   memcpy(probe, seqmap(sm)->probe, sm_probe_len);
@@ -259,9 +261,9 @@ SeqMap seqmap_realloc_(size_t sizk, size_t sizv, SeqMap sm, size_t cap) {
   memset(smd->data, 0, sm2_data_len);
 
   // Re-insert the members into the map.
-  for (size_t i = 0; i < sm2_cap; i++)
+  for (size_t i = 0; i < sm_cap; i++)
     if (probe[i] != -1)
-      sm = seqmap_set_(sizk, sizv, sm, key + i * sizeof(Seq), data + (i * sizv));
+      sm = seqmap_set_(sizk, sizv, sm, key[i], data + (i * sizv));
 
   CIRCA_FREE(pool);
 
