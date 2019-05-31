@@ -51,13 +51,15 @@ SeqMap seqmap_set_(size_t sizk, size_t sizv, SeqMap sm, Seq k, void *v) {
   for (i = hash; i < seqmap(sm)->cap; i++) {
     if (seqmap(sm)->probe[i] != -1) {
       if (seq_cmp_(sizk, seqmap(sm)->key[i], k)) {
+        circa_log("found equal");
         found = true;
         break;
       } else if (seqmap(sm)->probe[i] < swp_probe) {
+        circa_log("swapping");
         // c = a
         tmp_probe = seqmap(sm)->probe[i];
         memcpy(tmp_data, seqmap(sm)->data + (i * sizv), sizv);
-        tmp_key = seqmap(sm)->key + i;
+        tmp_key = seqmap(sm)->key[i];
         // a = b
         seqmap(sm)->probe[i] = swp_probe;
         memcpy(seqmap(sm)->data + (i * sizv), swp_data, sizv);
@@ -68,6 +70,7 @@ SeqMap seqmap_set_(size_t sizk, size_t sizv, SeqMap sm, Seq k, void *v) {
         swp_key = tmp_key;
       }
     } else {
+      circa_log("found empty");
       seqmap(sm)->len++;
       found = true;
       break;
@@ -76,15 +79,16 @@ SeqMap seqmap_set_(size_t sizk, size_t sizv, SeqMap sm, Seq k, void *v) {
   }
 
   if (found) {
+    circa_log("found, inserting");
+    seqmap(sm)->key[i] = seq_free_(sizk, seqmap(sm)->key[i]);
     seqmap(sm)->probe[i] = swp_probe;
     memcpy(seqmap(sm)->data + (i * sizv), swp_data, sizv);
     seqmap(sm)->key[i] = swp_key;
   } else {
+    circa_log("not found, reallocating");
     sm = seqmap_realloc_(sizk, sizv, sm, seqmap(sm)->cap + 1);
-    if (!CE) {
-      printf("seqmap_set key len: %zu\n", seq(swp_key)->len);
+    if (!CE)
       sm = seqmap_set_(sizk, sizv, sm, swp_key, swp_data);
-    }
     swp_key = seq_free_(sizk, swp_key);
   }
 

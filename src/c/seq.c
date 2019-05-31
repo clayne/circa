@@ -61,12 +61,10 @@ Seq seq_alloc_(size_t siz, size_t cap) {
 
 CIRCA CIRCA_ALLOCS
 Seq seq_wrap_(size_t siz, void *v, size_t cap) {
-  printf("wrap siz: %zu\n", siz);
-  printf("wrap cap: %zu\n", cap);
   circa_guard (!siz || !v || !cap)
     return (circa_throw(CE_ARG), NULL);
   Seq s = seq_alloc_(siz, cap);
-  memcpy(s, v, cap * siz); // FIXME: examples_sanitized halts here for seq_lit; why?
+  memcpy(s, v, cap * siz);
   seq(s)->len = cap;
   return s;
 }
