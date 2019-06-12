@@ -15,6 +15,18 @@
 #include "seq.h"
 
 /*
+** Macros
+*/
+
+/* Macro given by @craigbarnes. */
+
+#ifdef __GNUC__
+  #define PRINTF(X) __attribute__((__format__(__printf__, (X), (X + 1))))
+#else
+  #define PRINTF(X)
+#endif
+
+/*
 ** Type Definitions
 */
 
@@ -48,13 +60,19 @@ CIRCA CIRCA_RETURNS Txt txt_require_(Txt t, size_t cap);
 #define txt_free(S) (S) = txt_free_((S))
 CIRCA CIRCA_RETURNS Txt txt_free_(Txt t);
 
-/* Sequence Operations */
+/* String Operations */
 
 #define txt_cpy(DST, SRC) (DST) = txt_cpy_((DST), (SRC))
 CIRCA CIRCA_RETURNS Txt txt_cpy_(Txt dst, Txt src);
 
 #define txt_cpy_slice(DST, SRC, SLICE) (DST) = txt_cpy_slice_((DST), (SRC), (SLICE))
 CIRCA CIRCA_RETURNS Txt txt_cpy_slice_(Txt dst, Txt src, Slice slice);
+
+#define txt_fmt(S, FMT, ...) (S) = txt_fmt_((S), (FMT), __VA_ARGS__)
+CIRCA CIRCA_RETURNS PRINTF(2) Txt txt_fmt_(Txt t, const char *fmt, ...);
+
+#define txt_cat_fmt(S, FMT, ...) (S) = txt_cat_fmt_((S), (FMT), __VA_ARGS__)
+CIRCA CIRCA_RETURNS PRINTF(2) Txt txt_cat_fmt_(Txt t, const char *fmt, ...);
 
 /* Stack Operations */
 
@@ -75,6 +93,17 @@ CIRCA bool txt_cmp_(Txt a, Txt b);
 
 #define txt_cmp_slice(A, SA, B, SB) txt_cmp_slice_((A), (SA), (B), (SB))
 CIRCA bool txt_cmp_slice_(Txt a, Slice sa, Txt b, Slice sb);
+
+/* IO Operations */
+
+#define txt_read(S, FP) (S) = txt_read_((S), (FP))
+CIRCA CIRCA_RETURNS Txt txt_read_(Txt t, FILE *fp);
+
+#define txt_cat_read(S, FP) (S) = txt_cat_read_((S), (FP)) 
+CIRCA CIRCA_RETURNS Txt txt_cat_read_(Txt t, FILE *fp);
+
+#define txt_write(S, FP) txt_write_((S), (FP))
+CIRCA void txt_write_(Txt t, FILE *fp);
 
 /*
 ** Function Definitions
@@ -120,6 +149,12 @@ do {                                       \
 } while (0)
 
 // TODO: txt_foldl and txt_foldr
+
+/*
+** Macro Undef
+*/
+
+#undef PRINTF
 
 /*
 ** Header-Only Mode

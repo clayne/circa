@@ -56,18 +56,21 @@ sanitized: deps
 
 examples: debug
 	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) ex/seq.c    -o seq.o    -lcirca $(LDFLAGS)
+	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) ex/txt.c    -o txt.o    -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) ex/map.c    -o map.o    -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) ex/set.c    -o set.o    -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) ex/seqmap.c -o seqmap.o -lcirca $(LDFLAGS)
 
 examples_sanitized: sanitized
 	$(CC) $(CFLAGS_SANITIZED) $(CFLAGS_EX) ex/seq.c -o seq.o       -lcirca $(LDFLAGS)
+	$(CC) $(CFLAGS_SANITIZED) $(CFLAGS_EX) ex/txt.c -o txt.o       -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS_SANITIZED) $(CFLAGS_EX) ex/map.c -o map.o       -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS_SANITIZED) $(CFLAGS_EX) ex/set.c -o set.o       -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS_SANITIZED) $(CFLAGS_EX) ex/seqmap.c -o seqmap.o -lcirca $(LDFLAGS)
 
 examples_header:
 	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) -DCIRCA_HEADER_ONLY ex/seq.c    -o seq.o $(LDFLAGS)
+	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) -DCIRCA_HEADER_ONLY ex/txt.c    -o txt.o $(LDFLAGS)
 	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) -DCIRCA_HEADER_ONLY ex/map.c    -o map.o $(LDFLAGS)
 	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) -DCIRCA_HEADER_ONLY ex/set.c    -o set.o $(LDFLAGS)
 	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) -DCIRCA_HEADER_ONLY ex/seqmap.c -o seqmap.o $(LDFLAGS)

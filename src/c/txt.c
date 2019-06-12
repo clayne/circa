@@ -87,7 +87,7 @@ Txt txt_free_(Txt t) {
 }
 
 /*
-** Sequence Operations
+** String Operations
 */
 
 CIRCA CIRCA_RETURNS
@@ -116,6 +116,62 @@ Txt txt_cpy_slice_(Txt dst, Txt src, Slice slice) {
   seq(dst)->len = len;
   memcpy(dst, src + slice.le, len);
   return dst;
+}
+
+#ifdef CIRCA_GNU
+  #define VPRINTF(X) __attribute__((__format__(__printf__, (X), 0)))
+#else
+  #define VPRINTF(X)
+#endif
+
+static inline VPRINTF(2)
+Txt txt_fmt__(Txt t, const char *fmt, va_list ap) {
+  va_list ap2;
+  va_copy(ap2, ap);
+  size_t len = vsnprintf(NULL, 0, fmt, ap2);
+  va_end(ap2);
+  t = txt_require_(t, len + 1);
+  size_t written = vsnprintf(t, len + 1, fmt, ap);
+  txt(t)->len = written;
+  if (written != len)
+    CE = CE_FMT;
+  return t;
+}
+
+CIRCA CIRCA_RETURNS
+Txt txt_fmt_(Txt t, const char *fmt, ...) {
+  circa_guard (!t || !fmt)
+    return (circa_throw(CE_ARG), t);
+  va_list ap;
+  va_start(ap, fmt);
+  t = txt_fmt__(t, fmt, ap);
+  va_end(ap);
+  return t;
+}
+
+static inline VPRINTF(2)
+Txt txt_cat_fmt__(Txt t, const char *fmt, va_list ap) {
+  va_list ap2;
+  va_copy(ap2, ap);
+  size_t len = vsnprintf(NULL, 0, fmt, ap2);
+  va_end(ap2);
+  t = txt_require_(t, txt(t)->len + len + 1);
+  size_t written = vsnprintf(t + txt(t)->len, len + 1, fmt, ap);
+  txt(t)->len += written;
+  if (written != len)
+    CE = CE_FMT;
+  return t;
+}
+
+CIRCA CIRCA_RETURNS
+Txt txt_cat_fmt_(Txt t, const char *fmt, ...) {
+  circa_guard (!t || !fmt)
+    return (circa_throw(CE_ARG), t);
+  va_list ap;
+  va_start(ap, fmt);
+  t = txt_cat_fmt__(t, fmt, ap);
+  va_end(ap);
+  return t;
 }
 
 /*
@@ -178,4 +234,113 @@ bool txt_cmp_slice_(Txt a, Slice sa, Txt b, Slice sb) {
     if (a[i] != b[i])
       return false;
   return true;
+}
+
+/*
+** IO Operations
+*/
+
+CIRCA CIRCA_RETURNS
+Txt txt_read_(Txt t, FILE *fp) {
+  circa_guard (!t || !fp)
+    return (circa_throw(CE_ARG), t);
+  
+  /* Go to the end of the file. */
+  if (fseek(fp, 0, SEEK_END)) {
+    circa_log("failed to seek end of file");
+    return (circa_throw(CE_FILE_READ), t);
+  }
+
+  /* Get the length of the file. */
+  size_t len = (size_t) ftell(fp);
+
+  /* Rewind the file. */
+  if (fseek(fp, 0, SEEK_SET)) {
+    circa_log("failed to rewind file");
+    return (circa_throw(CE_FILE_READ), t);
+  }
+
+  /* Allocate enough text space to store the file contents. */
+  t = txt_require_(t, len + 1);
+  if (CE) {
+    circa_log("call to txt_require failed");
+    return t;
+  }
+  
+  /* Read the file into the text. */
+  if (fread(t, 1, len, fp) != len) {
+    circa_log("fread bytes did not match length");
+    return (circa_throw(CE_FILE_READ), t);
+  }
+
+  /* Rewind the file. */
+  if (fseek(fp, 0, SEEK_SET)) {
+    circa_log("failed to rewind file");
+    return (circa_throw(CE_FILE_READ), t);
+  }
+
+  /* Set the length and null-terminate. */
+  txt(t)->len = len;
+  t[len] = '\0';
+  
+  return t;
+}
+
+CIRCA CIRCA_RETURNS
+Txt txt_cat_read_(Txt t, FILE *fp) {
+  circa_guard (!t || !fp)
+    return (circa_throw(CE_ARG), t);
+  
+  /* Go to the end of the file. */
+  if (fseek(fp, 0, SEEK_END)) {
+    circa_log("failed to seek end of file");
+    return (circa_throw(CE_FILE_READ), t);
+  }
+
+  /* Get the length of the file. */
+  size_t len = (size_t) ftell(fp);
+
+  /* Rewind the file. */
+  if (fseek(fp, 0, SEEK_SET)) {
+    circa_log("failed to rewind file");
+    return (circa_throw(CE_FILE_READ), t);
+  }
+
+  /* Allocate enough text space to store the file contents. */
+  t = txt_require_(t, txt(t)->len + len + 1);
+  if (CE) {
+    circa_log("call to txt_require failed");
+    return t;
+  }
+  
+  /* Read the file into the text. */
+  if (fread(t + txt(t)->len, 1, len, fp) != len) {
+    circa_log("fread bytes did not match length");
+    return (circa_throw(CE_FILE_READ), t);
+  }
+
+  /* Rewind the file. */
+  if (fseek(fp, 0, SEEK_SET)) {
+    circa_log("failed to rewind");
+    return (circa_throw(CE_FILE_READ), t);
+  }
+
+  /* Set the length and null-terminate. */
+  txt(t)->len += len;
+  t[txt(t)->len] = '\0';
+  
+  return t;
+}
+
+CIRCA
+void txt_write_(Txt t, FILE *fp) {
+  circa_guard (!t || !fp) {
+    CE = CE_ARG;
+    return;
+  }
+  fputs(t, fp);
+  if (!fseek(fp, 0, SEEK_SET)) {
+    CE = CE_FILE_WRITE;
+    return;
+  }
 }
