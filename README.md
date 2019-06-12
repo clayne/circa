@@ -24,6 +24,12 @@ Coming soon.
 
 ---
 
+# Documentation
+
+Coming less soon, probably.
+
+---
+
 # Integration
 
 Circa is recommended to be used as a git subtree (if you just recoiled, note
