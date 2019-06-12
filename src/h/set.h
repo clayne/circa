@@ -134,10 +134,10 @@ Set set_free_(size_t siz, Set e) {
 ** Iterators
 */
 
+// TODO
 #define set_foreach_iso(T, E, K) \
 map_foreach_iso(T, bool, E, K, V) \
 if (V == true)
 #define set_foreach(E, K) set_foreach_iso(typeof(E->k), E, K)
-
 
 #endif // CIRCA_SET_H
