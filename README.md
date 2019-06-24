@@ -18,9 +18,83 @@ additional cost.
 
 ---
 
-# Code Snippets
+# Examples
 
-Coming soon.
+## Dictionaries
+
+```C
+#include <circa.h>
+
+int main() {
+  Dict(int) fruits = dict_alloc(int, 1);
+
+  dict_set(fruits, "oranges", &(int){7});
+  dict_set(fruits, "peaches", &(int){5});
+  dict_set(fruits, "apples",  &(int){10});
+
+  dict_foreach(fruits, k, v)
+    printf("%s: %i\n", k, v);
+
+  dict_free(fruits);
+
+  return 0;
+}
+```
+
+## Sequences
+
+```C
+#include <circa.h>
+
+int main() {
+  Seq(int) xs = seq_alloc(int, 10);
+  
+  for (int i = 0; i < 10; i++)
+    seq_push(xs, &i);
+
+  seq_filter(xs, it & 1); // Keep only the odd numbers.
+
+  seq_map(xs, it * it); // Square every number.
+
+  seq_foreach(xs, x)
+    printf("%i\n", x);
+  
+  seq_free(xs);
+
+  return 0;
+}
+```
+
+## Text
+
+```C
+#include <circa.h>
+
+int main(int argc, char **argv) {
+  if (argc < 2) {
+    puts("Pass files in and this program will act like cat.");
+    exit(1);
+  }
+  
+  Txt t = txt_alloc(1);
+
+  for (int i = 1; i < argc; i++) {
+    FILE *fp = fopen(argv[i], "r");
+    if (!fp) {
+      txt_fmt(t, "txt.o: %s: No such file\n", argv[i]);
+      txt_write(t, stdout);
+      exit(1);
+    }
+    txt_read(t, fp);
+    txt_write(t, stdout);
+    fclose(fp);
+  }
+
+  txt_free(t);
+
+  return 0;
+}
+```
 
 ---
 
