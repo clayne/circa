@@ -129,6 +129,8 @@ CIRCA bool seq_cmp_slice_(size_t siz, Seq a, Slice sa, Seq b, Slice sb);
 
 static inline CIRCA_PURE CIRCA_NONNULL(1)
 SeqData *seq(Seq s) {
+  circa_guard (!s)
+    return (circa_throw(CE_ARG), NULL);
   return ((SeqData*) s) - 1;
 }
 
