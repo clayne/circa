@@ -100,7 +100,7 @@ int main(int argc, char **argv) {
 
 # Documentation
 
-Coming less soon, probably.
+Coming soon. (TM)
 
 ---
 
