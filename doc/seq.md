@@ -32,8 +32,8 @@ as `b` will be `int` instead of `int*`.
 
 ```C
 struct seq_data {
-  size_t cap;
-  size_t len;
+  size_t cap; // Space allocated.
+  size_t len; // Space used.
   char data[];
 };
 ```
@@ -82,7 +82,10 @@ Seq seq_set_(size_t siz, Seq s, size_t a, void *v);
 This function sets the value of a sequence at a certain index.
 
 ```C
-// TODO
+Seq(int) xs = seq_alloc(int, 5);
+for (int i = 0; i < 5; i++)
+  seq_set(xs, i, &i); // Analogous to xs[i] = i, but with book-keeping.
+seq_free(xs);
 ```
 
 The following errors may be thrown:
@@ -98,10 +101,15 @@ T seq_get(Seq(T) s, size_t a);
 void *seq_get_(size_t siz, Seq s, size_t a);
 ```
 
-This function retrieves the value from a sequence at a specific index.
+This function retrieves the value from a sequence at a specific index. Note that this is not entirely necessary for anything other than nice debug info; it's plenty safe to just index directly as long as you're using a properly denoted sequence (that is, its type is `Seq(int)` for example, rather than `Seq`.)
 
 ```C
-// TODO
+Seq(int) xs = seq_alloc(int, 5);
+for (int i = 0; i < 5; i++)
+  seq_set(xs, i, &i);
+for (int i = 0; i < 5; i++)
+  printf("%i\n", seq_get(xs, i)); // Analogous to xs[i].
+seq_free(xs);
 ```
 
 The following errors may be thrown:
@@ -150,7 +158,21 @@ copying the contents of the passed-in sequence to that sequence.
 to a sequence of a stated capacity.
 
 ```C
-// TODO
+int *xs = malloc(10 * sizeof(int));
+
+for (int i = 0; i < 10; i++)
+  xs[i] = i;
+
+Seq(int) ys = seq_wrap(10, xs);
+
+Seq(int) zs = seq_from(ys);
+
+for (int i = 0; i < 10; i++)
+  printf("%i\n", seq_get(zs, i));
+
+seq_free(zs);
+seq_free(ys);
+free(xs);
 ```
 
 The following errors may be thrown:
@@ -170,7 +192,10 @@ Seq seq_realloc_(size_t siz, Seq s, size_t cap);
 Reallocates a sequence to a given capacity.
 
 ```C
-// TODO
+Seq(int) xs = seq_alloc(int, 5); // Allocate a sequence of 5 elements.
+printf("%zu\n", seq(xs)->cap); // 5
+seq_realloc(xs, 10); // Reallocate the sequence to 10 elements.
+printf("%zu\n", seq(xs)->cap); // 10
 ```
 
 The following errors may be thrown:
@@ -187,10 +212,15 @@ void seq_require(Seq(T) s, size_t cap);
 Seq seq_require_(size_t siz, Seq s, size_t cap);
 ```
 
-Shorthand for `cap < seq(s)->cap ? seq_realloc(s, cap) : s`.
+Shorthand for `cap < seq(s)->cap ? seq_realloc(s, cap + CIRCA_SEQ_PREALLOC) : s`.
 
 ```C
-// TODO
+Seq(int) xs = seq_alloc(int, 5); // Allocate a sequence of 5 elements.
+printf("%zu\n", seq(xs)->cap); // 5
+seq_require(xs, 3); // Require that the sequence has at least 3 elements.
+printf("%zu\n", seq(xs)->cap); // 5
+seq_require(xs, 7); // Require that the sequence has at least 7 elements.
+printf("%zu\n", seq(xs)->cap); // 7 + CIRCA_SEQ_PREALLOC
 ```
 
 The following errors may be thrown:
@@ -212,7 +242,8 @@ passed in via the macros will be made `NULL`; this way double-free is usually
 not a concern.
 
 ```C
-// TODO
+Seq(int) xs = seq_alloc(int, 10); // Allocate a sequence of 10 integers.
+seq_free(xs); // Free the memory used by the sequence.
 ```
 
 The following errors may be thrown:
