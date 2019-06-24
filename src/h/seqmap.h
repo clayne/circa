@@ -73,6 +73,8 @@ CIRCA CIRCA_RETURNS SeqMap seqmap_free_(size_t sizk, size_t sizv, SeqMap sm);
 
 static inline CIRCA_PURE
 SeqMapData *seqmap(SeqMap sm) {
+  circa_guard (!sm)
+    return (circa_throw(CE_ARG), sm);
   return ((SeqMapData*) sm) - 1;
 }
 

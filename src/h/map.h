@@ -85,6 +85,8 @@ CIRCA CIRCA_RETURNS Map map_free_(size_t sizk, size_t sizv, Map m);
 
 static inline CIRCA_PURE
 MapData *map(Map m) {
+  circa_guard (!m)
+    return (circa_throw(CE_ARG), m);
   return ((MapData*) m) - 1;
 }
 

@@ -69,6 +69,8 @@ static inline CIRCA_RETURNS Set set_free_(size_t siz, Set e);
 
 static inline CIRCA_PURE
 MapData *set(Set e) {
+  circa_guard (!e)
+    return (circa_throw(CE_ARG), e);
   return map(e);
 }
 

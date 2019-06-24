@@ -77,6 +77,8 @@ CIRCA Dict dict_free_(size_t siz, Dict d);
 
 static inline CIRCA_PURE
 SeqMapData *dict(Dict d) {
+  circa_guard (!d)
+    return (circa_throw(CE_ARG), d);
   return ((SeqMapData*) d) - 1;
 }
 
