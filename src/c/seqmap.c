@@ -104,12 +104,12 @@ SeqMap seqmap_set_(size_t sizk, size_t sizv, SeqMap sm, Seq k, void *v) {
 CIRCA
 bool seqmap_del_(size_t sizk, size_t sizv, SeqMap sm, Seq k) {
   circa_guard (!sizk || !sizv || !sm || !k)
-    return (circa_throw(CE_ARG), NULL);
+    return (circa_throw(CE_ARG), false);
 
   size_t hash = XXH3_64bits(k, seq(k)->len * sizk) % seqmap(sm)->cap;
 
   for (size_t i = hash; i < seqmap(sm)->cap; i++) {
-    if (seqmap(sm)->probe[i] != -1) {
+    if (seqmap(sm)->key[i] != NULL) {
       if (seq_cmp_(sizk, seqmap(sm)->key[i], k)) {
         seqmap(sm)->len--;
         seqmap(sm)->probe[i] = 0;
@@ -136,7 +136,7 @@ bool seqmap_del_(size_t sizk, size_t sizv, SeqMap sm, Seq k) {
 CIRCA
 bool seqmap_has_(size_t sizk, size_t sizv, SeqMap sm, Seq k) {
   circa_guard (!sizk || !sizv || !sm || !k)
-    return (circa_throw(CE_ARG), NULL);
+    return (circa_throw(CE_ARG), false);
 
   void *p = seqmap_get_(sizk, sizv, sm, k);
 
@@ -276,6 +276,14 @@ SeqMap seqmap_realloc_(size_t sizk, size_t sizv, SeqMap sm, size_t cap) {
   CIRCA_FREE(pool);
 
   return sm;
+}
+
+CIRCA CIRCA_RETURNS
+SeqMap seqmap_require_(size_t sizk, size_t sizv, SeqMap sm, size_t cap) {
+  circa_guard (!sizk || !sizv || !sm || !cap)
+    return (circa_throw(CE_ARG), sm);
+
+  return (cap > seqmap(sm)->cap) ? seqmap_realloc_(sizk, sizv, sm, cap) : sm;
 }
 
 CIRCA CIRCA_RETURNS

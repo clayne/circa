@@ -84,12 +84,12 @@ SeqMapData *dict(Dict d) {
 ** Iterators
 */
 
-#define dict_foreach_iso(TK, TV, D, K, V) \
+#define dict_foreach_iso(T, D, K, V) \
 for (size_t I = 0, J = 0; I < dict(D)->cap; I++, J = 0) \
 if (dict(D)->key[I]) \
-for (TK K = *(TK*) (dict(D)->key + I); J != 1; J = 1) \
-for (TV V = *(TV*) (dict(D)->data + (I * sizeof(TV)); J != 1; J = 1)
-#define dict_foreach(D, K, V) dict_foreach_iso(typeof(*D->k), typeof(*D->v), D, K, V)
+for (char *K = dict(D)->key[I]; J != 1; J = 1) \
+for (T V = *(T*) (dict(D)->data + (I * sizeof(T))); J != 1; J = 1)
+#define dict_foreach(D, K, V) dict_foreach_iso(typeof(D->k), D, K, V)
 
 #endif // CIRCA_DICT_H
 

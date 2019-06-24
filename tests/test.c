@@ -162,4 +162,25 @@ describe (SeqMap) {
   }
 }
 
+Dict(int) d;
+
+describe (Dict) {
+  subdesc (Allocators) {
+    it ("dict_alloc") {
+      d = dict_alloc(int, 1);
+      assert(!CE, "No error should be thrown after allocation.");
+      assert(d, "Dict shouldn't be NULL after allocation.");
+    }
+
+    it ("dict_free") {
+      dict_free(d);
+      assert(!CE, "No error should be thrown after freeing.");
+      assert(!d, "Dict should be NULL after freeing.");
+      dict_free(d);
+      assert(!CE, "No error should be thrown after double freeing.");
+      assert(!d, "Dict should remain NULL after double freeing.");
+    }
+  }
+}
+
 snow_main();

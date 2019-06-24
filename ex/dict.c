@@ -12,6 +12,9 @@ int main() {
   dict_set(fruits, "peaches", &(int){5});
   dict_set(fruits, "apples",  &(int){10});
 
+  dict_foreach(fruits, k, v)
+    printf("%s: %i\n", k, v);
+
   dict_free(fruits);
 
   return 0;

@@ -108,6 +108,84 @@ Dict dict_set_(size_t siz, Dict d, char *k, void *v, bool reuse_key) {
   return d;
 }
 
+CIRCA
+bool dict_del_(size_t siz, Dict d, char *k) {
+  circa_guard (!siz || !d || !k)
+    return (circa_throw(CE_ARG), false);
+
+  register const size_t k_len = strlen(k);
+
+  size_t hash = XXH3_64bits(k, k_len) % dict(d)->cap;
+
+  for (size_t i = hash; i < dict(d)->cap; i++) {
+    if (dict(d)->key[i] != NULL) {
+      if (!strcmp(dict(d)->key[i], k)) {
+        dict(d)->len--;
+        dict(d)->probe[i] = 0;
+        for (i++; i < dict(d)->cap; i++) {
+          if (dict(d)->probe[i] == 0)
+            return true;
+
+          dict(d)->probe[i - 1] = dict(d)->probe[i] - 1;
+          memcpy(dict(d)->data + siz * (i - 1), dict(d)->data + siz * i, siz);
+          CIRCA_FREE(dict(d)->key[i - 1]);
+          dict(d)->key[i - 1] = dict(d)->key[i];
+          dict(d)->probe[i] = 0;
+        }
+        return true;
+      }
+    } else {
+      return false;
+    }
+  }
+
+  return false;
+}
+
+CIRCA
+bool dict_has_(size_t siz, Dict d, char *k) {
+  circa_guard (!siz || !d || !k)
+    return (circa_throw(CE_ARG), false);
+
+  void *p = dict_get_(siz, d, k);
+
+  if (CE) {
+    if (CE == CE_OOB) {
+      CE = CE_OK;
+      circa_log("caught CE_OOB from dict_get; no worries.");
+    }
+    return false;
+  }
+  
+  return p != NULL;
+}
+
+CIRCA
+void *dict_get_(size_t siz, Dict d, char *k) {
+  circa_guard (!siz || !d || !k)
+    return (circa_throw(CE_ARG), NULL);
+
+  register const size_t k_len = strlen(k);
+
+  size_t hash = XXH3_64bits(k, k_len) % dict(d)->cap;
+
+  for (size_t i = hash; i < dict(d)->cap; i++) {
+    if (dict(d)->key[i] != NULL) {
+      if (!strcmp(dict(d)->key[i], k)) {
+        return dict(d)->data + (i * siz);
+      }
+    } else {
+      return (circa_throw(CE_OOB), NULL);
+    }
+  }
+
+  return (circa_throw(CE_OOB), NULL);
+}
+
+/*
+** Allocators
+*/
+
 CIRCA CIRCA_ALLOCS
 Dict dict_alloc_(size_t siz, size_t cap) {
   circa_guard (!siz || !cap)
@@ -205,6 +283,14 @@ Dict dict_realloc_(size_t siz, Dict d, size_t cap) {
   CIRCA_FREE(pool);
 
   return d;
+}
+
+CIRCA CIRCA_RETURNS
+Dict dict_require_(size_t siz, Dict d, size_t cap) {
+  circa_guard (!siz || !d || !cap)
+    return (circa_throw(CE_ARG), d);
+
+  return (cap > dict(d)->cap) ? dict_realloc_(siz, d, cap) : d;
 }
 
 CIRCA CIRCA_RETURNS
