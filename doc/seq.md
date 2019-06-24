@@ -100,7 +100,10 @@ T seq_get(Seq(T) s, size_t a);
 void *seq_get_(size_t siz, Seq s, size_t a);
 ```
 
-This function retrieves the value from a sequence at a specific index. Note that this is not entirely necessary for anything other than nice debug info; it's plenty safe to just index directly as long as you're using a properly denoted sequence (that is, its type is `Seq(int)` for example, rather than `Seq`.)
+This function retrieves the value from a sequence at a specific index. Note that
+this is not entirely necessary for anything other than nice debug info; it's
+plenty safe to just index directly as long as you're using a properly denoted
+sequence (that is, its type is `Seq(int)` for example, rather than `Seq`.)
 
 ```C
 Seq(int) xs = seq_alloc(int, 5);

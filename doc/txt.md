@@ -2,7 +2,9 @@
 
 ## Text
 
-Texts are the dynamic string type which Circa offers, largely inspired by the wonderful [sds](https://github.com/antirez/sds) library (which I would heavily advise using over Circa if you *only* need strings.)
+Texts are the dynamic string type which Circa offers, largely inspired by the
+wonderful [sds](https://github.com/antirez/sds) library (which I would heavily
+advise using over Circa if you *only* need strings.)
 
 ### Types
 
@@ -12,7 +14,8 @@ Texts are the dynamic string type which Circa offers, largely inspired by the wo
 typedef char *Txt;
 ```
 
-Texts are binary compatible with normal C strings and don't need to be generic, and the type definition reflects this. There's not much else to be said here.
+Texts are binary compatible with normal C strings and don't need to be generic,
+and the type definition reflects this. There's not much else to be said here.
 
 #### Internals
 
@@ -24,9 +27,12 @@ typedef struct {
 } TxtData;
 ```
 
-Texts are internally identical to Sequences-- in fact, they are passable as a `Seq(char)` and vice-versa. If you'd like to know a little bit more about how they work, you should look at the sequence documentation.
+Texts are internally identical to Sequences-- in fact, they are passable as a
+`Seq(char)` and vice-versa. If you'd like to know a little bit more about how
+they work, you should look at the sequence documentation.
 
-Note that `len` will always be at most `cap - 1` because these strings are still null-terminated for compatibility.
+Note that `len` will always be at most `cap - 1` because these strings are still
+null-terminated for compatibility.
 
 ### Accessors
 
@@ -36,7 +42,9 @@ Note that `len` will always be at most `cap - 1` because these strings are still
 static inline TxtData *txt(Txt t);
 ```
 
-This function returns a pointer to the internal structure of a text for easy modification. This is the idiomatic way of obtaining the capacity or length of a text.
+This function returns a pointer to the internal structure of a text for easy
+modification. This is the idiomatic way of obtaining the capacity or length of a
+text.
 
 ```C
 Txt t = txt_alloc(10); // Allocate a text of 10 characters.
@@ -78,7 +86,11 @@ char txt_get(Txt t, size_t a);
 char txt_get_(Txt t, size_t a);
 ```
 
-This function retreives the character from a specific index in a text. Unlike `seq_get`, this can never result in a `NULL` dereference, so this is always safe, even without you doing a bounds check beforehand-- however, `CE_OOB` will still be thrown so you can detect when an out-of-bounds does happen. `\0` will be returned in this instance.
+This function retreives the character from a specific index in a text. Unlike
+`seq_get`, this can never result in a `NULL` dereference, so this is always
+safe, even without you doing a bounds check beforehand-- however, `CE_OOB` will
+still be thrown so you can detect when an out-of-bounds does happen. `\0` will
+be returned in this instance.
 
 ```C
 Txt t = txt_alloc(2);
@@ -167,7 +179,8 @@ void txt_free(Txt t);
 Txt txt_free_(Txt t);
 ```
 
-Frees the memory used by a text. Passing in `NULL` is safe, and texts passed in via teh macro will be made `NULL`; this way double-free is usually not a concern.
+Frees the memory used by a text. Passing in `NULL` is safe, and texts passed in
+via the macro will be made `NULL`; this way double-free is usually not a concern.
 
 ```C
 Txt t = txt_alloc(10); // Allocate a text of 10 characters.
