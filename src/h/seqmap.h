@@ -19,8 +19,8 @@
 */
 
 typedef struct {
-  size_t cap;
-  size_t len;
+  size_t  cap;
+  size_t  len;
   size_t *probe;
   char   *data;
   Seq     key[];
@@ -82,7 +82,7 @@ SeqMapData *seqmap(SeqMap sm) {
 
 #define seqmap_foreach_iso(TK, TV, SM, K, V) \
 for (size_t I = 0, J = 0; I < seqmap(SM)->cap; I++, J = 0) \
-if (seqmap(SM)->probe[I] != -1) \
+if (seqmap(SM)->key[I] != NULL) \
 for (Seq(TK) K = seqmap(SM)->key[I]; J != 1; J = 1) \
 for (TV V = *(TV*) (seqmap(SM)->data + (I * sizeof(TV))); J != 1; J = 1)
 #define seqmap_foreach(SM, K, V) seqmap_foreach_iso(typeof((SM)->k), typeof((SM)->v), SM, K, V)

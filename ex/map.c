@@ -19,4 +19,6 @@ int main() {
     printf("%i -> %i\n", k, v);
 
   map_free(m);
+
+  return 0;
 }

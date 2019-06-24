@@ -18,12 +18,13 @@ int main() {
   seq_free(xs);
 
   seqmap_foreach(sm, ks, v) {
-    seq_foreach(ks, k) {
+    seq_foreach(ks, k) { // ks is NULL here?
       printf("%i ", k);
     }
     printf("-> %i\n", v);
   }
 
   seqmap_free(sm);
+
   return 0;
 }

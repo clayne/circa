@@ -21,10 +21,12 @@
 ** Accessors
 */
 
+// TODO: Allow reuse of keys, similar to dict_set_.
+
 CIRCA CIRCA_RETURNS
 SeqMap seqmap_set_(size_t sizk, size_t sizv, SeqMap sm, Seq k, void *v) {
   circa_guard (!sizk || !sizv || !sm || !k || !v)
-    return (CE = CE_ARG, NULL);
+    return (circa_throw(CE_ARG), NULL);
 
   size_t swp_probe = 0, tmp_probe;
 
@@ -49,8 +51,8 @@ SeqMap seqmap_set_(size_t sizk, size_t sizv, SeqMap sm, Seq k, void *v) {
   size_t i;
   bool found = false;
   for (i = hash; i < seqmap(sm)->cap; i++) {
-    if (seqmap(sm)->probe[i] != -1) {
-      if (seq_cmp_(sizk, seqmap(sm)->key[i], k)) {
+    if (seqmap(sm)->key[i] != NULL) {
+      if (seq_cmp_(sizk, seqmap(sm)->key[i], swp_key)) {
         circa_log("found equal");
         found = true;
         break;
@@ -102,7 +104,7 @@ SeqMap seqmap_set_(size_t sizk, size_t sizv, SeqMap sm, Seq k, void *v) {
 CIRCA
 bool seqmap_del_(size_t sizk, size_t sizv, SeqMap sm, Seq k) {
   circa_guard (!sizk || !sizv || !sm || !k)
-    return (CE = CE_ARG, NULL);
+    return (circa_throw(CE_ARG), NULL);
 
   size_t hash = XXH3_64bits(k, seq(k)->len * sizk) % seqmap(sm)->cap;
 
@@ -110,16 +112,16 @@ bool seqmap_del_(size_t sizk, size_t sizv, SeqMap sm, Seq k) {
     if (seqmap(sm)->probe[i] != -1) {
       if (seq_cmp_(sizk, seqmap(sm)->key[i], k)) {
         seqmap(sm)->len--;
-        seqmap(sm)->probe[i] = -1;
+        seqmap(sm)->probe[i] = 0;
         for (i++; i < seqmap(sm)->cap; i++) {
-          if (seqmap(sm)->probe[i] <= 0)
+          if (seqmap(sm)->probe[i] == 0)
             return true;
           
           seqmap(sm)->probe[i - 1] = seqmap(sm)->probe[i] - 1;
           memcpy(seqmap(sm)->data + sizv * (i - 1), seqmap(sm)->data + sizv * i, sizv);
           seqmap(sm)->key[i - 1] = seq_free_(sizk, seqmap(sm)->key[i - 1]);
           seqmap(sm)->key[i - 1] = seqmap(sm)->key[i];
-          seqmap(sm)->probe[i] = -1;
+          seqmap(sm)->probe[i] = 0;
         }
         return true;
       }
@@ -134,7 +136,7 @@ bool seqmap_del_(size_t sizk, size_t sizv, SeqMap sm, Seq k) {
 CIRCA
 bool seqmap_has_(size_t sizk, size_t sizv, SeqMap sm, Seq k) {
   circa_guard (!sizk || !sizv || !sm || !k)
-    return (CE = CE_ARG, NULL);
+    return (circa_throw(CE_ARG), NULL);
 
   void *p = seqmap_get_(sizk, sizv, sm, k);
 
@@ -152,12 +154,12 @@ bool seqmap_has_(size_t sizk, size_t sizv, SeqMap sm, Seq k) {
 CIRCA
 void *seqmap_get_(size_t sizk, size_t sizv, SeqMap sm, Seq k) {
   circa_guard (!sizk || !sizv || !sm || !k)
-    return (CE = CE_ARG, NULL);
+    return (circa_throw(CE_ARG), NULL);
 
   size_t hash = XXH3_64bits(k, seq(k)->len * sizk) % seqmap(sm)->cap;
 
   for (size_t i = hash; i < seqmap(sm)->cap; i++) {
-    if (seqmap(sm)->probe[i] != -1) {
+    if (seqmap(sm)->key[i] != NULL) {
       if (seq_cmp_(sizk, seqmap(sm)->key[i], k)) {
         return seqmap(sm)->data + (i * sizv);
       }
@@ -185,16 +187,15 @@ SeqMap seqmap_alloc_(size_t sizk, size_t sizv, size_t cap) {
   if (!smd)
     return (circa_throw(CE_OOM), NULL);
 
-  smd->probe = CIRCA_MALLOC(cap * sizeof(*smd->probe));
+  smd->probe = CIRCA_CALLOC(cap, sizeof(*smd->probe));
   smd->data = CIRCA_MALLOC(cap * sizv);
 
   if (!smd->probe || !smd->data) {
     CIRCA_FREE(smd->probe);
     CIRCA_FREE(smd->data);
+    CIRCA_FREE(smd);
+    return (circa_throw(CE_OOM), NULL);
   }
-
-  for (size_t i = 0; i < cap; i++)
-    smd->probe[i] = -1;
 
   smd->cap = cap;
 
@@ -227,7 +228,7 @@ SeqMap seqmap_realloc_(size_t sizk, size_t sizv, SeqMap sm, size_t cap) {
   memcpy(key,   sm,                  sm_key_len);
   memcpy(data,  seqmap(sm)->data,   sm_data_len);
 
-  // Calcualte the sizes of the replacement map.
+  // Calculate the sizes of the replacement map.
   register const size_t sm2_cap = usz_primegt(cap);
   register const size_t sm2_probe_len = sm2_cap * sizeof(*seqmap(sm)->probe);
   register const size_t sm2_key_len   = sm2_cap * sizeof(Seq);
@@ -259,14 +260,13 @@ SeqMap seqmap_realloc_(size_t sizk, size_t sizv, SeqMap sm, size_t cap) {
   smd->cap = sm2_cap;
 
   // Clear out the map's memory.
-  for (size_t i = 0; i < sm2_cap; i++)
-    smd->probe[i] = -1;
+  memset(smd->probe, 0, sm2_probe_len);
   memset(sm, 0, sm2_key_len);
   memset(smd->data, 0, sm2_data_len);
 
   // Re-insert the members into the map.
   for (size_t i = 0; i < sm_cap; i++)
-    if (probe[i] != -1)
+    if (key[i] != NULL)
       sm = seqmap_set_(sizk, sizv, sm, key[i], data + (i * sizv));
 
   CIRCA_FREE(pool);
@@ -276,6 +276,8 @@ SeqMap seqmap_realloc_(size_t sizk, size_t sizv, SeqMap sm, size_t cap) {
 
 CIRCA CIRCA_RETURNS
 SeqMap seqmap_free_(size_t sizk, size_t sizv, SeqMap sm) {
+  circa_guard (!sizk || !sizv)
+    return (circa_throw(CE_ARG), sm);
   if (sm) {
     // Free keys and zero out freed memory for security.
     for (size_t i = 0; i < seqmap(sm)->cap; i++)

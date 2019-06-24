@@ -190,6 +190,7 @@ Map map_alloc_(size_t sizk, size_t sizv, size_t cap) {
   if (!md->probe || !md->data) { 
     CIRCA_FREE(md->probe);
     CIRCA_FREE(md->data);
+    CIRCA_FREE(md);
     return (circa_throw(CE_OOM), NULL);
   }
 

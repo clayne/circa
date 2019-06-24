@@ -19,4 +19,6 @@ int main() {
     printf("%i\n", x);
   
   seq_free(xs);
+
+  return 0;
 }
