@@ -265,9 +265,13 @@ SeqMap seqmap_realloc_(size_t sizk, size_t sizv, SeqMap sm, size_t cap) {
   memset(smd->data, 0, sm2_data_len);
 
   // Re-insert the members into the map.
-  for (size_t i = 0; i < sm_cap; i++)
-    if (key[i] != NULL)
+  for (size_t i = 0; i < sm_cap; i++) {
+    if (key[i] != NULL) {
       sm = seqmap_set_(sizk, sizv, sm, key[i], data + (i * sizv));
+      key[i] = seq_free_(sizk, key[i]);
+    }
+  }
+
 
   CIRCA_FREE(pool);
 
@@ -278,6 +282,7 @@ CIRCA CIRCA_RETURNS
 SeqMap seqmap_free_(size_t sizk, size_t sizv, SeqMap sm) {
   circa_guard (!sizk || !sizv)
     return (circa_throw(CE_ARG), sm);
+
   if (sm) {
     // Free keys and zero out freed memory for security.
     for (size_t i = 0; i < seqmap(sm)->cap; i++)

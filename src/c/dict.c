@@ -158,8 +158,8 @@ Dict dict_realloc_(size_t siz, Dict d, size_t cap) {
 
   // Copy the dict's members into the pool.
   memcpy(probe, dict(d)->probe, d_probe_len);
-  memcpy(probe, d,              d_key_len);
-  memcpy(probe, dict(d)->data,  d_data_len);
+  memcpy(key,   d,              d_key_len);
+  memcpy(data,  dict(d)->data,  d_data_len);
 
   // Calculate the sizes of the replacement dict.
   register const size_t d2_cap = usz_primegt(cap);
