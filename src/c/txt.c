@@ -41,6 +41,8 @@ char txt_get_(Txt t, size_t a) {
 
 CIRCA CIRCA_ALLOCS
 Txt txt_alloc_(size_t cap) {
+  circa_guard (!cap)
+    return (circa_throw(CE_ARG), NULL);
   SeqData *sd = CIRCA_CALLOC(sizeof(*sd) + cap, 1);
   if (!sd)
     return (circa_throw(CE_OOM), NULL);

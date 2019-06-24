@@ -113,6 +113,8 @@ CIRCA void txt_write_(Txt t, FILE *fp);
 
 static inline
 SeqData *txt(Txt t) {
+  circa_guard (!t)
+    return (circa_throw(CE_ARG), t);
   return seq(t);
 }
 

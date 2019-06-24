@@ -2,7 +2,7 @@
 
 ## Sequences
 
-Sequences fundamental "dynamic array" type Circa offers,
+Sequences are the fundamental "dynamic array" type Circa offers,
 inspired by the data structures of the same name from Nim.
 
 ### Types
@@ -31,11 +31,11 @@ as `b` will be `int` instead of `int*`.
 #### Internals
 
 ```C
-struct seq_data {
+typedef struct {
   size_t cap; // Space allocated.
   size_t len; // Space used.
   char data[];
-};
+} SeqData;
 ```
 
 Sequences are very simple internally; they contain a capacity
@@ -52,13 +52,12 @@ you have to use the `seq` function.
 #### seq
 
 ```C
-static inline struct seq_data *seq(Seq s);
+static inline SeqData *seq(Seq s);
 ```
 
 This function returns a pointer to the internal structure
 of a sequence for easy modification. This is the idiomatic way of
-obtaining the capacity or length of a sequence for reading or
-modification.
+obtaining the capacity or length of a sequence.
 
 ```C
 Seq(int) xs = seq_alloc(int, 10); // Allocate 10 integers.
@@ -73,8 +72,8 @@ The following errors may be thrown:
 #### seq_set
 
 ```C
-Seq seq_set_iso(Type T, Seq(T) s, size_t a, T *v);
-Seq seq_set(Seq(T) s, size_t a, T *v);
+void seq_set_iso(Type T, Seq(T) s, size_t a, T *v);
+void seq_set(Seq(T) s, size_t a, T *v);
 
 Seq seq_set_(size_t siz, Seq s, size_t a, void *v);
 ```
@@ -212,7 +211,7 @@ void seq_require(Seq(T) s, size_t cap);
 Seq seq_require_(size_t siz, Seq s, size_t cap);
 ```
 
-Shorthand for `cap < seq(s)->cap ? seq_realloc(s, cap + CIRCA_SEQ_PREALLOC) : s`.
+Shorthand for `cap < seq(s)->cap ? seq_realloc_(siz, s, cap + CIRCA_SEQ_PREALLOC) : s`.
 
 ```C
 Seq(int) xs = seq_alloc(int, 5); // Allocate a sequence of 5 elements.
