@@ -100,7 +100,7 @@ int main(int argc, char **argv) {
 
 # Documentation
 
-Coming soon. (TM)
+Incomplete thus far; you can find what is already done [here](https://github.com/davidgarland/circa/blob/master/doc/README.md).
 
 ---
 
