@@ -1,88 +1,97 @@
 CC=clang
-CFLAGS=-pipe
-WFLAGS=-Weverything
-LDFLAGS=-Isrc/h -Ilib/xxhash -I. -L.
+WFLAGS=-pedantic -Wall
+CFLAGS=$(WFLAGS) -pipe -std=c11
+LDFLAGS=-I. -L.
 
-BUILD=-O2 -DNDEBUG -fno-omit-frame-pointer
-FAST=-O3 -s -DNDEBUG -fomit-frame-pointer
-SMALL=-Os -s -DNDEBUG -fomit-frame-pointer
-DEBUG=-Og -g -fno-inline -fno-omit-frame-pointer
+CFLAGS_FAST= $(CFLAGS) -O3 -s -DNDEBUG
+CFLAGS_SMALL=$(CFLAGS) -Os -s -DNDEBUG
+CFLAGS_BUILD=$(CFLAGS) -O2    -fno-omit-frame-pointer
+CFLAGS_DEBUG=$(CFLAGS) -Og -g -fno-omit-frame-pointer
+CFLAGS_SANITIZED=$(CFLAGS_DEBUG) -fsanitize=undefined -fsanitize=address -fsanitize=leak
+
+CFLAGS_EX=-std=gnu11 -Wno-everything
 
 default: build
+
+#
+# Dependency Options
+#
 
 deps:
 	-@cd lib/xxhash && $(MAKE) -s libxxhash.a >/dev/null
 	-@ar -x lib/xxhash/libxxhash.a
-	-@rm -rf *SYM*
 
-build: deps
-	$(CC) $(CFLAGS) $(BUILD) -c src/c/*.c $(LDFLAGS)
-	ar -cvq libcirca.a *.o
-	-@rm -rf *.dSYM *.o
+#
+# Build Options
+#
 
 fast: deps
-	$(CC) $(CFLAGS) $(FAST) -c src/c/*.c $(LDFLAGS)
+	$(CC) -c $(CFLAGS_FAST) src/c/*.c $(LDFLAGS)
 	ar -cvq libcirca.a *.o
-	-@rm -rf *.dSYM *.o
+	-@rm -f *.o
 
 small: deps
-	$(CC) $(CFLAGS) $(SMALL) -c src/c/*.c $(LDFLAGS)
+	$(CC) -c $(CFLAGS_SMALL) src/c/*.c $(LDFLAGS)
 	ar -cvq libcirca.a *.o
-	-@rm -rf *.dSYM *.o
+	-@rm -f *.o
+
+build: deps
+	$(CC) -c $(CFLAGS_BUILD) src/c/*.c $(LDFLAGS)
+	ar -cvq libcirca.a *.o
+	-@rm -f *.o
 
 debug: deps
-	$(CC) $(CFLAGS) $(DEBUG) -c src/c/*.c $(LDFLAGS)
+	$(CC) -c $(CFLAGS_DEBUG) src/c/*.c $(LDFLAGS)
 	ar -cvq libcirca.a *.o
-	-@rm -rf *.dSYM *.o
+	-@rm -f *.o
 
-disas: deps
-	$(CC) $(CFLAGS) $(FAST) -S src/c/*.c $(DLFLAGS)
+sanitized: deps
+	$(CC) -c $(CFLAGS_SANITIZED) src/c/*.c $(LDFLAGS)
+	ar -cvq libcirca.a *.o
+	-@rm -f *.o
 
-compare:
-	$(MAKE) build
-	mv libcirca.a libcirca-build
-	$(MAKE) fast
-	mv libcirca.a libcirca-fast
-	$(MAKE) small
-	mv libcirca.a libcirca-small
-	$(MAKE) debug
-	mv libcirca.a libcirca-debug
+#
+# Tests
+#
 
-ex: debug
-	$(CC) $(CFLAGS) $(DEBUG) -o nums.o    ex/map/nums.c      -lcirca $(LDFLAGS)
-	$(CC) $(CFLAGS) $(DEBUG) -o del.o     ex/map/del.c       -lcirca $(LDFLAGS)
-	$(CC) $(CFLAGS) $(DEBUG) -o sum.o     ex/seq/sum.c       -lcirca $(LDFLAGS)
-	$(CC) $(CFLAGS) $(DEBUG) -o queue.o   ex/seq/queue.c     -lcirca $(LDFLAGS)
-	$(CC) $(CFLAGS) $(DEBUG) -o insdel.o  ex/seq/insdel.c    -lcirca $(LDFLAGS)
-	$(CC) $(CFLAGS) $(DEBUG) -o seqkey.o  ex/seqmap/seqkey.c -lcirca $(LDFLAGS)
-	$(CC) $(CFLAGS) $(DEBUG) -o slice.o   ex/txt/slice.c     -lcirca $(LDFLAGS)
-	$(CC) $(CFLAGS) $(DEBUG) -o self.o    ex/txt/self.c      -lcirca $(LDFLAGS)
-	$(CC) $(CFLAGS) $(DEBUG) -o fmt.o     ex/txt/fmt.c       -lcirca $(LDFLAGS)
-	$(CC) $(CFLAGS) $(DEBUG) -o fruits.o  ex/dict/fruits.c   -lcirca $(LDFLAGS)
-	-@rm -rf *.a *.dSYM
+examples: debug
+	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) ex/seq.c    -o seq.o    -lcirca $(LDFLAGS)
+	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) ex/txt.c    -o txt.o    -lcirca $(LDFLAGS)
+	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) ex/map.c    -o map.o    -lcirca $(LDFLAGS)
+	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) ex/set.c    -o set.o    -lcirca $(LDFLAGS)
+	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) ex/seqmap.c -o seqmap.o -lcirca $(LDFLAGS)
+	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) ex/dict.c   -o dict.o   -lcirca $(LDFLAGS)
+
+examples_sanitized: sanitized
+	$(CC) $(CFLAGS_SANITIZED) $(CFLAGS_EX) ex/seq.c    -o seq.o    -lcirca $(LDFLAGS)
+	$(CC) $(CFLAGS_SANITIZED) $(CFLAGS_EX) ex/txt.c    -o txt.o    -lcirca $(LDFLAGS)
+	$(CC) $(CFLAGS_SANITIZED) $(CFLAGS_EX) ex/map.c    -o map.o    -lcirca $(LDFLAGS)
+	$(CC) $(CFLAGS_SANITIZED) $(CFLAGS_EX) ex/set.c    -o set.o    -lcirca $(LDFLAGS)
+	$(CC) $(CFLAGS_SANITIZED) $(CFLAGS_EX) ex/seqmap.c -o seqmap.o -lcirca $(LDFLAGS)
+	$(CC) $(CFLAGS_SANITIZED) $(CFLAGS_EX) ex/dict.c   -o dict.o   -lcirca $(LDFLAGS)
+
+examples_header:
+	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) -DCIRCA_HEADER_ONLY ex/seq.c    -o seq.o    $(LDFLAGS)
+	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) -DCIRCA_HEADER_ONLY ex/txt.c    -o txt.o    $(LDFLAGS)
+	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) -DCIRCA_HEADER_ONLY ex/map.c    -o map.o    $(LDFLAGS)
+	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) -DCIRCA_HEADER_ONLY ex/set.c    -o set.o    $(LDFLAGS)
+	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) -DCIRCA_HEADER_ONLY ex/seqmap.c -o seqmap.o $(LDFLAGS)
+	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) -DCIRCA_HEADER_ONLY ex/dict.c   -o dict.o   $(LDFLAGS)
 
 test: debug
-	$(CC) $(CFLAGS) $(DEBUG) tests/test.c -L. -I. -Ilib/snow -DSNOW_ENABLED -o test.o -lcirca -lm
-	-@rm -rf *.dSYM
+	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) -fPIC tests/test.c -I. -L. -Ilib/snow -DSNOW_ENABLED -o test.o -lcirca -lm
+
+test_sanitized: sanitized
+	$(CC) $(CFLAGS_SANITIZED) $(CFLAGS_EX) -fPIC tests/test.c -I. -L. -Ilib/snow -DSNOW_ENABLED -o test.o -lcirca -lm
+
+test_header:
+	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) -DCIRCA_HEADER_ONLY tests/test.c -I. -L. -Ilib/snow -DSNOW_ENABLED -o test.o -lm
+
+#
+# Cleanup
+#
 
 clean:
 	-@cd lib/xxhash && $(MAKE) -s clean >/dev/null
-	-@rm -rf *.o *.s *.out *.a *.dSYM src/h/*.gch libcirca-build libcirca-fast libcirca-small libcirca-debug
+	-@rm -f $(BIN) *.o *.out *.a *.so *.data *.old
 
-# Updates
-
-refresh_snow:
-	git remote add -f snow https://github.com/mortie/snow
-	git subtree add --prefix lib/snow snow master --squash
-
-refresh_xxhash:
-	git remote add -f xxhash https://github.com/Cyan4973/xxHash
-	git subtree add --prefix lib/xxhash xxhash master --squash
-
-update_snow:
-	git fetch snow master
-	git subtree pull --prefix lib/snow snow master --squash
-
-update_xxhash:
-	git fetch xxhash master
-	git subtree pull --prefix lib/xxhash xxhash master --squash

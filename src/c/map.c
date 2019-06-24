@@ -1,82 +1,82 @@
 /*
-** map.c | The Circa Library Set | Dual-Generic Maps
+** map.c | The Circa Library Set | Dynamic maps.
 ** https://github.com/davidgarland/circa
 */
 
+/*
+** Dependencies
+*/
+
+/* Standard */
+
+#include <string.h>
+
+/* Circa */
+
+#include "../h/core.h"
+#include "../h/debug.h"
+#include "../h/bits.h"
+#include "../h/map.h"
+
+/* Vendored */
+
 #define XXH_STATIC_LINKING_ONLY
-#include "xxhash.h"
+#include "../../lib/xxhash/xxhash.h"
 
-#include "seq.h"
-#include "map.h"
+/*
+** Accessors
+*/
 
+CIRCA CIRCA_RETURNS
 Map map_set_(size_t sizk, size_t sizv, Map m, void *k, void *v) {
-  ce_guard (!sizk || !sizv || !m || !k || !v)
-    return (CE = CE_ARG, m);
+  circa_guard (!sizk || !sizv || !m || !k || !v)
+    return (circa_throw(CE_ARG), m);
 
-  // Avoid redundant calls.
-  struct map_data *md = map(m);
+  intmax_t swp_probe = 0, tmp_probe;
 
-  // And avoid redundant dereferences.
-  const size_t m_cap = md->cap;
-
-  // Construct two buckets for shuffling values around. Use VLAs if possible.
-  bool swp_used = true, tmp_used;
-  bool swp_probe = 0, tmp_probe;
   #ifdef CIRCA_VLA
-    char  swp_data[sizv], tmp_data[sizv];
-    char  swp_key[sizk],  tmp_key[sizk];
+    char swp_data[sizv], tmp_data[sizv];
+    char swp_key[sizk],  tmp_key[sizk];
   #else
-    char *swp_data,      *tmp_data;
-    char *swp_key,       *tmp_key;
-  
-    swp_data = malloc(sizv);
-    swp_key  = malloc(sizk);
-    tmp_data = malloc(sizv);
-    tmp_key  = malloc(sizk);
+    char *pool = CIRCA_MALLOC((sizv * 2) + (sizk * 2));
 
-    if (!swp_data || !swp_key || !tmp_data || !tmp_key) {
-      free(swp_data);
-      free(swp_key);
-      free(tmp_data);
-      free(tmp_key);
-      return (CE = CE_OOM, m);
-    }
+    if (!pool)
+      return (circa_throw(CE_OOM), m);
+
+    char *swp_data = pool + (0 * sizk) + (0 * sizv);
+    char *tmp_data = pool + (0 * sizk) + (1 * sizv);
+    char *swp_key  = pool + (0 * sizk) + (2 * sizv);
+    char *tmp_key  = pool + (1 * sizk) + (2 * sizv);
   #endif
 
-  // Copy the key and value into the swap bucket.
   memcpy(swp_data, v, sizv);
   memcpy(swp_key,  k, sizk);
 
-  // Calculate the starting position using xxHash.
-  const size_t hash = XXH3_64bits(k, sizk);
-  const size_t addr = hash % m_cap;
+  size_t hash = XXH3_64bits(k, sizk) % map(m)->cap;
 
   size_t i;
   bool found = false;
-  for (i = addr; i < m_cap; i++) {
-    if (md->used[i]) {
-      if (!memcmp(md->key + (i * sizk), swp_key, sizk)) {
+  for (i = hash; i < map(m)->cap; i++) {
+    if (map(m)->probe[i] != -1) {
+      if (!memcmp(map(m)->key + (i * sizk), swp_key, sizk)) {
         found = true;
         break;
-      } else if (md->probe[i] < swp_probe) {
-        // c := a
-        tmp_used  = md->used[i];
-        tmp_probe = md->probe[i];
-        memcpy(tmp_data, md->data + (i * sizv), sizv);
-        memcpy(tmp_key,  md->key + (i * sizk), sizk);
-        // a := b
-        md->used[i]  = swp_used;
-        md->probe[i] = swp_probe;
-        memcpy(md->data + (i * sizv), swp_data, sizv);
-        memcpy(md->key + (i * sizk), swp_key, sizk);
-        // b := c
-        swp_used  = tmp_used;
+      } else if (map(m)->probe[i] < swp_probe) {
+        // c = a
+        tmp_probe = map(m)->probe[i];
+        memcpy(tmp_data, map(m)->data + (i * sizv), sizv);
+        memcpy(tmp_key,  map(m)->key  + (i * sizk), sizk);
+        // a = b
+        map(m)->probe[i] = swp_probe;
+        memcpy(map(m)->data + (i * sizv), swp_data, sizv);
+        memcpy(map(m)->key  + (i * sizk), swp_key,  sizk);
+        // b = c
         swp_probe = tmp_probe;
         memcpy(swp_data, tmp_data, sizv);
-        memcpy(swp_key, tmp_key, sizk);
+        memcpy(swp_key,  tmp_key,  sizk);
       }
     } else {
-      md->len++;
+      map(m)->len++;
       found = true;
       break;
     }
@@ -84,59 +84,42 @@ Map map_set_(size_t sizk, size_t sizv, Map m, void *k, void *v) {
   }
 
   if (found) {
-    md->probe[i] = swp_probe;
-    md->used[i]  = swp_used;
-    memcpy(md->data + (i * sizv), swp_data, sizv);
-    memcpy(md->key + (i * sizk),  swp_key,  sizk);
+    map(m)->probe[i] = swp_probe;
+    memcpy(map(m)->data + (i * sizv), swp_data, sizv);
+    memcpy(map(m)->key  + (i * sizk), swp_key,  sizk);
   } else {
-    m = map_realloc_(sizk, sizv, m, m_cap + 1);
-    if (CE) {
-      #ifndef CIRCA_VLA
-        free(swp_data);
-        free(swp_key);
-        free(tmp_data);
-        free(tmp_key);
-      #endif
-      return m;
-    }
-    m = map_set_(sizk, sizv, m, swp_key, swp_data);
+    m = map_realloc_(sizk, sizv, m, map(m)->cap + 1);
+    if (!CE)
+      m = map_set_(sizk, sizv, m, swp_key, swp_data);
   }
 
   #ifndef CIRCA_VLA
-    free(swp_data);
-    free(swp_key);
-    free(tmp_data);
-    free(tmp_key);
+    CIRCA_FREE(pool);
   #endif
 
   return m;
 }
 
+CIRCA
 bool map_del_(size_t sizk, size_t sizv, Map m, void *k) {
-  struct map_data *const md = map(m);
+  circa_guard (!sizk || !sizv || !m || !k)
+    return (circa_throw(CE_ARG), m);
 
-  const size_t m_cap = md->cap;
+  size_t hash = XXH3_64bits(k, sizk) % map(m)->cap;
 
-  const size_t hash = XXH3_64bits(k, sizk);
-  const size_t addr = hash % m_cap;
-
-  for (size_t i = addr; i < m_cap; i++) {
-    if (md->used[i]) {
-      if (!memcmp(md->key + (i * sizk), k, sizk)) {
-        md->len--;
-        md->used[i] = false;
-        md->probe[i] = 0;
-        for (i++; i < m_cap; i++) {
-          // If the current bucket is not used or is a root, return.
-          if (!md->used[i] || md->probe[i] == 0)
+  for (size_t i = hash; i < map(m)->cap; i++) {
+    if (map(m)->probe[i] != -1) {
+      if (!memcmp(map(m)->key + (i * sizk), k, sizk)) {
+        map(m)->len--;
+        map(m)->probe[i] = -1;
+        for (i++; i < map(m)->cap; i++) {
+          if (map(m)->probe[i] <= 0)
             return true;
-          // Move the current bucket into the last bucket.
-          md->probe[i - 1] = md->probe[i] - 1;
-          md->data[i - 1] = md->data[i];
-          memcpy(md->key + sizk * (i - 1), md->key + sizk * i, sizk);
-          // Make the current bucket appear unused.
-          md->used[i]  = false;
-          md->probe[i] = 0;
+
+          map(m)->probe[i - 1] = map(m)->probe[i] - 1;
+          memcpy(map(m)->data + sizv * (i - 1), map(m)->data + sizv * i, sizv);
+          memcpy(map(m)->key + sizk * (i - 1), map(m)->key + sizk * i, sizk); 
+          map(m)->probe[i] = -1;
         }
         return true;
       }
@@ -148,180 +131,167 @@ bool map_del_(size_t sizk, size_t sizv, Map m, void *k) {
   return false;
 }
 
+CIRCA
 bool map_has_(size_t sizk, size_t sizv, Map m, void *k) {
+  circa_guard (!sizk || !sizv || !m || !k)
+    return (circa_throw(CE_ARG), false);
+  
   void *p = map_get_(sizk, sizv, m, k);
+
   if (CE) {
     if (CE == CE_OOB)
       CE = CE_OK;
+    circa_log("caught CE_OOB from map_get; no worries.");
     return false;
-  } else {
-    return p != NULL;
   }
+  
+  return p != NULL;
 }
 
+CIRCA
 void *map_get_(size_t sizk, size_t sizv, Map m, void *k) {
-  ce_guard (!sizk || !sizv || !m || !k)
-    return (CE = CE_ARG, NULL);
+  circa_guard (!sizk || !sizv || !m || !k)
+    return (circa_throw(CE_ARG), NULL);
 
-  struct map_data *md = map(m);
-  
-  const size_t m_cap = md->cap;
+  size_t hash = XXH3_64bits(k, sizk);
 
-  const size_t hash = XXH3_64bits(k, sizk);
-  const size_t addr = hash % m_cap;
-
-  for (size_t i = addr; i < m_cap; i++) {
-    if (md->used[i]) {
-      if (!memcmp(md->key + (i * sizk), k, sizk)) {
-        return md->data + (i * sizv);
+  for (size_t i = hash; i < map(m)->cap; i++) {
+    if (map(m)->probe[i] != -1) {
+      if (!memcmp(map(m)->key + (i * sizk), k, sizk)) {
+        return map(m)->data + (i * sizv);
       }
     } else {
-      return (CE = CE_OOB, NULL);
+      return (circa_throw(CE_OOB), NULL);
     }
   }
 
-  return (CE = CE_OOB, NULL);
+  return (circa_throw(CE_OOB), NULL);
 }
 
+/*
+** Allocators
+*/
+
+CIRCA CIRCA_ALLOCS
 Map map_alloc_(size_t sizk, size_t sizv, size_t cap) {
-  ce_guard (!sizk || !sizv || !cap)
-    return (CE = CE_ARG, NULL);
+  circa_guard (!sizk || !sizv || !cap)
+    return (circa_throw(CE_ARG), NULL);
 
   cap = usz_primegt(cap);
- 
-  struct map_data *md = calloc(sizeof(*md) + cap * sizk, 1);
+
+  MapData *md = CIRCA_CALLOC(sizeof(*md) + cap * sizk, 1);
 
   if (!md)
-    return (CE = CE_OOM, NULL);
+    return (circa_throw(CE_OOM), NULL);
 
-  md->used  = calloc(cap, 1);
-  md->probe = calloc(cap, sizeof(size_t));
-  md->data  = calloc(cap, sizv);
+  md->probe = CIRCA_MALLOC(cap * sizeof(*md->probe));
+  md->data  = CIRCA_MALLOC(cap * sizv);
 
-  if (!md->probe || !md->data) {
-    free(md->used);
-    free(md->probe);
-    free(md->data);
-    free(md);
-    return (CE = CE_OOM, NULL);
+  if (!md->probe || !md->data) { 
+    CIRCA_FREE(md->probe);
+    CIRCA_FREE(md->data);
+    CIRCA_FREE(md);
+    return (circa_throw(CE_OOM), NULL);
   }
+
+  for (size_t i = 0; i < cap; i++)
+    md->probe[i] = -1;
 
   md->cap = cap;
 
   return md->key;
 }
 
+CIRCA CIRCA_RETURNS
 Map map_realloc_(size_t sizk, size_t sizv, Map m, size_t cap) {
-  ce_guard (!sizk || !sizv || !m || !cap)
-    return (CE = CE_ARG, NULL);
+  circa_guard (!sizk || !sizv || !m || !cap)
+    return (circa_throw(CE_ARG), m);
 
-  // Let's not call this function a million times, sounds good.
-  struct map_data *md = map(m);
+  // Calculate the sizes of the input map.
+  register const size_t m_cap = map(m)->cap;
+  register const size_t m_probe_len = m_cap * sizeof(*map(m)->probe);
+  register const size_t m_key_len   = m_cap * sizk;
+  register const size_t m_data_len  = m_cap * sizv;
 
-  // Calculate the size of the current map's fields.
-  const size_t m_cap   = md->cap;
-  const size_t m_data  = m_cap * sizv;
-  const size_t m_key   = m_cap * sizk;
+  // Allocate a temporary memory pool to store the map.
+  char *pool = CIRCA_MALLOC(m_probe_len + m_key_len + m_data_len);
+  if (!pool)
+    return (circa_throw(CE_OOM), m);
 
-  // Construct a temporary "fake" map based on these sizes.
-  struct {
-    bool   *used;
-    char   *data;
-    char   *key;
-  } tmp = {
-    .used  = malloc(m_cap),
-    .data  = malloc(m_data),
-    .key   = malloc(m_key)
-  };
+  // Set pointers to parts of the pool for temporary storage.
+  size_t *probe = (size_t*) pool;
+  char   *key   = ((char*) probe) + m_probe_len;
+  char   *data  = key   +   m_key_len;
 
-  // If the allocation doesn't succeed, raise an OOM error.
-  if (!tmp.used || !tmp.data || !tmp.key) {
-    free(tmp.used);
-    free(tmp.data);
-    free(tmp.key);
-    return (CE = CE_OOM, m);
-  }
+  // Copy the map's members into the pool.
+  memcpy(probe, map(m)->probe, m_probe_len);
+  memcpy(key,   m,               m_key_len);
+  memcpy(data,  map(m)->data,   m_data_len);
 
-  // If it did, however, load the map into the temporary "fake" map.
-  memcpy(tmp.used,  md->used,  m_cap);
-  memcpy(tmp.data,  md->data,  m_data);
-  memcpy(tmp.key,   md->key,   m_key);
+  // Calcualte the sizes of the replacement map.
+  register const size_t m2_cap       = usz_primegt(cap);
+  register const size_t m2_probe_len = m2_cap * sizeof(*map(m)->probe);
+  register const size_t m2_key_len   = m2_cap * sizk;
+  register const size_t m2_data_len  = m2_cap * sizv;
 
-  // Calculate the size of the map's resized fields.
-  const size_t m2_cap   = usz_primegt(cap);
-  const size_t m2_probe = m2_cap * sizeof(size_t);
-  const size_t m2_data  = m2_cap * sizv;
-  const size_t m2_key   = m2_cap * sizk;
-  
-  // Reallocate the original map to the new sizes.
-  md = realloc(md, sizeof(*md) + m2_key);
-  
+  // Reallocate the map to the new sizes.
+  MapData *md = CIRCA_REALLOC(map(m), sizeof(*md) + m2_key_len);
+
   if (!md) {
-    free(tmp.used);
-    free(tmp.data);
-    free(tmp.key);
-    return (CE = CE_OOM, m);
+    CIRCA_FREE(pool);
+    return (circa_throw(CE_OOM), m);
   }
 
-  md->used  = realloc(md->used,  m2_cap);
-
-  if (!md->used) {
-    free(tmp.used);
-    free(tmp.data);
-    free(tmp.key);
-    return (CE = CE_OOM, m);
-  }
-
-  md->probe = realloc(md->probe, m2_probe);
+  md->probe = CIRCA_REALLOC(md->probe, m2_probe_len);
 
   if (!md->probe) {
-    free(tmp.used);
-    free(tmp.data);
-    free(tmp.key);
-    return (CE = CE_OOM, m);
+    CIRCA_FREE(pool);
+    return (circa_throw(CE_OOM), m);
   }
 
-  md->data  = realloc(md->data,  m2_data);
-
-  if (!md->data) {
-    free(tmp.used);
-    free(tmp.data);
-    free(tmp.key);
-    return (CE = CE_OOM, m);
-  }
+  md->data = CIRCA_REALLOC(md->data, m2_data_len);
   
+  if (!md->data) {
+    CIRCA_FREE(pool);
+    return (circa_throw(CE_OOM), m);
+  }
+
   m = md->key;
   md->cap = m2_cap;
 
   // Clear out the map's memory.
-  memset(md->used,  0, m2_cap);
-  memset(md->probe, 0, m2_probe);
-  memset(md->data,  0, m2_data);
-  memset(m,         0, m2_key);
+  for (size_t i = 0; i < m2_cap; i++)
+    md->probe[i] = -1;
+  memset(m, 0, m2_key_len);
+  memset(md->data, 0, m2_data_len);
 
-  // Load the data back into the map.
+  // Re-insert the members into the map.
   for (size_t i = 0; i < m_cap; i++)
-    if (tmp.used[i])
-      m = map_set_(sizk, sizv, m, tmp.key + (i * sizk), tmp.data + (i * sizv));
+    if (probe[i] != -1)
+      m = map_set_(sizk, sizv, m, key + (i * sizk), data + (i * sizv));
 
-  // Free the temporary "fake" map.
-  free(tmp.used);
-  free(tmp.data);
-  free(tmp.key);
+  CIRCA_FREE(pool);
 
   return m;
 }
 
+CIRCA CIRCA_RETURNS
 Map map_require_(size_t sizk, size_t sizv, Map m, size_t cap) {
   return map(m)->cap < cap ? map_realloc_(sizk, sizv, m, cap) : m;
 }
 
-Map map_free_(Map m) {
+CIRCA CIRCA_RETURNS
+Map map_free_(size_t sizk, size_t sizv, Map m) {
   if (m) {
-    free(map(m)->used);
-    free(map(m)->probe);
-    free(map(m)->data);
-    free(map(m));
+    // Zero out freed memory for security. We don't bother with probe count.
+    memset(m, 0, map(m)->cap * sizk);
+    memset(map(m)->data, 0, map(m)->cap * sizv);
+
+    // Free the members of the map, then the map itself.
+    CIRCA_FREE(map(m)->probe);
+    CIRCA_FREE(map(m)->data);
+    CIRCA_FREE(map(m));
   }
+
   return NULL;
 }

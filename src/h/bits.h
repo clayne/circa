@@ -1,5 +1,5 @@
 /*
-** bits.h | The Circa Library Set | Numerical functions.
+** bits.h | The Circa Library Set | Integer operations.
 ** https://github.com/davidgarland/circa
 */
 
@@ -10,38 +10,48 @@
 ** Dependencies
 */
 
-#include "core.h"
+/* Standard */
+
+#include <stdint.h>
+#include <stdlib.h>
+
+/* Circa */
+
+#include "config.h"
+#include "debug.h"
 
 /*
-** A little macro to help us pick which builtin to use, courtesy of 
-** @craigbarnes.
+** Macros
 */
 
-#ifdef __GNUC__
-  #define USE_BUILTIN(fn, arg)                                                 \
-    if (__builtin_types_compatible_p(__typeof__(arg), unsigned long long)) {   \
-      return (uint8_t) __builtin_ ## fn ## ll(arg);                            \
-    } else if (__builtin_types_compatible_p(__typeof__(arg), unsigned long)) { \
-      return (uint8_t) __builtin_ ## fn ## l(arg);                             \
-    } else if (__builtin_types_compatible_p(__typeof__(arg), unsigned int)) {  \
-      return (uint8_t) __builtin_ ## fn(arg);                                  \
+// This macro helps us to automatically select builtins for GNU C
+// code; given by @craigbarnes.
+
+#ifdef CIRCA_GNU
+  #define USE_BUILTIN(FN, ARG)                                                 \
+    if (__builtin_types_compatible_p(__typeof__(ARG), unsigned long long)) {   \
+      return (uint8_t) __builtin_ ## FN ## ll(ARG);                            \
+    } else if (__builtin_types_compatible_p(__typeof__(ARG), unsigned long)) { \
+      return (uint8_t) __builtin_ ## FN ## l(ARG);                             \
+    } else if (__builtin_types_compatible_p(__typeof__(ARG), unsigned int)) {  \
+      return (uint8_t) __builtin_ ## FN(ARG);                                  \
     }
 #endif
 
 /*
-** Because we need a prime number as our capacity for `Dict` in order to have
-** the best hash distribution, the solution used is to align an input number to
-** the next highest power of two, get the 2's logarithm of that, and then get
-** the corresponding prime number higher than that from the array of primes
-** below.
+** Global Declarations
 */
 
-extern uint32_t circa_primes[24];
+// To put this as simply as possible: Generating prime numbers every time we want
+// a new map capacity seems annoying, so instead there's a table.
+
+CIRCA_EXTERN uint32_t circa_primes[24];
 
 /*
-** Then we have a portable version of binary popcount, which tells you how many
-** bits are set to 1 in an unsigned integer.
+** Function Declarations
 */
+
+/* Popcount */
 
 static inline uint8_t  u8_pop(uint8_t  n);
 static inline uint8_t u16_pop(uint16_t n);
@@ -49,42 +59,23 @@ static inline uint8_t u32_pop(uint32_t n);
 static inline uint8_t u64_pop(uint64_t n);
 static inline  size_t usz_pop(size_t   n);
 
-/*
-** There's also a portable implementation of CLZ, standing for "Count Leading 
-** Zeroes." As the name would imply, it counts the number of leading zeroes in
-** an unsigned integer.
-*/
+/* Count Leading Zeroes */
 
 static inline uint8_t  u8_clz(uint8_t  n);
 static inline uint8_t u16_clz(uint16_t n);
 static inline uint8_t u32_clz(uint32_t n);
 static inline uint8_t u64_clz(uint64_t n);
-static inline  size_t usz_ctz(size_t   n);
+static inline  size_t usz_clz(size_t   n);
 
-/*
-** Similarly there is a portable version of CTZ, similar to CLZ but counting
-** trailing zeroes instead.
-*/
+/* Count Trailing Zeroes */
 
-static inline uint8_t  u8_ctz(uint8_t  n);
+static inline uint8_t  u8_ctz(uint8_t n);
 static inline uint8_t u16_ctz(uint16_t n);
 static inline uint8_t u32_ctz(uint32_t n);
 static inline uint8_t u64_ctz(uint64_t n);
-static inline  size_t usz_ctz(size_t   n);
+static inline size_t  usz_clz(size_t   n);
 
-/*
-** Next we have an implementation of the binary logarithm, which finds its
-** output by doing `(sizeof(T) * 8) - clz(n) - 1`, essentially subtracting
-** the number of leading zeroes from the number of total bits the number has.
-**
-** Through a simple demonstration this can verify that this works:
-**
-** |         8 -> Binary 0000 1000 |
-** | 0000 1000 -> CLZ of 4         |
-** | 8 - 4 - 1 -> log2 of 8 is 3   |
-** |    1 << 3 -> 8                |
-**
-*/
+/* Twos Logarithm */
 
 static inline uint8_t  u8_log2(uint8_t  n);
 static inline uint8_t u16_log2(uint16_t n);
@@ -92,75 +83,27 @@ static inline uint8_t u32_log2(uint32_t n);
 static inline uint8_t u64_log2(uint64_t n);
 static inline  size_t usz_log2(size_t   n);
 
-/*
-** Then we get a "next power of two" function, named `np2`. This uses the `log2`
-** function above on the input, adds one to it, then shifts over one. To put it
-** more precisely: `1 << (log2(n ? n - 1 : n) + 1)`.
-**
-** We can demonstrate this below:
-** 
-** Example 1) Keeping at current power of two.
-** |        8 - 1 -> 7                |
-** |            7 -> Binary 0000 0111 |
-** |    0000 0111 -> CLZ of 7 is 5    |
-** |    8 - 5 - 1 -> log2 of 7 is 3   |
-** | 1 << (2 + 1) -> np2 of 8 is 8    |
-** 
-** Example 2) Upping to next power otherwise.
-** |        9 - 1 -> 8                |
-** |            8 -> Binary 0000 1000 |
-** |    0000 1000 -> CLZ of 8 is 4    |
-** |    8 - 4 - 1 -> log2 of 8 is 3   |
-** | 1 << (3 + 1) -> np2 of 9 is 16   |
-*/
+/* Next Power of Two */
 
 static inline uint16_t  u8_np2(uint8_t  n);
 static inline uint32_t u16_np2(uint16_t n);
 static inline uint64_t u32_np2(uint32_t n);
 static inline uint64_t u64_np2(uint64_t n);
-static inline size_t   usz_np2(size_t   n);
+static inline  size_t  usz_np2(size_t   n);
 
-/*
-** Then we have ceil10, which aligns a number to the nearest higher multiple
-** of 10. This works by doing `10 * div10(n + 9)`.
-*/
-
-static inline uint16_t  u8_ceil10(uint8_t  n);
-static inline uint32_t u16_ceil10(uint16_t n);
-static inline uint64_t u32_ceil10(uint32_t n);
-static inline uint64_t u64_ceil10(uint64_t n);
-static inline size_t   usz_ceil10(size_t   n);
-
-/*
-** And there's the most important function for `Dict`'s operation in specific,
-** the `primegt` functions. These return a prime number greater than the input;
-** it's not guaranteed to be the next highest, just higher than in general.
-**
-** How this function works is documented back up where `circa_primes` is defined
-** at the top of the file, if you want to read about it.
-*/
+/* Prime Greater Than */
 
 static inline uint32_t  u8_primegt(uint8_t  n);
 static inline uint32_t u16_primegt(uint16_t n);
 static inline uint32_t u32_primegt(uint32_t n);
 static inline uint32_t u64_primegt(uint64_t n);
-static inline size_t   usz_primegt(size_t   n);
+static inline  size_t  usz_primegt(size_t   n);
 
 /*
-** Finally we have a generic "round" function to round a number up to some
-** multiple of another number, because that just seems genereally useful to
-** have. The first argument is the input, the second argument is the number the
-** input should be made a multiple of.
+** Function Definitions
 */
 
-static inline uint16_t  u8_round(uint8_t  n, uint8_t  m);
-static inline uint32_t u16_round(uint16_t n, uint16_t m);
-static inline uint64_t u32_round(uint32_t n, uint32_t m);
-static inline size_t   usz_round(size_t   n, size_t   m);
-
-/*
-** Binary Popcount
-*/
+/* Popcount */
 
 static inline
 uint8_t u8_pop(uint8_t n) {
@@ -169,7 +112,7 @@ uint8_t u8_pop(uint8_t n) {
 
 static inline
 uint8_t u16_pop(uint16_t n) {
-  #ifdef __GNUC__
+  #ifdef CIRCA_GNU
     return u32_pop(n);
   #else
     n -= ((n >> 1) & 0x5555);
@@ -206,14 +149,12 @@ size_t usz_pop(size_t n) {
   return (sizeof(size_t) == 8) ? u64_pop(n) : u32_pop(n);
 }
 
-/*
-** Binary CLZ
-*/
+/* Count Leading Zeroes */
 
 static inline
 uint8_t u8_clz(uint8_t n) {
-  ce_guard (!n)
-    return (CE = CE_ARG, 8);
+  circa_guard (!n)
+    return (circa_throw(CE_ARG), 8);
   #ifdef __GNUC__
     return (uint8_t) __builtin_clzll(n) - (64 - 8);
   #else
@@ -226,8 +167,8 @@ uint8_t u8_clz(uint8_t n) {
 
 static inline
 uint8_t u16_clz(uint16_t n) {
-  ce_guard (!n)
-    return (CE = CE_ARG, 16);
+  circa_guard (!n)
+    return (circa_throw(CE_ARG), 16);
   #ifdef __GNUC__
     return (uint8_t) __builtin_clzll(n) - (64 - 16);
   #else
@@ -241,8 +182,8 @@ uint8_t u16_clz(uint16_t n) {
 
 static inline
 uint8_t u32_clz(uint32_t n) {
-  ce_guard (!n)
-    return (CE = CE_ARG, 32);
+  circa_guard (!n)
+    return (circa_throw(CE_ARG), 32);
   #ifdef __GNUC__
     USE_BUILTIN(clz, n);
   #else
@@ -257,8 +198,8 @@ uint8_t u32_clz(uint32_t n) {
 
 static inline
 uint8_t u64_clz(uint64_t n) {
-  ce_guard (!n)
-    return (CE = CE_ARG, 64);
+  circa_guard (!n)
+    return (circa_throw(CE_ARG), 64);
   #ifdef __GNUC__
     USE_BUILTIN(clz, n);
   #else
@@ -273,18 +214,16 @@ uint8_t u64_clz(uint64_t n) {
 }
 
 static inline
-uint8_t usz_clz(size_t n) {
+size_t usz_clz(size_t n) {
   return (sizeof(size_t) == 8) ? u64_clz(n) : u32_clz(n);
 }
 
-/*
-** Binary CTZ
-*/
+/* Count Trailing Zeroes */
 
 static inline
 uint8_t u8_ctz(uint8_t n) {
-  ce_guard (!n)
-    return (CE = CE_ARG, 8);
+  circa_guard (!n)
+    return (circa_throw(CE_ARG), 8);
   #ifdef __GNUC__
     return (uint8_t) __builtin_ctzll(n);
   #else
@@ -300,8 +239,8 @@ uint8_t u8_ctz(uint8_t n) {
 
 static inline
 uint8_t u16_ctz(uint16_t n) {
-  ce_guard (!n)
-    return (CE = CE_ARG, 16);
+  circa_guard (!n)
+    return (circa_throw(CE_ARG), 16);
   #ifdef __GNUC__
     return (uint8_t) __builtin_ctzll(n);
   #else
@@ -318,8 +257,8 @@ uint8_t u16_ctz(uint16_t n) {
 
 static inline
 uint8_t u32_ctz(uint32_t n) {
-  ce_guard (!n)
-    return (CE = CE_ARG, 32);
+  circa_guard (!n)
+    return (circa_throw(CE_ARG), 32);
   #ifdef __GNUC__
     USE_BUILTIN(ctz, n);
   #else
@@ -337,8 +276,8 @@ uint8_t u32_ctz(uint32_t n) {
 
 static inline
 uint8_t u64_ctz(uint64_t n) {
-  ce_guard(!n)
-    return (CE = CE_ARG, 64);
+  circa_guard(!n)
+    return (circa_throw(CE_ARG), 64);
   #ifdef __GNUC__
     USE_BUILTIN(ctz, n);
   #else
@@ -360,9 +299,7 @@ size_t usz_ctz(size_t n) {
   return (sizeof(size_t) == 8) ? u64_ctz(n) : u32_ctz(n);
 }
 
-/*
-** Binary Logarithm
-*/
+/* Twos Logarithm */
 
 static inline
 uint8_t u8_log2(uint8_t n) {
@@ -389,9 +326,7 @@ size_t usz_log2(size_t n) {
   return (sizeof(size_t) == 8) ? u64_log2(n) : u32_log2(n);
 }
 
-/*
-** Next Binary Power
-*/
+/* Next Power of Two */
 
 static inline
 uint16_t u8_np2(uint8_t n) {
@@ -418,38 +353,7 @@ size_t usz_np2(size_t n) {
   return (sizeof(size_t) == 8) ? u64_np2(n) : u32_np2(n);
 }
 
-/*
-** Round Up To Nearest Ten
-*/
-
-static inline
-uint16_t u8_ceil10(uint8_t n) {
-  return 10 * ((n + 9) / 10);
-}
-
-static inline
-uint32_t u16_ceil10(uint16_t n) {
-  return 10 * ((n + 9) / 10);
-}
-
-static inline
-uint64_t u32_ceil10(uint32_t n) {
-  return 10 * ((n + 9) / 10);
-}
-
-static inline
-uint64_t u64_ceil10(uint64_t n) {
-  return 10 * ((n + 9) / 10);
-}
-
-static inline
-size_t usz_ceil10(size_t n) {
-  return (sizeof(size_t) == 8) ? u64_ceil10(n) : u32_ceil10(n);
-}
-
-/*
-** Prime Greater Than N
-*/
+/* Prime Greater Than */
 
 static inline
 uint32_t u8_primegt(uint8_t n) {
@@ -476,36 +380,8 @@ size_t usz_primegt(size_t n) {
   return (sizeof(size_t) == 8) ? u64_primegt(n) : u32_primegt(n);
 }
 
-/*
-** Generic Round
-*/
-
-static inline
-uint16_t u8_round(uint8_t n, uint8_t m) {
-  ce_guard (!m)
-    return (CE = CE_ARG, n);
-  return ((n + m - 1) / m) * m;
-}
-
-static inline
-uint32_t u16_round(uint16_t n, uint16_t m) {
-  ce_guard (!m)
-    return (CE = CE_ARG, n);
-  return ((n + m - 1) / m) * m;
-}
-
-static inline
-uint64_t u32_round(uint32_t n, uint32_t m) {
-  ce_guard (!m)
-    return (CE = CE_ARG, n);
-  return ((n + m - 1) / m) * m;
-}
-
-static inline
-uint64_t u64_round(uint64_t n, uint64_t m) {
-  ce_guard (!m)
-    return (CE = CE_ARG, n);
-  return ((n + m - 1) / m) * m;
-}
+#ifdef CIRCA_HEADER_ONLY
+  #include "../c/bits.c"
+#endif
 
 #endif // CIRCA_BITS_H
