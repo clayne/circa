@@ -64,7 +64,7 @@ CIRCA CIRCA_ALLOCS Seq seq_alloc_(size_t siz, size_t cap);
 #define seq_from_iso(T, S) seq_wrap_iso(T, S, seq(S)->len)
 #define seq_from(S) seq_from_iso(typeof(*S), S)
 #define seq_lit_iso(T, ...) ((T*) seq_wrap_(sizeof(T), &(T[]){__VA_ARGS__}, sizeof((T[]){__VA_ARGS__}) / sizeof(T)))
-#define seq_lit(...) seq_lit_iso(typeof(CIRCA_FST(__VA_ARGS__)), __VA_ARGS__)
+#define seq_lit(T, ...) seq_lit_iso(T, __VA_ARGS__)
 CIRCA CIRCA_ALLOCS Seq seq_wrap_(size_t siz, void *v, size_t cap);
 
 #define seq_realloc_iso(T, S, C) (S) = seq_realloc_(sizeof(T), (S), (C))

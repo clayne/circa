@@ -120,7 +120,7 @@ Seq seq_free_(size_t siz, Seq s) {
 
 CIRCA CIRCA_RETURNS
 Seq seq_cpy_(size_t siz, Seq dst, void *src, size_t cap) {
-  circa_guard (!siz || !dst || !src)
+  circa_guard (!siz || !dst || !src || !cap)
     return (circa_throw(CE_ARG), dst);
   dst = seq_require_(siz, dst, cap);
   if (CE) {

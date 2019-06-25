@@ -150,6 +150,9 @@ Seq(T) seq_from(Seq(T) s);
 Seq(T) seq_wrap_iso(Type T, size_t n, T *v);
 Seq(T) seq_wrap(size_t n, T *v);
 
+Seq(T) seq_lit_iso(Type T, ...);
+Seq(T) seq_lit(Type T, ...);
+
 Seq seq_wrap_(size_t siz, size_t n, void *v);
 ```
 
@@ -158,6 +161,8 @@ copying the contents of the passed-in sequence to that sequence.
 
 `seq_wrap` allows for easy conversion from a normal C array
 to a sequence of a stated capacity.
+
+`seq_lit` creates a sequence from a set of literals given as variadic arguments.
 
 ```C
 int *xs = malloc(10 * sizeof(int));
@@ -172,6 +177,9 @@ Seq(int) zs = seq_from(ys);
 for (int i = 0; i < 10; i++)
   printf("%i\n", seq_get(zs, i));
 
+Seq(int) ws = seq_lit(int, 1, 2, 3);
+
+seq_free(ws);
 seq_free(zs);
 seq_free(ys);
 free(xs);
@@ -251,3 +259,46 @@ seq_free(xs); // Free the memory used by the sequence.
 The following errors may be thrown:
 
 - `CE_ARG`: if `siz` is 0. (Debug builds only.)
+
+### Sequence Operations
+
+#### seq_cpy
+
+```C
+void seq_cpy_lit_iso(Type T, Seq(T) dst, ...);
+void seq_cpy_lit(Seq(T) dst, ...);
+
+void seq_cpy_iso(Type T, Seq(T) dst, Seq(T) src);
+void seq_cpy(Seq(T) dst, Seq(T) src);
+
+Seq seq_cpy_(size_t siz, Seq dst, void *src, size_t cap);
+```
+
+`seq_cpy_lit` copies the varargs given into `dst`.
+
+`seq_cpy` copies `src` into `dst`.
+
+```C
+// TODO
+```
+
+The following errors may be thrown:
+
+- `CE_ARG`: if `siz` is 0, `dst` is NULL, `src` is NULL, or `cap` is 0. (Debug builds only.)
+
+#### seq_cpy_slice
+
+```C
+void seq_cpy_slice_iso(Type T, Seq(T) dst, Seq(T) src, Slice slice);
+void seq_cpy_slice(Seq(T) dst, Seq(T) src, Slice slice);
+
+Seq seq_cpy_slice_(size_t siz, Seq dst, Seq src, Slice slice);
+```
+
+`seq_cpy_slice` copies the slice `slice` of `src` into `dst`.
+
+```C
+// TODO
+```
+
+- `CE_ARG`: if `siz` is 0, `dst` is NULL, or `src` is NULL. (Debug builds only.)
