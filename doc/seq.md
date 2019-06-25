@@ -301,4 +301,176 @@ Seq seq_cpy_slice_(size_t siz, Seq dst, Seq src, Slice slice);
 // TODO
 ```
 
+The following errors may be thrown:
+
 - `CE_ARG`: if `siz` is 0, `dst` is NULL, or `src` is NULL. (Debug builds only.)
+
+### Stack Operations
+
+#### seq_push
+
+```C
+void seq_push_iso(Type T, Seq(T) s, T *v);
+void seq_push(Seq(T) s, T *v);
+
+Seq seq_push_(size_t siz, Seq s, void *v);
+```
+
+Pushes a value onto the top of a sequence; that is, shorthand for
+`seq_set_(siz, s, seq(s)->len, v)`.
+
+```C
+// TODO
+```
+
+The following errors may be thrown:
+
+- `CE_ARG`: if `siz` is 0, `s` is NULL, or `v` is NULL. (Debug builds only.)
+
+#### seq_pop
+
+```C
+T seq_pop_iso(Type T, Seq(T) s);
+T seq_pop(Seq(T) s);
+
+T *seq_tos_ptr_iso(Type T, Seq(T) s);
+T *seq_tos_ptr(Seq(T) s);
+
+T seq_tos_iso(Type T, Seq(T) s);
+T seq_tos(Seq(T) s);
+
+void *seq_pop_(size_t siz, Seq s, size_t n);
+```
+
+`seq_pop` pops the top value off of a sequence as though it were a stack.
+
+`seq_tos_ptr` yields a pointer to the top value of a sequence; `tos` stands
+for "top of stack".
+
+`seq_tos` yields the top value of a sequence.
+
+```C
+// TODO
+```
+
+The following errors may be thrown:
+
+- `CE_ARG`: if `siz` is 0 or `s` is NULL. (Debug builds only.)
+- `CE_OOB`: if `seq(s)->len` is 0.
+
+#### seq_pull
+
+```C
+T seq_pull_iso(Type T, Seq(T) s);
+T seq_pull(Seq(T) s);
+
+void *seq_pull_(size_t siz, Seq s);
+```
+
+Pulls the bottom of the sequence out from under it, allowing it to act like
+a queue. Note that this is an O(n) operation, so this isn't the most efficient
+use-case for Seq, but it is provided nonetheless.
+
+```C
+// TODO
+```
+
+The following errors may be thrown:
+
+- `CE_ARG`: if `siz` is 0 or `s` is NULL. (Debug builds only.)
+- `CE_OOB`: if `seq(s)->len` is 0.
+- `CE_OOM`: if VLAs are not allowed and memory allocation fails.
+
+### Comparison Operations
+
+#### seq_cmp
+
+```C
+bool seq_cmp_iso(Type T, Seq(T) a, Seq(T) b);
+bool seq_cmp(Seq(T) a, Seq(T) b);
+
+bool seq_cmp_(size_t siz, Seq a, Seq b);
+```
+
+Compares two sequences element-by-element for equality; returns `true` if equal.
+Sequences of different lengths are automatically considered inequal; that is,
+`{1, 2, 3} != {1, 2}`.
+
+```C
+Seq(int) xs = seq_lit(int, 1, 2, 3);
+Seq(int) ys = seq_lit(int, 1, 2, 3);
+Seq(int) zs = seq_lit(int, 1, 2);
+
+puts(seq_cmp(xs, ys) ? "true" : "false"); // true
+puts(seq_cmp(ys, zs) ? "true" : "false"); // false
+
+seq_free(zs);
+seq_free(ys);
+seq_free(xs);
+```
+
+The following errors may be thrown:
+
+- `CE_ARG`: if `siz` is 0, `a` is NULL or `b` is NULL. (Debug builds only.)
+
+#### seq_cmp_len
+
+```C
+bool seq_cmp_len_iso(Type T, Seq(T) a, Seq(T) b, size_t len);
+bool seq_cmp_len(Seq(T) a, Seq(T) b, size_t len);
+
+bool seq_cmp_len_(size_t siz, Seq a, Seq b, size_t len);
+```
+
+Compares two sequences up to a certain length; returns `true` if equal. If the
+length exceeds the length of either sequence, `false` will be returned
+regardless of how "similar" the two are.
+
+```C
+Seq(int) xs = seq_lit(int, 1, 2, 3);
+Seq(int) ys = seq_lit(int, 1, 2, 3, 4);
+Seq(int) zs = seq_lit(int, 2, 3, 4);
+
+puts(seq_cmp_len(xs, ys, 3) ? "true" : "false"); // true
+puts(seq_cmp_len(xs, zs, 3) ? "true" : "false"); // false
+
+seq_free(zs);
+seq_free(ys);
+seq_free(xs);
+```
+
+The following errors may be thrown:
+
+- `CE_ARG`: if `siz` is 0, `a` is NULL, `b` is NULL or `len` is 0. (Debug builds only.)
+
+#### seq_cmp_slice
+
+```C
+bool seq_cmp_slice_iso(Type T, Seq(T) a, Slice sa, Seq(T) b, Slice sb);
+bool seq_cmp_slice(Seq(T) a, Slice sa, Seq(T) b, Slice sb);
+
+bool seq_cmp_slice_(size_t siz, Seq a, Slice sa, Seq b, Slice sb);
+```
+
+Compares slices of two sequences, `sa` of `a` and `sb` of `b`; returns true if
+equal. If the slices are of inequal length, `false` will be returned regardless
+of how "similar" the two are.
+
+```C
+Seq(int) xs = seq_lit(int, 1, 2, 3);
+Seq(int) ys = seq_from(xs);
+
+Slice a = slice_lit(0, 1); // addresses 0 .. 1
+Slice b = slice_lit(1, 2); // addresses 1 .. 2
+
+puts(seq_cmp_slice(xs, a, ys, a) ? "true" : "false"); // true; {1, 2} == {1, 2}.
+puts(seq_cmp_slice(xs, a, ys, b) ? "true" : "false"); // false; {1, 2} != {2, 3}.
+
+seq_free(ys);
+seq_free(xs);
+```
+
+The following errors may be thrown:
+
+- `CE_ARG`: if `siz` is 0, `a` is NULL or `b` is NULL. (Debug builds only.)
+- `CE_OOB`: if `sa` is not contained within `a` or `sb` is not contained within `b`.

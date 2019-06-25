@@ -211,10 +211,10 @@ bool seq_cmp_(size_t siz, Seq a, Seq b) {
 
 CIRCA
 bool seq_cmp_len_(size_t siz, Seq a, Seq b, size_t len) {
-  circa_guard (!siz || !a || !b)
+  circa_guard (!siz || !a || !b || !len)
     return (circa_throw(CE_ARG), false);
   if (len > seq(a)->len || len > seq(b)->len)
-    return (circa_throw(CE_OOB), false);
+    return false;
   return !memcmp(a, b, seq(a)->len * siz);
 }
 
@@ -226,6 +226,8 @@ bool seq_cmp_slice_(size_t siz, Seq a, Slice sa, Seq b, Slice sb) {
     return (circa_throw(CE_OOB), false);
   if (!slice_in_len(sb, 0, seq(b)->len))
     return (circa_throw(CE_OOB), false);
+  if ((sa.ri - sa.le) != (sb.ri - sb.le))
+    return false;
   for (size_t i = sa.le, j = sb.le; (i <= sa.ri) && (j <= sb.ri); i++, j++)
     if (memcmp(((char*) a) + siz * i, ((char*) b) + siz * j, siz))
       return false;
