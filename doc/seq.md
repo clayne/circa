@@ -545,6 +545,6 @@ seq_free(xs);
 
 Not yet implemented.
 
-### seq_foldl
+#### seq_foldl
 
 Not yet implemented.
