@@ -474,3 +474,77 @@ The following errors may be thrown:
 
 - `CE_ARG`: if `siz` is 0, `a` is NULL or `b` is NULL. (Debug builds only.)
 - `CE_OOB`: if `sa` is not contained within `a` or `sb` is not contained within `b`.
+
+### Iterators & Higher-Order Functions
+
+#### seq_foreach
+
+```C
+seq_foreach_iso (Type T, Seq(T) S, Iden v) {}
+seq_foreah(Seq(T) s, Iden v) {}
+```
+
+Pretty much exactly what it sounds like; a `foreach` iterator. Syntactically,
+it behaves similarly to `for` or `while`; you can even omit the braces if you
+want to.
+
+```C
+Seq(int) xs = seq_lit(int, 1, 2, 3, 4, 5);
+
+seq_foreach(xs, x) { // "for each x in xs"
+  printf("%i\n", x);
+}
+
+seq_free(xs);
+```
+
+#### seq_filter
+
+```C
+void seq_filter_iso(Type T, Seq(T) S, Expr EXPR);
+void seq_filter(Seq(T) S, Expr EXPR);
+```
+
+Filters a sequence to only contain items for which the expression yields a
+truthy value. The item to test in the expression is given by a (non-global)
+variable named "`it`".
+
+```C
+Seq(int) xs = seq_lit(int, 1, 2, 3, 4, 5);
+
+seq_filter(xs, it > 2); // "keep each element if it is greater than 2"
+
+seq_foreach(xs, x)
+  printf("%i\n", x); // 3, 4, 5
+
+seq_free(xs);
+```
+
+#### seq_map
+
+```C
+void seq_map_iso(Type T, Seq(T) S, Expr EXPR);
+void seq_map(Type T, Seq(T) S, Expr EXPR);
+```
+
+Maps a sequence's values to an expression using the previous values, which are
+yielded by a (non-global) variable named "`it`".
+
+```C
+Seq(int) xs = seq_lit(int, 1, 2, 3, 4, 5);
+
+seq_map(xs, it * it); // square each value in the sequence
+
+seq_foreach(xs, x)
+  printf("%i\n", x); // 1, 4, 9, 16, 25
+
+seq_free(xs);
+```
+
+#### seq_foldr
+
+Not yet implemented.
+
+### seq_foldl
+
+Not yet implemented.
