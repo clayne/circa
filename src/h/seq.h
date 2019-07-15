@@ -41,7 +41,7 @@ typedef Seq(void) Seq;
 
 /* Accessors */
 
-static inline CIRCA_PURE CIRCA_NONNULL(1) SeqData *seq(Seq s);
+static inline CIRCA_PURE SeqData *seq(Seq s);
 
 #define seq_set_iso(T, S, A, V) (S) = seq_set_(sizeof(T), (S), (A), (V))
 #define seq_set(S, A, V) seq_set_iso(typeof(*S), S, A, V)
@@ -127,7 +127,7 @@ CIRCA bool seq_cmp_slice_(size_t siz, Seq a, Slice sa, Seq b, Slice sb);
 ** Function Implementations
 */
 
-static inline CIRCA_PURE CIRCA_NONNULL(1)
+static inline CIRCA_PURE
 SeqData *seq(Seq s) {
   circa_guard (!s)
     return (circa_throw(CE_ARG), NULL);
@@ -174,6 +174,5 @@ do {                                          \
 #ifdef CIRCA_HEADER_ONLY
   #include "../c/seq.c"
 #endif
-
 
 #endif // CIRCA_SEQ_H
