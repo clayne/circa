@@ -167,7 +167,6 @@ cd lib/circa && $(MAKE) <build_type>
 
 Where `<build_type>` is one of:
 
-```
 | Build Type | Description                                                 |
 | ---------- | ----------------------------------------------------------- |
 | fast       | a speed-focused build with no debug features.               |
@@ -175,7 +174,6 @@ Where `<build_type>` is one of:
 | build      | a balanced build with debugging features and optimizations. |
 | debug      | a debugging focused build.                                  |
 | sanitized  | a debugging build with ubsan, asan, and lsan.               |
-```
 
 Finally, just add `-llib/circa` to your `LDFLAGS`, assuming that's where you
 put it.
