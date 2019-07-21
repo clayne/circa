@@ -159,7 +159,8 @@ void *seqmap_get_(size_t sizk, size_t sizv, SeqMap sm, Seq k) {
   size_t hash = XXH3_64bits(k, seq(k)->len * sizk) % seqmap(sm)->cap;
 
   for (size_t i = hash; i < seqmap(sm)->cap; i++) {
-    if (seqmap(sm)->key[i] != NULL) {
+    bool ok_probe = (i == hash) || (seqmap(sm)->probe[i] > 0);
+    if ((seqmap(sm)->key[i] != NULL) && ok_probe) {
       if (seq_cmp_(sizk, seqmap(sm)->key[i], k)) {
         return seqmap(sm)->data + (i * sizv);
       }

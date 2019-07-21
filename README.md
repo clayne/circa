@@ -1,5 +1,5 @@
 # The Circa Library Set
-## 0.1.0
+## 0.1.1
 
 Circa is a library set for C11 that aims to make common tasks
 faster and less error prone by providing the generic datatypes

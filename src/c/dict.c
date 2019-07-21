@@ -170,7 +170,8 @@ void *dict_get_(size_t siz, Dict d, char *k) {
   size_t hash = XXH3_64bits(k, k_len) % dict(d)->cap;
 
   for (size_t i = hash; i < dict(d)->cap; i++) {
-    if (dict(d)->key[i] != NULL) {
+    bool ok_probe = (i == hash) || (dict(d)->probe[i] > 0);
+    if ((dict(d)->key[i] != NULL) && ok_probe) {
       if (!strcmp(dict(d)->key[i], k)) {
         return dict(d)->data + (i * siz);
       }

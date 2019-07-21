@@ -153,10 +153,11 @@ void *map_get_(size_t sizk, size_t sizv, Map m, void *k) {
   circa_guard (!sizk || !sizv || !m || !k)
     return (circa_throw(CE_ARG), NULL);
 
-  size_t hash = XXH3_64bits(k, sizk);
+  size_t hash = XXH3_64bits(k, sizk) % map(m)->cap;
 
   for (size_t i = hash; i < map(m)->cap; i++) {
-    if (map(m)->probe[i] != -1) {
+    bool ok_probe = (i == hash) || (map(m)->probe[i] > 0);
+    if ((map(m)->probe[i] != -1) && ok_probe) {
       if (!memcmp(map(m)->key + (i * sizk), k, sizk)) {
         return map(m)->data + (i * sizv);
       }
