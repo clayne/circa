@@ -120,6 +120,31 @@ Txt txt_cpy_slice_(Txt dst, Txt src, Slice slice) {
   return dst;
 }
 
+CIRCA CIRCA_RETURNS
+Txt txt_cat_(Txt dst, Txt src) {
+  circa_guard (!dst || !src)
+    return (circa_throw(CE_ARG), dst);
+  size_t len = txt(dst)->len + txt(src)->len + 1;
+  dst = txt_require_(dst, len);
+  memcpy(dst + txt(dst)->len, src, txt(src)->len);
+  txt(dst)->len = len;
+  dst[len] = '\0';
+  return dst;
+}
+
+CIRCA CIRCA_RETURNS
+Txt txt_cat_lit_(Txt dst, char *src) {
+  circa_guard (!dst || !src)
+    return (circa_throw(CE_ARG), dst);
+  size_t src_len = strlen(src);
+  size_t len = txt(dst)->len + src_len;
+  dst = txt_require_(dst, len);
+  memcpy(dst + txt(dst)->len, src, src_len);
+  txt(dst)->len = len;
+  dst[len] = '\0';
+  return dst;
+}
+
 #ifdef CIRCA_GNU
   #define VPRINTF(X) __attribute__((__format__(__printf__, (X), 0)))
 #else

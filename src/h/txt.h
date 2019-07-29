@@ -68,6 +68,12 @@ CIRCA CIRCA_RETURNS Txt txt_cpy_(Txt dst, Txt src);
 #define txt_cpy_slice(DST, SRC, SLICE) (DST) = txt_cpy_slice_((DST), (SRC), (SLICE))
 CIRCA CIRCA_RETURNS Txt txt_cpy_slice_(Txt dst, Txt src, Slice slice);
 
+#define txt_cat(DST, SRC) (DST) = txt_cat_((DST), (SRC))
+CIRCA CIRCA_RETURNS Txt txt_cat_(Txt dst, Txt src);
+
+#define txt_cat_lit(DST, SRC) (DST) = txt_cat_lit_((DST), (SRC))
+CIRCA CIRCA_RETURNS Txt txt_cat_lit_(Txt dst, char *src);
+
 #define txt_fmt(S, FMT, ...) (S) = txt_fmt_((S), (FMT), __VA_ARGS__)
 CIRCA CIRCA_RETURNS PRINTF(2) Txt txt_fmt_(Txt t, const char *fmt, ...);
 
