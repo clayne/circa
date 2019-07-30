@@ -124,8 +124,8 @@ CIRCA CIRCA_RETURNS
 Txt txt_cat_(Txt dst, Txt src) {
   circa_guard (!dst || !src)
     return (circa_throw(CE_ARG), dst);
-  size_t len = txt(dst)->len + txt(src)->len + 1;
-  dst = txt_require_(dst, len);
+  size_t len = txt(dst)->len + txt(src)->len;
+  dst = txt_require_(dst, len + 1);
   memcpy(dst + txt(dst)->len, src, txt(src)->len);
   txt(dst)->len = len;
   dst[len] = '\0';
@@ -137,8 +137,8 @@ Txt txt_cat_lit_(Txt dst, char *src) {
   circa_guard (!dst || !src)
     return (circa_throw(CE_ARG), dst);
   size_t src_len = strlen(src);
-  size_t len = txt(dst)->len + src_len + 1;
-  dst = txt_require_(dst, len);
+  size_t len = txt(dst)->len + src_len;
+  dst = txt_require_(dst, len + 1);
   memcpy(dst + txt(dst)->len, src, src_len);
   txt(dst)->len = len;
   dst[len] = '\0';
