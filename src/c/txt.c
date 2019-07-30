@@ -137,7 +137,7 @@ Txt txt_cat_lit_(Txt dst, char *src) {
   circa_guard (!dst || !src)
     return (circa_throw(CE_ARG), dst);
   size_t src_len = strlen(src);
-  size_t len = txt(dst)->len + src_len;
+  size_t len = txt(dst)->len + src_len + 1;
   dst = txt_require_(dst, len);
   memcpy(dst + txt(dst)->len, src, src_len);
   txt(dst)->len = len;
