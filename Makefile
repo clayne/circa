@@ -9,7 +9,7 @@ CFLAGS_BUILD=$(CFLAGS) -O2    -fno-omit-frame-pointer
 CFLAGS_DEBUG=$(CFLAGS) -Og -g -fno-omit-frame-pointer
 CFLAGS_SANITIZED=$(CFLAGS_DEBUG) -fsanitize=undefined -fsanitize=address -fsanitize=leak
 
-CFLAGS_EX=-std=gnu11 -Wno-everything
+CFLAGS_EX=-std=gnu11 -Wno-language-extension-token
 
 default: build
 

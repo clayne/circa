@@ -83,7 +83,14 @@ static inline
 bool set_rem_(size_t siz, Set e, void *k) {
   if (!set_has_(siz, e, k))
     return false;
+  #ifdef __clang__
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wunused-result"
+  #endif
   map_set_(siz, 1, e, k, &(bool){false}); // This is safe because it will *NOT* realloc.
+  #ifdef __clang__
+    #pragma clang diagnostic pop
+  #endif 
   return true;
 }
 

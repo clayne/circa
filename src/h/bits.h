@@ -124,7 +124,7 @@ uint8_t u16_pop(uint16_t n) {
 static inline
 uint8_t u32_pop(uint32_t n) {
   #ifdef __GNUC__
-    USE_BUILTIN(popcount, n);
+    USE_BUILTIN(popcount, n)
   #else
     n -= ((n >> 1) & 0x55555555);
     n = (n & 0x33333333) + ((n >> 2) & 0x33333333);
@@ -135,7 +135,7 @@ uint8_t u32_pop(uint32_t n) {
 static inline
 uint8_t u64_pop(uint64_t n) {
   #ifdef __GNUC__
-    USE_BUILTIN(popcount, n);
+    USE_BUILTIN(popcount, n)
   #else
     n -= ((n >> 1) & 0x5555555555555555ULL);
     n = (n & 0x3333333333333333ULL) + ((n >> 2) & 0x3333333333333333ULL);
@@ -185,7 +185,7 @@ uint8_t u32_clz(uint32_t n) {
   circa_guard (!n)
     return (circa_throw(CE_ARG), 32);
   #ifdef __GNUC__
-    USE_BUILTIN(clz, n);
+    USE_BUILTIN(clz, n)
   #else
     n |= (n >>  1);
     n |= (n >>  2);
@@ -201,7 +201,7 @@ uint8_t u64_clz(uint64_t n) {
   circa_guard (!n)
     return (circa_throw(CE_ARG), 64);
   #ifdef __GNUC__
-    USE_BUILTIN(clz, n);
+    USE_BUILTIN(clz, n)
   #else
     n |= (n >>  1);
     n |= (n >>  2);
@@ -260,7 +260,7 @@ uint8_t u32_ctz(uint32_t n) {
   circa_guard (!n)
     return (circa_throw(CE_ARG), 32);
   #ifdef __GNUC__
-    USE_BUILTIN(ctz, n);
+    USE_BUILTIN(ctz, n)
   #else
     uint8_t c = 32;
     n &= -((int32_t) n);
@@ -279,7 +279,7 @@ uint8_t u64_ctz(uint64_t n) {
   circa_guard(!n)
     return (circa_throw(CE_ARG), 64);
   #ifdef __GNUC__
-    USE_BUILTIN(ctz, n);
+    USE_BUILTIN(ctz, n)
   #else
     uint8_t c = 64;
     n &= -((int64_t) n);
