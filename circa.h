@@ -6,8 +6,6 @@
 #ifdef __clang__
   #pragma clang diagnostic push
   #pragma clang diagnostic ignored "-Wcomma"
-  #pragma clang diagnostic push
-  #pragma clang diagnostic ignored "-Wunused-paramater"
 #endif
 
 #include "src/h/debug.h"
@@ -20,6 +18,5 @@
 #include "src/h/dict.h"
 
 #ifdef __clang__
-  #pragma clang diagnostic pop
   #pragma clang diagnostic pop
 #endif
