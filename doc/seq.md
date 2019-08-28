@@ -534,7 +534,7 @@ The following errors may be thrown:
 
 ```C
 seq_foreach_iso (Type T, Seq(T) S, Iden v) {}
-seq_foreah(Seq(T) s, Iden v) {}
+seq_foreach(Seq(T) s, Iden v) {}
 ```
 
 Pretty much exactly what it sounds like; a `foreach` iterator. Syntactically,
