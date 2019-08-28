@@ -26,7 +26,7 @@
 CIRCA CIRCA_RETURNS
 SeqMap seqmap_set_(size_t sizk, size_t sizv, SeqMap sm, Seq k, void *v) {
   circa_guard (!sizk || !sizv || !sm || !k || !v)
-    return (circa_throw(CE_ARG), NULL);
+    return (circa_throw(CE_ARG), sm);
 
   size_t swp_probe = 0, tmp_probe;
 
@@ -34,11 +34,12 @@ SeqMap seqmap_set_(size_t sizk, size_t sizv, SeqMap sm, Seq k, void *v) {
     char swp_data[sizv], tmp_data[sizv];
   #else
     char *pool = CIRCA_MALLOC(sizv * 2);
-    char *swp_data = pool;
-    char *tmp_data = pool + sizv;
 
     if (!pool)
       return (circa_throw(CE_OOM), sm);
+
+    char *swp_data = pool;
+    char *tmp_data = pool + sizv;
   #endif
 
   Seq swp_key, tmp_key;
@@ -114,12 +115,12 @@ bool seqmap_del_(size_t sizk, size_t sizv, SeqMap sm, Seq k) {
         seqmap(sm)->len--;
         seqmap(sm)->probe[i] = 0;
         for (i++; i < seqmap(sm)->cap; i++) {
+          seqmap(sm)->key[i - 1] = seq_free_(sizk, seqmap(sm)->key[i - 1]);
+          seqmap(sm)->key[i - 1] = NULL;
           if (seqmap(sm)->probe[i] == 0)
             return true;
-          
           seqmap(sm)->probe[i - 1] = seqmap(sm)->probe[i] - 1;
           memcpy(seqmap(sm)->data + sizv * (i - 1), seqmap(sm)->data + sizv * i, sizv);
-          seqmap(sm)->key[i - 1] = seq_free_(sizk, seqmap(sm)->key[i - 1]);
           seqmap(sm)->key[i - 1] = seqmap(sm)->key[i];
           seqmap(sm)->probe[i] = 0;
         }

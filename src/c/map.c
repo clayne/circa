@@ -113,6 +113,8 @@ bool map_del_(size_t sizk, size_t sizv, Map m, void *k) {
         map(m)->len--;
         map(m)->probe[i] = -1;
         for (i++; i < map(m)->cap; i++) {
+          map(m)->probe[i - 1] = -1;
+          
           if (map(m)->probe[i] <= 0)
             return true;
 

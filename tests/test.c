@@ -162,6 +162,20 @@ describe (SeqMap) {
   }
 }
 
+MapSeq(int, int) ms;
+
+describe (MapSeq) {
+  subdesc (Allocators) {
+    it ("mapseq_alloc") {
+      ms = mapseq_alloc(int, int, 1);
+    }
+
+    it ("mapseq_free") {
+      mapseq_free(ms);
+    }
+  }
+}
+
 Dict(int) d;
 
 describe (Dict) {

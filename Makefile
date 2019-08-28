@@ -60,6 +60,7 @@ examples: debug
 	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) ex/map.c    -o map.o    -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) ex/set.c    -o set.o    -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) ex/seqmap.c -o seqmap.o -lcirca $(LDFLAGS)
+	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) ex/mapseq.c -o mapseq.o -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) ex/dict.c   -o dict.o   -lcirca $(LDFLAGS)
 
 examples_sanitized: sanitized
@@ -68,6 +69,7 @@ examples_sanitized: sanitized
 	$(CC) $(CFLAGS_SANITIZED) $(CFLAGS_EX) ex/map.c    -o map.o    -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS_SANITIZED) $(CFLAGS_EX) ex/set.c    -o set.o    -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS_SANITIZED) $(CFLAGS_EX) ex/seqmap.c -o seqmap.o -lcirca $(LDFLAGS)
+	$(CC) $(CFLAGS_SANITIZED) $(CFLAGS_EX) ex/mapseq.c -o mapseq.o -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS_SANITIZED) $(CFLAGS_EX) ex/dict.c   -o dict.o   -lcirca $(LDFLAGS)
 
 examples_header:
@@ -76,6 +78,7 @@ examples_header:
 	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) -DCIRCA_HEADER_ONLY ex/map.c    -o map.o    $(LDFLAGS)
 	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) -DCIRCA_HEADER_ONLY ex/set.c    -o set.o    $(LDFLAGS)
 	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) -DCIRCA_HEADER_ONLY ex/seqmap.c -o seqmap.o $(LDFLAGS)
+	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) -DCIRCA_HEADER_ONLY ex/mapseq.c -o mapseq.o $(LDFLAGS)
 	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) -DCIRCA_HEADER_ONLY ex/dict.c   -o dict.o   $(LDFLAGS)
 
 test: debug
