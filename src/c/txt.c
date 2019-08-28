@@ -9,6 +9,9 @@
 
 /* Circa */
 
+#include "../h/core.h"
+#include "../h/debug.h"
+#include "../h/bits.h"
 #include "../h/txt.h"
 
 /*
@@ -24,6 +27,31 @@ Txt txt_set_(Txt t, size_t a, char c) {
   if (txt(t)->len < a + 1)
     txt(t)->len = a + 1;
   return t;
+}
+
+CIRCA CIRCA_RETURNS
+Txt txt_ins_(Txt t, size_t a, char c) {
+  circa_guard (!t || !c)
+    return (circa_throw(CE_ARG), t);
+  register const size_t len = usz_max(txt(t)->len, a) + 1;
+  if (len > txt(t)->len + 1)
+    memset(t + txt(t)->len, 0, len - txt(t)->len + 1);
+  txt(t)->len = len;
+  t = txt_require_(t, len);
+  memmove(t + a + 1, t + a, len - a);
+  t[a] = c;
+  return t;
+}
+
+CIRCA
+bool txt_del_(Txt t, size_t a) {
+  circa_guard (!t)
+    return (circa_throw(CE_ARG), t);
+  if (a >= txt(t)->len)
+    return false;
+  memmove(t + a, t + a + 1, txt(t)->len - (a + 1));
+  txt(t)->len--;
+  return true;
 }
 
 CIRCA

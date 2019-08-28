@@ -17,7 +17,7 @@ int main() {
 
   seq_foreach(xs, x)
     printf("%i\n", x);
-  
+ 
   seq_free(xs);
 
   return 0;

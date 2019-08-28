@@ -43,6 +43,12 @@ static inline SeqData *txt(Txt t);
 #define txt_set(S, A, V) (S) = txt_set_((S), (A), (V))
 CIRCA CIRCA_RETURNS Txt txt_set_(Txt t, size_t a, char c);
 
+#define txt_ins(S, A, V) (S) = txt_ins_((S), (A), (V))
+CIRCA CIRCA_RETURNS Txt txt_ins_(Txt t, size_t a, char c);
+
+#define txt_del(S, A) txt_del_((S), (A))
+CIRCA bool txt_del_(Txt t, size_t a);
+
 #define txt_get(S, A) txt_get_((S), (A))
 CIRCA char txt_get_(Txt t, size_t a);
 

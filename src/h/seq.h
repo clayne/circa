@@ -47,6 +47,14 @@ static inline CIRCA_PURE SeqData *seq(Seq s);
 #define seq_set(S, A, V) seq_set_iso(typeof(*S), S, A, V)
 CIRCA CIRCA_RETURNS Seq seq_set_(size_t siz, Seq s, size_t a, void *v);
 
+#define seq_ins_iso(T, S, A, V) (S) = seq_ins_(sizeof(T), (S), (A), (V))
+#define seq_ins(S, A, V) seq_ins_iso(typeof(*S), S, A, V)
+CIRCA CIRCA_RETURNS Seq seq_ins_(size_t siz, Seq s, size_t a, void *v);
+
+#define seq_del_iso(T, S, A) seq_del_(sizeof(T), (S), (A))
+#define seq_del(S, A) seq_del_iso(typeof(*S), S, A)
+CIRCA bool seq_del_(size_t siz, Seq s, size_t a);
+
 #define seq_get_ptr_iso(T, S, A) ((T*) seq_get_(sizeof(T), (S), (A)))
 #define seq_get_ptr(S, A) seq_get_ptr_iso(typeof(*S), S, A)
 #define seq_get_iso(T, S, A) (*seq_get_ptr_iso(T, S, A))

@@ -15,6 +15,7 @@
 
 #include "../h/core.h"
 #include "../h/debug.h"
+#include "../h/bits.h"
 #include "../h/seq.h"
 
 /*
@@ -30,6 +31,35 @@ Seq seq_set_(size_t siz, Seq s, size_t a, void *v) {
   if (seq(s)->len < a + 1)
     seq(s)->len = a + 1;
   return s;
+}
+
+CIRCA CIRCA_RETURNS
+Seq seq_ins_(size_t siz, Seq s, size_t a, void *v) {
+  circa_guard (!siz || !s || !v)
+    return (circa_throw(CE_ARG), s);
+  register const size_t len = usz_max(seq(s)->len, a) + 1;
+  if (len > seq(s)->len + 1)
+    memset(((char*) s) + siz * seq(s)->len, 0, (len - seq(s)->len + 1) * siz);
+  seq(s)->len = len;
+  s = seq_require_(siz, s, len);
+  memmove(((char*) s) + siz * (a + 1), ((char*) s) + siz * a, siz * (len - a));
+  memcpy(((char*) s) + siz * a, v, siz);
+  return s;
+}
+
+CIRCA
+bool seq_del_(size_t siz, Seq s, size_t a) {
+  circa_guard (!siz || !s)
+    return (circa_throw(CE_ARG), s);
+  if (a >= seq(s)->len)
+    return false;
+  memmove(
+    ((char*) s) + siz * a,
+    ((char*) s) + siz * (a + 1),
+    siz * (seq(s)->len - (a + 1))
+  );
+  seq(s)->len--;
+  return true;
 }
 
 CIRCA

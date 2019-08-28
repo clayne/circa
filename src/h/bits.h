@@ -51,6 +51,22 @@ CIRCA_EXTERN uint32_t circa_primes[24];
 ** Function Declarations
 */
 
+/* Minimum */
+
+static inline uint8_t   u8_min(uint8_t a,  uint8_t  b);
+static inline uint16_t u16_min(uint16_t a, uint16_t b);
+static inline uint32_t u32_min(uint32_t a, uint32_t b);
+static inline uint64_t u64_min(uint64_t a, uint64_t b);
+static inline   size_t usz_min(size_t   a, size_t   b);
+
+/* Maximum */
+
+static inline uint8_t   u8_max(uint8_t a,  uint8_t  b);
+static inline uint16_t u16_max(uint16_t a, uint16_t b);
+static inline uint32_t u32_max(uint32_t a, uint32_t b);
+static inline uint64_t u64_max(uint64_t a, uint64_t b);
+static inline   size_t usz_max(size_t   a, size_t   b);
+
 /* Popcount */
 
 static inline uint8_t  u8_pop(uint8_t  n);
@@ -102,6 +118,60 @@ static inline  size_t  usz_primegt(size_t   n);
 /*
 ** Function Definitions
 */
+
+/* Minimum */
+
+static inline
+uint8_t u8_min(uint8_t a, uint8_t b) {
+  return a < b ? a : b;
+}
+
+static inline
+uint16_t u16_min(uint16_t a, uint16_t b) {
+  return a < b ? a : b;
+}
+
+static inline
+uint32_t u32_min(uint32_t a, uint32_t b) {
+  return a < b ? a : b;
+}
+
+static inline
+uint64_t u64_min(uint64_t a, uint64_t b) {
+  return a < b ? a : b;
+}
+
+static inline
+size_t usz_min(size_t a, size_t b) {
+  return a < b ? a : b;
+}
+
+/* Maximum */
+
+static inline
+uint8_t u8_max(uint8_t a, uint8_t b) {
+  return a > b ? a : b;
+}
+
+static inline
+uint16_t u16_max(uint16_t a, uint16_t b) {
+  return a > b ? a : b;
+}
+
+static inline
+uint32_t u32_max(uint32_t a, uint32_t b) {
+  return a > b ? a : b;
+}
+
+static inline
+uint64_t u64_max(uint64_t a, uint64_t b) {
+  return a > b ? a : b;
+}
+
+static inline
+size_t usz_max(size_t a, size_t b) {
+  return a > b ? a : b;
+}
 
 /* Popcount */
 
