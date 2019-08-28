@@ -35,8 +35,9 @@ Txt txt_ins_(Txt t, size_t a, char c) {
     return (circa_throw(CE_ARG), t);
   register const size_t len = usz_max(txt(t)->len, a) + 1;
   if (len > txt(t)->len + 1)
-    memset(t + txt(t)->len, 0, len - txt(t)->len + 1);
+    return (circa_throw(CE_OOB), t);
   txt(t)->len = len;
+  t[txt(t)->len] = '\0';
   t = txt_require_(t, len);
   memmove(t + a + 1, t + a, len - a);
   t[a] = c;
@@ -51,6 +52,7 @@ bool txt_del_(Txt t, size_t a) {
     return false;
   memmove(t + a, t + a + 1, txt(t)->len - (a + 1));
   txt(t)->len--;
+  t[txt(t)->len] = '\0';
   return true;
 }
 

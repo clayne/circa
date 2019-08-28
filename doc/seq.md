@@ -91,6 +91,59 @@ The following errors may be thrown:
 
 - `CE_ARG`: if `siz` is 0, `s` is NULL, or `v` is NULL. (Debug builds only.)
 
+#### seq_ins
+
+```C
+void seq_ins_iso(Type T, Seq(T) s, size_t a, T *v);
+void seq_ins(Seq(T) s, size_t a, T *v);
+
+Seq seq_ins_(size_t siz, Seq s, size_t a, void *v);
+```
+
+This function inserts a value at the given address, shifting pre-existing
+occupants to the right as needed.
+
+If the index is out of bounds, the array is grown and any empty space is zero
+initialized.
+
+```C
+Seq(int) xs = seq_alloc(int, 5);
+for (int i = 0; i < 5; i++)
+  seq_set(xs, i, &i); // [0, 1, 2, 3, 4]
+seq_ins(xs, 2, 100);  // [0, 1, 100, 2, 3, 4]
+seq_free(xs);
+```
+
+The following errors may be thrown:
+
+- `CE_ARG`: if `siz` is 0, `s` is NULL, or `v` is NULL. (Debug builds only.)
+
+#### seq_del
+
+```C
+bool seq_del_iso(Type T, Seq(T) s, size_t a);
+bool seq_del(Seq(T) s, size_t a);
+
+bool seq_del_(size_t siz, Seq s, size_t a);
+```
+
+This function deletes a value at the given address, shifting other elements
+from the right in to replace it if necessary.
+
+If the index is out of bounds, `false` will be returned. Otherwise, `true` will
+be returned.
+
+```C
+Seq(int) xs = seq_alloc(int, 5);
+for (int i = 0; i < 5; i++)
+  seq_set(xs, i, &i); // [0, 1, 2, 3, 4]
+seq_del(xs, 2); // [0, 1, 3, 4]
+```
+
+The following errors may be thrown:
+
+- `CE_ARG`: if `siz` is 0 or `s` is NULL. (Debug builds only.)
+
 #### seq_get
 
 ```C

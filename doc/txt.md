@@ -78,6 +78,58 @@ The following errors may be thrown:
 
 - `CE_ARG`: if `t` is NULL or `c` is `\0`. (Debug builds only.)
 
+#### txt_ins
+
+```C
+void txt_ins(Txt t, size_t a, char c);
+
+Txt txt_ins_(Txt t, size_t a, char c);
+```
+
+This function inserts a character at the given address, shifting pre-existing
+characters to the right as needed.
+
+Unlike `seq_ins`, if the index is out of bounds, an error is thrown.
+
+```C
+Txt t = txt_alloc(3);
+for (int i = 0; i < 3; i++)
+  txt_set(t, i, '0' + i); // "012"
+txt_ins(t, 1, 'x');       // "0x12"
+txt_free(t);
+```
+
+The following errors may be thrown:
+
+- `CE_ARG`: if `t` is NULL or `c` is `\0`. (Debug builds only.)
+- `CE_OOB`: if `a` is out of bounds.
+
+#### txt_del
+
+```C
+bool txt_del(Txt t, size_t a);
+
+bool txt_del_(Txt t, size_t a);
+```
+
+This function deletes a character at the given address, shifting other
+characters from the right in to replace it if necessary.
+
+If the index is out of bounds, `false` will be returned. Otherwise, `true` will
+be returned.
+
+```C
+Txt t = txt_alloc(3);
+for (int i = 0; i < 3; i++)
+  txt_set(t, i, '0' + i); // "012"
+txt_del(t, 1);            // "02"
+txt_free(t);
+```
+
+The following errors may be thrown:
+
+- `CE_ARG`: if `t` is NULL.
+
 #### txt_get
 
 ```C
