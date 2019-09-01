@@ -151,6 +151,21 @@ Txt txt_cpy_slice_(Txt dst, Txt src, Slice slice) {
 }
 
 CIRCA CIRCA_RETURNS
+Txt txt_cpy_slice_lit_(Txt dst, char *src, Slice slice) {
+  circa_guard (!dst || !src)
+    return (circa_throw(CE_ARG), dst);
+  const size_t len = slice.ri - slice.le + 1;
+  dst = txt_require_(dst, len + 1);
+  if (CE) {
+    circa_log("txt_require failed.");
+    return dst;
+  }
+  seq(dst)->len = len;
+  memcpy(dst, src + slice.le, len);
+  return dst;
+}
+
+CIRCA CIRCA_RETURNS
 Txt txt_cat_(Txt dst, Txt src) {
   circa_guard (!dst || !src)
     return (circa_throw(CE_ARG), dst);
