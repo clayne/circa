@@ -17,7 +17,11 @@ int main() {
 
   seq_foreach(xs, x)
     printf("%i\n", x);
- 
+
+  int sum = 0;
+  seq_foldl(xs, sum, lhs + rhs); // Sum the sequence into the variable `sum`.
+  printf("sum: %i\n", sum);
+
   seq_free(xs);
 
   return 0;

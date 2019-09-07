@@ -162,7 +162,7 @@ do {                                                                 \
   seq(S)->len -= LEN;                                                \
   memcpy(S, ((char*) S) + LEN * sizeof(T), seq(S)->len * sizeof(T)); \
 } while(0)
-#define seq_filter(S, F) seq_filter_iso(typeof(*S), S, F)
+#define seq_filter(S, EXPR) seq_filter_iso(typeof(*S), S, EXPR)
 
 #define seq_map_iso(T, S, EXPR)               \
 do {                                          \
@@ -171,9 +171,31 @@ do {                                          \
     seq_set_iso(T, S, I, &(T){EXPR});         \
   }                                           \
 } while (0)
-#define seq_map(S, F) seq_map_iso(typeof(*S), S, F)
+#define seq_map(S, EXPR) seq_map_iso(typeof(*S), S, EXPR)
 
-// TODO: seq_foldl and seq_foldr
+#define seq_foldl_iso(T, S, V, EXPR)         \
+do {                                         \
+  T lhs = V;                                 \
+  T rhs;                                     \
+  for (size_t I = 0; I < seq(S)->len; I++) { \
+    rhs = seq_get_iso(T, (S), (I));          \
+    lhs = EXPR;                              \
+  }                                          \
+  V = lhs;                                   \
+} while (0)
+#define seq_foldl(S, V, EXPR) seq_foldl_iso(typeof(*S), S, V, EXPR)
+
+#define seq_foldr_iso(T, S, V, EXPR)       \
+do {                                       \
+  T lhs;                                   \
+  T rhs = V;                               \
+  for (size_t I = seq(S)->len; I-- > 0;) { \
+    lhs = seq_get_iso(T, (S), (I));        \
+    rhs = EXPR;                            \
+  }                                        \
+  V = rhs;                                 \
+} while (0)
+#define seq_foldr(S, V, EXPR) seq_foldr_iso(typeof(*S), S, V, EXPR)
 
 /*
 ** Header-Only Mode
