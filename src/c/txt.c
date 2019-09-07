@@ -267,6 +267,7 @@ char txt_pop_(Txt t, size_t n) {
   if (!txt(t)->len)
     return (circa_throw(CE_OOB), '\0');
   txt(t)->len -= n;
+  t[txt(t)->len] = '\0';
   return t[txt(t)->len - (n ? 0 : 1)];
 }
 
@@ -276,11 +277,10 @@ char txt_pull_(Txt t) {
     return (circa_throw(CE_ARG), '\0');
   if (!txt(t)->len)
     return (circa_throw(CE_OOB), '\0');
-  char tmp;
-  tmp = t[0];
+  char tmp = t[0];
   memmove(t, t + 1, txt(t)->len--);
-  t[txt(t)->len] = tmp;
-  return t[txt(t)->len];
+  t[txt(t)->len] = '\0';
+  return tmp;
 }
 
 /*
