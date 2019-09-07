@@ -147,6 +147,7 @@ Txt txt_cpy_slice_(Txt dst, Txt src, Slice slice) {
   }
   seq(dst)->len = len;
   memcpy(dst, src + slice.le, len);
+  dst[len] = '\0';
   return dst;
 }
 
@@ -162,6 +163,7 @@ Txt txt_cpy_slice_lit_(Txt dst, char *src, Slice slice) {
   }
   seq(dst)->len = len;
   memcpy(dst, src + slice.le, len);
+  dst[len] = '\0';
   return dst;
 }
 

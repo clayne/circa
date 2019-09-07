@@ -95,4 +95,8 @@ for (TK K = *(TK*) (mapseq(MS)->key + (I * sizeof(TK))); J != 1; J = 1) \
 for (Seq(TV) V = mapseq(MS)->data[I]; J != 1; J = 1)
 #define mapseq_foreach(MS, K, V) mapseq_foreach_iso(typeof((MS)->k), typeof((MS)->v), MS, K, V)
 
+#ifdef CIRCA_HEADER_ONLY
+  #include "../c/mapseq.c"
+#endif
+
 #endif // CIRCA_MAPSEQ_H
