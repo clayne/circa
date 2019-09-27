@@ -99,13 +99,33 @@ CIRCA CIRCA_RETURNS
 Txt txt_require_(Txt t, size_t cap) {
   circa_guard (!t || !cap)
     return (circa_throw(CE_ARG), t);
-  
-  t = (cap > txt(t)->cap) ? txt_realloc_(t, cap + CIRCA_TXT_PREALLOC) : t;
 
-  if (CE)
-    circa_log("call to txt_realloc failed.");
+  if (cap <= txt(t)->cap)
+    return t;
 
-  return t;
+  SeqData *sd = CIRCA_REALLOC(txt(t), sizeof(*sd) + cap + CIRCA_TXT_PREALLOC);
+
+  if (!sd)
+    return (circa_throw(CE_OOM), t);
+
+  sd->cap = cap + CIRCA_TXT_PREALLOC;
+
+  return sd->data;
+}
+
+CIRCA CIRCA_RETURNS
+Txt txt_shrink_(Txt t) {
+  circa_guard (!t)
+    return (circa_throw(CE_ARG), t);
+
+  SeqData *sd = CIRCA_REALLOC(txt(t), sizeof(*sd) + txt(t)->len + 1);
+
+  if (!sd)
+    return (circa_throw(CE_OOM), t); // Imagine running out of memory on a shrink
+
+  sd->cap = sd->len + 1;
+
+  return sd->data;
 }
 
 CIRCA CIRCA_RETURNS

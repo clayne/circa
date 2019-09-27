@@ -57,11 +57,14 @@ CIRCA char txt_get_(Txt t, size_t a);
 #define txt_alloc(C) txt_alloc_((C))
 CIRCA CIRCA_ALLOCS Txt txt_alloc_(size_t cap);
 
-#define txt_realloc(S, C) (S) = txt_realloc_(S, C)
+#define txt_realloc(S, C) (S) = txt_realloc_((S), (C))
 CIRCA CIRCA_RETURNS Txt txt_realloc_(Txt t, size_t cap);
 
-#define txt_require(S, C) (S) = txt_require_(S, C)
+#define txt_require(S, C) (S) = txt_require_((S), (C))
 CIRCA CIRCA_RETURNS Txt txt_require_(Txt t, size_t cap);
+
+#define txt_shrink(S) (S) = txt_shrink_((S))
+CIRCA CIRCA_RETURNS Txt txt_shrink_(Txt t);
 
 #define txt_free(S) (S) = txt_free_((S))
 CIRCA CIRCA_RETURNS Txt txt_free_(Txt t);

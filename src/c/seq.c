@@ -123,12 +123,32 @@ Seq seq_require_(size_t siz, Seq s, size_t cap) {
   circa_guard (!siz || !s || !cap)
     return (circa_throw(CE_ARG), s);
 
-  s = (cap > seq(s)->cap) ? seq_realloc_(siz, s, cap + CIRCA_SEQ_PREALLOC) : s;
-  
-  if (CE)
-    circa_log("call to seq_realloc failed.");
-  
+  if (cap <= seq(s)->cap)
+    return s;
+
+  SeqData *sd = CIRCA_REALLOC(seq(s), sizeof(*sd) + (cap + CIRCA_SEQ_PREALLOC) * siz);
+
+  if (!sd)
+    return (circa_throw(CE_OOM), s);
+
+  sd->cap = cap + CIRCA_SEQ_PREALLOC;
+
   return s;
+}
+
+CIRCA CIRCA_RETURNS
+Seq seq_shrink_(size_t siz, Seq s) {
+  circa_guard (!siz || !s)
+    return (circa_throw(CE_ARG), s);
+
+  SeqData *sd = CIRCA_REALLOC(seq(s), sizeof(*sd) + seq(s)->len * siz);
+
+  if (!sd)
+    return (circa_throw(CE_OOM), s); // Imagine this actually happening
+
+  sd->cap = sd->len;
+
+  return sd->data;
 }
 
 CIRCA CIRCA_RETURNS
