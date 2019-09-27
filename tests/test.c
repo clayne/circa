@@ -15,6 +15,31 @@
 
 #include <snow/snow.h>
 
+Buck bs;
+
+describe (Buck) {
+  subdesc (Allocators) {
+    it ("buck_alloc") {
+      bs = buck_alloc(int, 10, 20);
+      assert(!CE, "No error should be thrown after allocation.");
+    }
+
+    it ("buck_require") {
+      buck_require(int, &bs, 300);
+      assert(!CE, "No error should be thrown after requirement.");
+    }
+
+    it ("buck_shrink") {
+      buck_shrink(int, &bs);
+      assert(!CE, "No error should be thrown after shrinking.");
+    }
+
+    it ("buck_free") {
+      buck_free(int, &bs);
+    }
+  }
+}
+
 Seq(int) xs;
 
 describe (Seq) {

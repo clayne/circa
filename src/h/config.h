@@ -13,7 +13,7 @@
 /* Debugging */
 
 #define CIRCA_GUARD_D 1 // Whether or not input guard checks are done.
-#define CIRCA_LOG_D 0   // Whether or not to log actions to stdout.
+#define CIRCA_LOG_D 1   // Whether or not to log actions to stdout.
 
 /* General */
 
@@ -30,6 +30,10 @@
 #define CIRCA_CALLOC_D  calloc  // The default zeroing memory allocator.
 #define CIRCA_REALLOC_D realloc // The default reallocator.
 #define CIRCA_FREE_D    free    // The default deallocator.
+
+/* Buckets */
+
+#define CIRCA_BUCK_SMALL 32 // How many elements to use for small-bucket optimization.
 
 /* Sequences */
 
@@ -121,6 +125,14 @@
 
 #if !defined(CIRCA_FREE)
   #define CIRCA_FREE CIRCA_FREE_D
+#endif
+
+/* Buckets */
+
+// BUCK_SMALL
+
+#if !defined(CIRCA_BUCK_SMALL)
+  #define CIRCA_BUCK_SMALL CIRCA_BUCK_SMALL_D
 #endif
 
 /* Sequences */
