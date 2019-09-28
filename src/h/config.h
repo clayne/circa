@@ -13,7 +13,7 @@
 /* Debugging */
 
 #define CIRCA_GUARD_D 1 // Whether or not input guard checks are done.
-#define CIRCA_LOG_D 1   // Whether or not to log actions to stdout.
+#define CIRCA_LOG_D 0   // Whether or not to log actions to stdout.
 
 /* General */
 
