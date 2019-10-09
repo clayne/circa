@@ -7,6 +7,10 @@
 ** Dependencies
 */
 
+/* Standard */
+
+#include <stdarg.h>
+
 /* Circa */
 
 #include "../h/core.h"

@@ -27,7 +27,7 @@ bool buck_small_(size_t siz, Buck *b) {
   circa_guard (!siz || !b)
     return (circa_throw(CE_ARG), false);
   
-  return (siz * b->cap) <= CIRCA_BUCK_SMALL;
+  return (siz * b->len) <= CIRCA_BUCK_SMALL;
 }
 
 CIRCA

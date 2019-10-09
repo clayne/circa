@@ -1,4 +1,3 @@
-CC=clang
 WFLAGS=-pedantic -Wall
 CFLAGS=$(WFLAGS) -pipe -std=c11
 LDFLAGS=-I. -L.

@@ -83,4 +83,30 @@ CIRCA void buck_push_(size_t siz, Buck *b, void *v);
 #define buck_pop(T, B) buck_pop_(sizeof(T), (B))
 CIRCA void *buck_pop_(size_t siz, Buck *b);
 
+/*
+** Iterator Macros
+*/
+
+#define buck_foreach(T, B, V, E)                   \
+do {                                               \
+  T V;                                             \
+  if (buck_small(T, B)) {                          \
+    for (size_t I = 0; I < (B)->len; I++) {          \
+      V = (*((T*) ((B)->small + I * sizeof(T))));       \
+      E                                            \
+    }                                              \
+  } else {                                         \
+    BuckData *bd = (B)->next;                         \
+    for (size_t I = 0; I < (B)->len / (B)->width; I++) { \
+      for (size_t J = 0; J < (B)->width; J++) {        \
+        V = (*((T*) (bd->data + J * sizeof(T))));            \
+        E                                            \
+      }                                            \
+      if (!bd->next) \
+        break; \
+      bd = bd->next;                               \
+    }                                              \
+  }                                                \
+} while (0)
+
 #endif // CIRCA_BUCK_H
