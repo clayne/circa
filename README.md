@@ -1,6 +1,8 @@
 # The Circa Library Set
 ## 0.1.2
 
+[![Build Status](https://travis-ci.com/davidgarland/circa.svg?branch=master)](https://travis-ci.com/davidgarland/circa)
+
 Circa is a library set for C11 that aims to make common tasks
 faster and less error prone by providing the generic datatypes
 that C is commonly criticized for missing, and doing it right--
