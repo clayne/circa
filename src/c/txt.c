@@ -136,7 +136,7 @@ CIRCA CIRCA_RETURNS
 Txt txt_free_(Txt t) {
   if (t) {
     memset(txt(t), 0, sizeof(*txt(t)) + txt(t)->cap);
-    free(txt(t));
+    CIRCA_FREE(txt(t));
   }
 
   return NULL;
