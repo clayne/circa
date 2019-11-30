@@ -133,7 +133,7 @@ Seq seq_require_(size_t siz, Seq s, size_t cap) {
 
   sd->cap = cap + CIRCA_SEQ_PREALLOC;
 
-  return s;
+  return sd->data;
 }
 
 CIRCA CIRCA_RETURNS
