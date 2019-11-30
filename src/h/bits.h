@@ -464,7 +464,7 @@ static inline
 uint64_t u8_roundup(uint8_t n, uint64_t mul) {
   circa_guard (!mul)
     return (circa_throw(CE_ARG), n);
-  uint8_t pos = n >= 0 ? 1 : 0;
+  uint8_t pos = 1; // if n < 0 then 0, but these numbers are unsigned.
   return ((n + pos * (mul - 1)) / mul) * mul;
 }
 
@@ -472,7 +472,7 @@ static inline
 uint64_t u16_roundup(uint16_t n, uint64_t mul) {
   circa_guard (!mul)
     return (circa_throw(CE_ARG), n);
-  uint8_t pos = n >= 0 ? 1 : 0;
+  uint8_t pos = 1;
   return ((n + pos * (mul - 1)) / mul) * mul;
 }
 
@@ -480,7 +480,7 @@ static inline
 uint64_t u32_roundup(uint32_t n, uint64_t mul) {
   circa_guard (!mul)
     return (circa_throw(CE_ARG), n);
-  uint8_t pos = n >= 0 ? 1 : 0;
+  uint8_t pos = 1;
   return ((n + pos * (mul - 1)) / mul) * mul;
 }
 
@@ -488,7 +488,7 @@ static inline
 uint64_t u64_roundup(uint64_t n, uint64_t mul) {
   circa_guard (!mul)
     return (circa_throw(CE_ARG), n);
-  uint8_t pos = n >= 0 ? 1 : 0;
+  uint8_t pos = 1;
   return ((n + pos * (mul - 1)) / mul) * mul;
 }
 
@@ -496,7 +496,7 @@ static inline
 size_t usz_roundup(size_t n, size_t mul) {
   circa_guard (!mul)
     return (circa_throw(CE_ARG), n);
-  uint8_t pos = n >= 0 ? 1 : 0;
+  uint8_t pos = 1;
   return ((n + pos * (mul - 1)) / mul) * mul;
 }
 
