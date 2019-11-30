@@ -89,4 +89,8 @@ for (Seq(TK) K = seqmap(SM)->key[I]; J != 1; J = 1) \
 for (TV V = *(TV*) (seqmap(SM)->data + (I * sizeof(TV))); J != 1; J = 1)
 #define seqmap_foreach(SM, K, V) seqmap_foreach_iso(typeof((SM)->k), typeof((SM)->v), SM, K, V)
 
+#ifdef CIRCA_HEADER_ONLY
+  #include "../c/seqmap.c"
+#endif
+
 #endif // CIRCA_SEQ_H

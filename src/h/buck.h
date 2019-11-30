@@ -109,4 +109,8 @@ do {                                               \
   }                                                \
 } while (0)
 
+#ifdef CIRCA_HEADER_ONLY
+  #include "../c/buck.c"
+#endif
+
 #endif // CIRCA_BUCK_H

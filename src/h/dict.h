@@ -93,5 +93,8 @@ for (char *K = dict(D)->key[I]; J != 1; J = 1) \
 for (T V = *(T*) (dict(D)->data + (I * sizeof(T))); J != 1; J = 1)
 #define dict_foreach(D, K, V) dict_foreach_iso(typeof(D->k), D, K, V)
 
-#endif // CIRCA_DICT_H
+#ifdef CIRCA_HEADER_ONLY
+  #include "../c/dict.c"
+#endif
 
+#endif // CIRCA_DICT_H
