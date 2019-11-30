@@ -14,6 +14,10 @@
 
 #include <stdlib.h>
 
+/* Circa */
+
+#include "bits.h"
+
 /*
 ** Type Definitions
 */
@@ -30,6 +34,11 @@ typedef struct {
 /* Initializers */
 
 static inline Slice slice_lit(size_t le, size_t ri);
+
+/* Slice Functions */
+
+static inline size_t slice_len(Slice s);
+static inline Slice slice_combine(Slice a, Slice b);
 
 /* Comparison Operators */
 
@@ -48,6 +57,18 @@ static inline
 Slice slice_lit(size_t le, size_t ri) {
   Slice s = {le, ri};
   return s;
+}
+
+/* Slice Functions */
+
+static inline
+size_t slice_len(Slice s) {
+  return s.le - s.ri + 1;
+}
+
+static inline
+Slice slice_combine(Slice a, Slice b) {
+  return (Slice) {usz_min(a.le, b.le), usz_max(a.ri, b.ri)};
 }
 
 /* Comparison Operators */
