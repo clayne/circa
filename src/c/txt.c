@@ -132,6 +132,17 @@ Txt txt_shrink_(Txt t) {
   return sd->data;
 }
 
+CIRCA
+void txt_clear_(Txt t) {
+  circa_guard (!t) {
+    circa_throw(CE_ARG);
+    return;
+  }
+
+  txt(t)->len = 0;
+  memset(t, 0, txt(t)->cap);
+}
+
 CIRCA CIRCA_RETURNS
 Txt txt_free_(Txt t) {
   if (t) {

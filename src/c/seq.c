@@ -151,6 +151,17 @@ Seq seq_shrink_(size_t siz, Seq s) {
   return sd->data;
 }
 
+CIRCA
+void seq_clear_(size_t siz, Seq s) {
+  circa_guard (!siz || !s) {
+    circa_throw(CE_ARG);
+    return;
+  }
+
+  seq(s)->len = 0;
+  memset(s, 0, siz * seq(s)->cap);
+}
+
 CIRCA CIRCA_RETURNS
 Seq seq_free_(size_t siz, Seq s) {
   circa_guard (!siz)

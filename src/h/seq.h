@@ -87,6 +87,10 @@ CIRCA CIRCA_RETURNS Seq seq_require_(size_t siz, Seq s, size_t cap);
 #define seq_shrink(S) seq_shrink_iso(typeof(*S), S)
 CIRCA CIRCA_RETURNS Seq seq_shrink_(size_t siz, Seq s);
 
+#define seq_clear_iso(T, S) seq_clear_(sizeof(T), S)
+#define seq_clear(S) seq_clear_iso(typeof(*S), S)
+CIRCA void seq_clear_(size_t siz, Seq s);
+
 #define seq_free_iso(T, S) (S) = seq_free_(sizeof(T), (S))
 #define seq_free(S) seq_free_iso(typeof(*S), S)
 CIRCA CIRCA_RETURNS Seq seq_free_(size_t siz, Seq s);
