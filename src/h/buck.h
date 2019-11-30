@@ -80,8 +80,8 @@ CIRCA void buck_free_(size_t siz, Buck *b);
 #define buck_push(T, B, V) buck_push_(sizeof(T), (B), (V))
 CIRCA void buck_push_(size_t siz, Buck *b, void *v);
 
-#define buck_pop(T, B) buck_pop_(sizeof(T), (B))
-CIRCA void *buck_pop_(size_t siz, Buck *b);
+//#define buck_pop(T, B) buck_pop_(sizeof(T), (B))
+//CIRCA void *buck_pop_(size_t siz, Buck *b);
 
 /*
 ** Iterator Macros
