@@ -292,6 +292,7 @@ Txt txt_push_(Txt t, char c) {
   circa_guard (!t)
     return (circa_throw(CE_ARG), t);
   t = txt_set_(t, txt(t)->len, c);
+  t[txt(t)->len] = '\0';
   return t;
 }
 
