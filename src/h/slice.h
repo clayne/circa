@@ -63,7 +63,7 @@ Slice slice_lit(size_t le, size_t ri) {
 
 static inline
 size_t slice_len(Slice s) {
-  return s.le - s.ri + 1;
+  return s.ri - s.le + 1;
 }
 
 static inline
