@@ -14,7 +14,12 @@
 
 /* Vendored */
 
-#define XXH_STATIC_LINKING_ONLY
+#ifdef CIRCA_HEADER_ONLY
+  #define XXH_INLINE_ALL
+#else
+  #define XXH_STATIC_LINKING_ONLY
+#endif
+
 #include "../../lib/xxhash/xxhash.h"
 
 /*
