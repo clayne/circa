@@ -61,7 +61,6 @@ examples: debug
 	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) ex/seqmap.c -o seqmap.o -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) ex/mapseq.c -o mapseq.o -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) ex/dict.c   -o dict.o   -lcirca $(LDFLAGS)
-	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) ex/buck.c   -o buck.o   -lcirca $(LDFLAGS)
 
 examples_sanitized: sanitized
 	$(CC) $(CFLAGS_SANITIZED) $(CFLAGS_EX) ex/seq.c    -o seq.o    -lcirca $(LDFLAGS)
@@ -71,8 +70,6 @@ examples_sanitized: sanitized
 	$(CC) $(CFLAGS_SANITIZED) $(CFLAGS_EX) ex/seqmap.c -o seqmap.o -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS_SANITIZED) $(CFLAGS_EX) ex/mapseq.c -o mapseq.o -lcirca $(LDFLAGS)
 	$(CC) $(CFLAGS_SANITIZED) $(CFLAGS_EX) ex/dict.c   -o dict.o   -lcirca $(LDFLAGS)
-	$(CC) $(CFLAGS_SANITIZED) $(CFLAGS_EX) ex/buck.c   -o buck.o   -lcirca $(LDFLAGS)
-
 
 examples_header:
 	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) -DCIRCA_HEADER_ONLY ex/seq.c    -o seq.o    $(LDFLAGS)
@@ -82,8 +79,6 @@ examples_header:
 	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) -DCIRCA_HEADER_ONLY ex/seqmap.c -o seqmap.o $(LDFLAGS)
 	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) -DCIRCA_HEADER_ONLY ex/mapseq.c -o mapseq.o $(LDFLAGS)
 	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) -DCIRCA_HEADER_ONLY ex/dict.c   -o dict.o   $(LDFLAGS)
-	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) -DCIRCA_HEADER_ONLY ex/buck.c   -o buck.o   $(LDFLAGS)
-
 
 test: debug
 	$(CC) $(CFLAGS_DEBUG) $(CFLAGS_EX) -fPIC tests/test.c -I. -L. -Ilib/snow -DSNOW_ENABLED -o test.o -lcirca -lm
