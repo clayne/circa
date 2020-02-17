@@ -40,14 +40,8 @@ typedef Seq(char) Txt;
 
 static inline SeqData *txt(Txt t);
 
-#define txt_set(S, A, V) (S) = txt_set_((S), (A), (V))
-CIRCA CIRCA_RETURNS Txt txt_set_(Txt t, size_t a, char c);
-
-#define txt_ins(S, A, V) (S) = txt_ins_((S), (A), (V))
-CIRCA CIRCA_RETURNS Txt txt_ins_(Txt t, size_t a, char c);
-
-#define txt_del(S, A) txt_del_((S), (A))
-CIRCA bool txt_del_(Txt t, size_t a);
+#define txt_set(S, A, V) txt_set_((S), (A), (V))
+CIRCA void txt_set_(Txt t, size_t a, char c);
 
 #define txt_get(S, A) txt_get_((S), (A))
 CIRCA char txt_get_(Txt t, size_t a);
@@ -63,8 +57,14 @@ CIRCA CIRCA_RETURNS Txt txt_realloc_(Txt t, size_t cap);
 #define txt_require(S, C) (S) = txt_require_((S), (C))
 CIRCA CIRCA_RETURNS Txt txt_require_(Txt t, size_t cap);
 
+#define txt_set_len(S, L) (S) = txt_set_len_((S), (L))
+CIRCA CIRCA_RETURNS Txt txt_set_len_(Txt t, size_t len);
+
 #define txt_shrink(S) (S) = txt_shrink_((S))
 CIRCA CIRCA_RETURNS Txt txt_shrink_(Txt t);
+
+#define txt_clear(T) txt_clear_((T))
+CIRCA void txt_clear_(Txt t);
 
 #define txt_free(S) (S) = txt_free_((S))
 CIRCA CIRCA_RETURNS Txt txt_free_(Txt t);
@@ -73,6 +73,9 @@ CIRCA CIRCA_RETURNS Txt txt_free_(Txt t);
 
 #define txt_cpy(DST, SRC) (DST) = txt_cpy_((DST), (SRC))
 CIRCA CIRCA_RETURNS Txt txt_cpy_(Txt dst, Txt src);
+
+#define txt_cpy_lit(DST, SRC) (DST) = txt_cpy_lit_((DST), (SRC))
+CIRCA CIRCA_RETURNS Txt txt_cpy_lit_(Txt dst, char *src);
 
 #define txt_cpy_slice(DST, SRC, SLICE) (DST) = txt_cpy_slice_((DST), (SRC), (SLICE))
 CIRCA CIRCA_RETURNS Txt txt_cpy_slice_(Txt dst, Txt src, Slice slice);
@@ -96,13 +99,6 @@ CIRCA CIRCA_RETURNS PRINTF(2) Txt txt_cat_fmt_(Txt t, const char *fmt, ...);
 
 #define txt_push(S, V) (S) = txt_push_((S), (V))
 CIRCA CIRCA_RETURNS Txt txt_push_(Txt t, char c);
-
-#define txt_tos(S) txt_pop_((S), 0)
-#define txt_pop(S) txt_pop_((S), 1)
-CIRCA char txt_pop_(Txt t, size_t n);
-
-#define txt_pull(S) txt_pull_((S))
-CIRCA char txt_pull_(Txt t);
 
 /* Comparison Operations */
 

@@ -22,42 +22,17 @@
 ** Accessors
 */
 
-CIRCA CIRCA_RETURNS
-Txt txt_set_(Txt t, size_t a, char c) {
-  circa_guard (!t || !c)
-    return (circa_throw(CE_ARG), t);
-  t = txt_require_(t, a + 2);
-  t[a] = c;
-  if (txt(t)->len < a + 1)
-    txt(t)->len = a + 1;
-  return t;
-}
-
-CIRCA CIRCA_RETURNS
-Txt txt_ins_(Txt t, size_t a, char c) {
-  circa_guard (!t || !c)
-    return (circa_throw(CE_ARG), t);
-  register const size_t len = usz_max(txt(t)->len, a) + 1;
-  if (len > txt(t)->len + 1)
-    return (circa_throw(CE_OOB), t);
-  txt(t)->len = len;
-  t[txt(t)->len] = '\0';
-  t = txt_require_(t, len);
-  memmove(t + a + 1, t + a, len - a);
-  t[a] = c;
-  return t;
-}
-
 CIRCA
-bool txt_del_(Txt t, size_t a) {
-  circa_guard (!t)
-    return (circa_throw(CE_ARG), t);
-  if (a >= txt(t)->len)
-    return false;
-  memmove(t + a, t + a + 1, txt(t)->len - (a + 1));
-  txt(t)->len--;
-  t[txt(t)->len] = '\0';
-  return true;
+void txt_set_(Txt t, size_t a, char c) {
+  circa_guard (!t || !c) {
+    circa_throw(CE_ARG);
+    return;
+  }
+  if (a >= txt(t)->len) {
+    circa_throw(CE_OOB);
+    return;
+  }
+  t[a] = c;
 }
 
 CIRCA
@@ -118,6 +93,23 @@ Txt txt_require_(Txt t, size_t cap) {
 }
 
 CIRCA CIRCA_RETURNS
+Txt txt_set_len_(Txt t, size_t len) {
+  circa_guard (!t)
+    return (circa_throw(CE_ARG), t);
+  if (len == txt(t)->len)
+    return t;
+  if (len < txt(t)->len) {
+    memset(t + len, 0, txt(t)->len - len);
+  } else {
+    if (len >= txt(t)->cap)
+      t = txt_realloc_(t, len + 1);
+    memset(t + txt(t)->len, 0, len - txt(t)->len);
+  }
+  txt(t)->len = len;
+  return t;
+}
+
+CIRCA CIRCA_RETURNS
 Txt txt_shrink_(Txt t) {
   circa_guard (!t)
     return (circa_throw(CE_ARG), t);
@@ -125,8 +117,8 @@ Txt txt_shrink_(Txt t) {
   SeqData *sd = CIRCA_REALLOC(txt(t), sizeof(*sd) + txt(t)->len + 1);
 
   if (!sd)
-    return (circa_throw(CE_OOM), t); // Imagine running out of memory on a shrink
-
+    return (circa_throw(CE_OOM), t);
+  
   sd->cap = sd->len + 1;
 
   return sd->data;
@@ -161,12 +153,26 @@ CIRCA CIRCA_RETURNS
 Txt txt_cpy_(Txt dst, Txt src) {
   circa_guard (!dst || !src)
     return (circa_throw(CE_ARG), dst);
-  dst = txt_require_(dst, txt(src)->len + 1);
+  dst = txt_set_len_(dst, txt(src)->len);
+  if (CE) {
+    circa_log("txt_set_len failed.");
+    return dst;
+  }
+  memcpy(dst, src, txt(src)->len);
+  return dst;
+}
+
+CIRCA CIRCA_RETURNS
+Txt txt_cpy_lit_(Txt dst, char *src) {
+  circa_guard (!dst || !src)
+    return (circa_throw(CE_ARG), dst);
+  const size_t len = strlen(src);
+  dst = txt_set_len_(dst, len);
   if (CE) {
     circa_log("txt_require failed.");
     return dst;
   }
-  memcpy(dst, src, txt(src)->len);
+  memcpy(dst, src, len);
   return dst;
 }
 
@@ -175,14 +181,12 @@ Txt txt_cpy_slice_(Txt dst, Txt src, Slice slice) {
   circa_guard (!dst || !src)
     return (circa_throw(CE_ARG), dst);
   const size_t len = slice.ri - slice.le + 1;
-  dst = txt_require_(dst, len + 1);
+  dst = txt_set_len_(dst, len);
   if (CE) {
     circa_log("txt_require failed.");
     return dst;
   }
-  seq(dst)->len = len;
   memcpy(dst, src + slice.le, len);
-  dst[len] = '\0';
   return dst;
 }
 
@@ -191,14 +195,12 @@ Txt txt_cpy_slice_lit_(Txt dst, char *src, Slice slice) {
   circa_guard (!dst || !src)
     return (circa_throw(CE_ARG), dst);
   const size_t len = slice.ri - slice.le + 1;
-  dst = txt_require_(dst, len + 1);
+  dst = txt_set_len_(dst, len);
   if (CE) {
     circa_log("txt_require failed.");
     return dst;
   }
-  seq(dst)->len = len;
   memcpy(dst, src + slice.le, len);
-  dst[len] = '\0';
   return dst;
 }
 
@@ -207,10 +209,8 @@ Txt txt_cat_(Txt dst, Txt src) {
   circa_guard (!dst || !src)
     return (circa_throw(CE_ARG), dst);
   size_t len = txt(dst)->len + txt(src)->len;
-  dst = txt_require_(dst, len + 1);
+  dst = txt_set_len_(dst, len);
   memcpy(dst + txt(dst)->len, src, txt(src)->len);
-  txt(dst)->len = len;
-  dst[len] = '\0';
   return dst;
 }
 
@@ -220,10 +220,8 @@ Txt txt_cat_lit_(Txt dst, char *src) {
     return (circa_throw(CE_ARG), dst);
   size_t src_len = strlen(src);
   size_t len = txt(dst)->len + src_len;
-  dst = txt_require_(dst, len + 1);
+  dst = txt_set_len_(dst, len);
   memcpy(dst + txt(dst)->len, src, src_len);
-  txt(dst)->len = len;
-  dst[len] = '\0';
   return dst;
 }
 
@@ -239,9 +237,8 @@ Txt txt_fmt__(Txt t, const char *fmt, va_list ap) {
   va_copy(ap2, ap);
   size_t len = vsnprintf(NULL, 0, fmt, ap2);
   va_end(ap2);
-  t = txt_require_(t, len + 1);
+  t = txt_set_len_(t, len);
   size_t written = vsnprintf(t, len + 1, fmt, ap);
-  txt(t)->len = written;
   if (written != len)
     CE = CE_FMT;
   return t;
@@ -264,9 +261,8 @@ Txt txt_cat_fmt__(Txt t, const char *fmt, va_list ap) {
   va_copy(ap2, ap);
   size_t len = vsnprintf(NULL, 0, fmt, ap2);
   va_end(ap2);
-  t = txt_require_(t, txt(t)->len + len + 1);
+  t = txt_set_len_(t, txt(t)->len + len);
   size_t written = vsnprintf(t + txt(t)->len, len + 1, fmt, ap);
-  txt(t)->len += written;
   if (written != len)
     CE = CE_FMT;
   return t;
@@ -291,32 +287,9 @@ CIRCA CIRCA_RETURNS
 Txt txt_push_(Txt t, char c) {
   circa_guard (!t)
     return (circa_throw(CE_ARG), t);
-  t = txt_set_(t, txt(t)->len, c);
-  t[txt(t)->len] = '\0';
+  t = txt_set_len_(t, txt(t)->len + 1);
+  t[txt(t)->len - 1] = c;
   return t;
-}
-
-CIRCA
-char txt_pop_(Txt t, size_t n) {
-  circa_guard (!t)
-    return (circa_throw(CE_ARG), '\0');
-  if (!txt(t)->len)
-    return (circa_throw(CE_OOB), '\0');
-  txt(t)->len -= n;
-  t[txt(t)->len] = '\0';
-  return t[txt(t)->len - (n ? 0 : 1)];
-}
-
-CIRCA
-char txt_pull_(Txt t) {
-  circa_guard (!t)
-    return (circa_throw(CE_ARG), '\0');
-  if (!txt(t)->len)
-    return (circa_throw(CE_OOB), '\0');
-  char tmp = t[0];
-  memmove(t, t + 1, txt(t)->len--);
-  t[txt(t)->len] = '\0';
-  return tmp;
 }
 
 /*
@@ -371,9 +344,9 @@ Txt txt_read_(Txt t, FILE *fp) {
   }
 
   /* Allocate enough text space to store the file contents. */
-  t = txt_require_(t, len + 1);
+  t = txt_set_len_(t, len);
   if (CE) {
-    circa_log("call to txt_require failed");
+    circa_log("call to txt_set_len failed");
     return t;
   }
   
@@ -389,10 +362,6 @@ Txt txt_read_(Txt t, FILE *fp) {
     return (circa_throw(CE_FILE_READ), t);
   }
 
-  /* Set the length and null-terminate. */
-  txt(t)->len = len;
-  t[len] = '\0';
-  
   return t;
 }
 
@@ -417,9 +386,9 @@ Txt txt_cat_read_(Txt t, FILE *fp) {
   }
 
   /* Allocate enough text space to store the file contents. */
-  t = txt_require_(t, txt(t)->len + len + 1);
+  t = txt_set_len_(t, txt(t)->len + len);
   if (CE) {
-    circa_log("call to txt_require failed");
+    circa_log("call to txt_set_len failed");
     return t;
   }
   
@@ -435,10 +404,6 @@ Txt txt_cat_read_(Txt t, FILE *fp) {
     return (circa_throw(CE_FILE_READ), t);
   }
 
-  /* Set the length and null-terminate. */
-  txt(t)->len += len;
-  t[txt(t)->len] = '\0';
-  
   return t;
 }
 
