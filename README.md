@@ -1,185 +1,59 @@
 # The Circa Library Set
-## 0.1.2
+## 0.2.0
 
-[![Build Status](https://travis-ci.com/davidgarland/circa.svg?branch=master)](https://travis-ci.com/davidgarland/circa)
+### Introduction
 
-Circa is a library set for C11 that aims to make common tasks
-faster and less error prone by providing the generic datatypes
-that C is commonly criticized for missing, and doing it right--
-with speed in mind.
+Circa is a library set for standard or GNU C11 intended for my personal use in
+writing desktop applications like compilers or games, where you tend to want
+efficient collections and portable wrappers over intrinsics.
 
-All of Circa's generic datatypes and functions are also *actually* generic;
-no weird template or overloader macro stuff is being done. Instead, functions
-are designed in such a way that they just shuffle data around type-agnostically
-with `void*` and data sizes, hidden behind some nice macros that hide the dirty
-stuff.
+It assumes a unity build structure for your project, which for intermediate
+sized projects will generally be faster to compile while having very good
+performance thanks to being able to inline without the use of LTO. In addition,
+unity builds allow polymorphic specialization to be done in a way that avoids
+duplication. As an added bonus, you don't necessarily need a build system.
+However, you don't get parallelized compilation. This may be a deal-breaker for
+some people who have massive projects and powerful CPU, not that I think they
+would care much for this library anyways.
 
-This means that Circa yields very space-efficient code that has good
-cache locality and fast compile times, granting you simplicity with little to no
-additional cost.
+There's no real documentation, everything is clarified through code comments.
+Things are formatted cleanly enough that you should hopefully be able to follow
+it regardless, but again this may be a deal breaker.
 
----
+Circa is not exhaustively tested, the API is unstable, and many abstractions are
+intentionally leaky for the sake of simplicity and performance. Caveat emptor.
 
-# Examples
+### Features
 
-## Dictionaries
+If you can stomach all of that, you'll get a little toolkit of performance
+focused data structures and functions, shown below.
 
-```C
-#include <circa.h>
-
-int main() {
-  Dict(int) fruits = dict_alloc(int, 1);
-
-  dict_set(fruits, "oranges", &(int){7});
-  dict_set(fruits, "peaches", &(int){5});
-  dict_set(fruits, "apples",  &(int){10});
-
-  dict_foreach(fruits, k, v)
-    printf("%s: %i\n", k, v);
-
-  dict_free(fruits);
-
-  return 0;
-}
+```
+circa
+|- data - Data structure implementations.
+|  |- vec.h - A sequential vector. O(1) read/write, O(1) amortized snoc, O(n) wasted space.
+|  |- hatc.h - A sequential hashed array tree with constant-sized sub-blocks. O(1) read/write/snoc. O(n) wasted space.
+|  |- hatd.h - A sequential hashed array tree with doubling-size sub-blocks. O(1) read/write/snoc. O(n) wasted space.
+|- algo - Algorithm implementations.
+|  |- imath.h - Integer math operations. ctz, clz, popcount, the list goes on.
+|- macro - Macro utilities.
+|  |- cat.h - Tools for concatenating identifiers. Useful for polymorphism.
+|  |- gnu.h - Macros for optional GNU extension usage. (Still works in standard C!)
 ```
 
-## Sequences
+### Potential To-Do List
 
-```C
-#include <circa.h>
+More will be added as time goes on. With no particular order, priority, or
+guarantee of delivery:
 
-int main() {
-  Seq(int) xs = seq_alloc(int, 10);
-  
-  for (int i = 0; i < 10; i++)
-    seq_push(xs, &i);
-
-  seq_filter(xs, it & 1); // Keep only the odd numbers.
-
-  seq_map(xs, it * it); // Square every number.
-
-  seq_foreach(xs, x)
-    printf("%i\n", x);
-
-  int sum = 0;
-  seq_foldl(xs, sum, lhs + rhs); // Sum the sequence into the variable `sum`.
-  printf("sum: %i\n", sum);
-
-  seq_free(xs);
-
-  return 0;
-}
-```
-
-## Text
-
-```C
-#include <circa.h>
-
-int main(int argc, char **argv) {
-  if (argc < 2) {
-    puts("Pass files in and this program will act like cat.");
-    exit(1);
-  }
-  
-  Txt t = txt_alloc(1);
-
-  for (int i = 1; i < argc; i++) {
-    FILE *fp = fopen(argv[i], "r");
-    if (!fp) {
-      txt_fmt(t, "txt.o: %s: No such file\n", argv[i]);
-      txt_write(t, stdout);
-      exit(1);
-    }
-    txt_read(t, fp);
-    txt_write(t, stdout);
-    fclose(fp);
-  }
-
-  txt_free(t);
-
-  return 0;
-}
-```
-
----
-
-# Documentation
-
-Incomplete thus far; you can find what is already done [here](https://github.com/davidgarland/circa/blob/master/doc/README.md).
-
----
-
-# Integration
-
-Circa is recommended to be used as a git subtree (if you just recoiled, note
-that these are different than git submodules; look it up) and statically linked
-so that no user-side installation is needed, code bloat is reduced, and runtime
-performance is improved.
-
-In order to do this, you should first add Circa as a remote:
-
-```Bash
-git remote add -f circa https://github.com/davidgarland/circa
-```
-
-Next, we can add it as a subtree:
-
-```Bash
-git subtree add --prefix lib/circa circa master --squash
-```
-
-(Of course, you can swap `lib/circa` out for wherever you want to put it in
-your project.)
-
-To update at a later date, all you need to do is:
-
-```Bash
-git fetch circa master
-git subtree pull --prefix lib/circa circa master --squash
-```
-
-Now that Circa is installed, you can use it one of two ways, given below.
-
----
-
-## Header-Only Mode
-
-Header-only is the simplest way of using C libraries, and so Circa supports
-this-- it also has good performance implications in some cases due to everything
-being inlined. However, it can notably be bad for icache because it leads to a
-lot of code duplication at the assembly level, so be wary of this if you're
-using the more heavyweight utilities like `Map(K, V)` and such.
-
-In order to do this, all you have to do is put the following in *before* doing
-the `#include` for Circa:
-
-```C
-#define CIRCA_HEADER_ONLY
-```
-
----
-
-## Statically Linked via Make
-
-Static linkage is only slightly more complicated to set up.
-
-If you're using a Makefile, it should be as simple as doing the following
-in your "build libraries" recipe or wherever:
-
-```Makefile
-cd lib/circa && $(MAKE) <build_type>
-```
-
-Where `<build_type>` is one of:
-
-| Build Type | Description                                                 |
-| ---------- | ----------------------------------------------------------- |
-| fast       | a speed-focused build with no debug features.               |
-| small      | a size-focused build with no debug features.                |
-| build      | a balanced build with debugging features and optimizations. |
-| debug      | a debugging focused build.                                  |
-| sanitized  | a debugging build with ubsan, asan, and lsan.               |
-
-Finally, just add `-llib/circa` to your `LDFLAGS`, assuming that's where you
-put it.
+- Floating point function approximations.
+- Portable SIMD functions.
+- FNV1a hashing.
+- Hashmaps.
+- Concurrent vectors.
+- Concurrent queues.
+- Concurrent hashmaps.
+- A `hatq` hashed array tree type with only `O(sqrt n)` wasted space.
+- A `str` type implementing dynamic strings, based on how `vec_T` works.
+- Functions for handling UTF-8 data in strings.
+- More proper benchmark and test suites to demonstrate the library.
