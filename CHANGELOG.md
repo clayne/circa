@@ -1,5 +1,9 @@
 # Circa Changelog
 
+## 0.3.1/2020-11-28-hotfix1
+
+Apparently `str_read` did not insert a null terminator. Whoops.
+
 ## 0.3.0/2020-11-28
 
 Two large breaking changes to the API have been made, namely including return

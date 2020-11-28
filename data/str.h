@@ -160,6 +160,7 @@ circa_err str_read(str *s, FILE *fp) {
   if (fread(s->data, 1, len, fp) != len)
     return CIRCA_ERR_READ;
 
+  s->data[len] = '\0';
   s->len = len;
 
   return CIRCA_ERR_NONE;
