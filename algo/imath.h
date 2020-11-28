@@ -12,61 +12,6 @@
 **   https://github.com/davidgarland/circa
 */
 
-/*
-** Function Prototypes
-*/
-
-// Find the minimum of two numbers.
-static inline circa_gnu_attr(const)  uint8_t  uint8_t_min( uint8_t,  uint8_t);
-static inline circa_gnu_attr(const) uint16_t uint16_t_min(uint16_t, uint16_t);
-static inline circa_gnu_attr(const) uint32_t uint32_t_min(uint32_t, uint32_t);
-static inline circa_gnu_attr(const) uint64_t uint64_t_min(uint64_t, uint64_t);
-static inline circa_gnu_attr(const)   size_t   size_t_min(  size_t,   size_t);
-
-// Find the maximum of two numbers.
-static inline circa_gnu_attr(const)  uint8_t  uint8_t_max( uint8_t,  uint8_t);
-static inline circa_gnu_attr(const) uint16_t uint16_t_max(uint16_t, uint16_t);
-static inline circa_gnu_attr(const) uint32_t uint32_t_max(uint32_t, uint32_t);
-static inline circa_gnu_attr(const) uint64_t uint64_t_max(uint64_t, uint64_t);
-static inline circa_gnu_attr(const)   size_t   size_t_max(  size_t,   size_t);
-
-// Find the population count of a number; in other words, the number of nonzero
-// bits.
-static circa_if_gnu(inline) circa_gnu_attr(const) uint8_t  uint8_t_pop( uint8_t);
-static circa_if_gnu(inline) circa_gnu_attr(const) uint8_t uint16_t_pop(uint16_t);
-static circa_if_gnu(inline) circa_gnu_attr(const) uint8_t uint32_t_pop(uint32_t);
-static circa_if_gnu(inline) circa_gnu_attr(const) uint8_t uint64_t_pop(uint64_t);
-static circa_if_gnu(inline) circa_gnu_attr(const) uint8_t   size_t_pop(  size_t);
-
-// Find the number of leading binary zeros in a number. The function is only
-// defined for nonzero inputs.
-static circa_if_gnu(inline) circa_gnu_attr(const) uint8_t  uint8_t_clz( uint8_t);
-static circa_if_gnu(inline) circa_gnu_attr(const) uint8_t uint16_t_clz(uint16_t);
-static circa_if_gnu(inline) circa_gnu_attr(const) uint8_t uint32_t_clz(uint32_t);
-static circa_if_gnu(inline) circa_gnu_attr(const) uint8_t uint64_t_clz(uint64_t);
-static circa_if_gnu(inline) circa_gnu_attr(const) uint8_t   size_t_clz(  size_t);
-
-// Bit scan reverse. Finds the index of the leftmost nonzero bit from the
-// right. This may also be viewed as integer log2. The function is only defined
-// for nonzero inputs.
-static inline circa_gnu_attr(const) uint8_t  uint8_t_bsr( uint8_t);
-static inline circa_gnu_attr(const) uint8_t uint16_t_bsr(uint16_t);
-static inline circa_gnu_attr(const) uint8_t uint32_t_bsr(uint32_t);
-static inline circa_gnu_attr(const) uint8_t uint64_t_bsr(uint64_t);
-static inline circa_gnu_attr(const) uint8_t   size_t_bsr(  size_t);
-
-// Find the number of trailing binary zeros in a number. This function is only
-// defined for nonzero inputs.
-static circa_if_gnu(inline) circa_gnu_attr(const) uint8_t  uint8_t_ctz( uint8_t);
-static circa_if_gnu(inline) circa_gnu_attr(const) uint8_t uint16_t_ctz(uint16_t);
-static circa_if_gnu(inline) circa_gnu_attr(const) uint8_t uint32_t_ctz(uint32_t);
-static circa_if_gnu(inline) circa_gnu_attr(const) uint8_t uint64_t_ctz(uint64_t);
-static circa_if_gnu(inline) circa_gnu_attr(const) uint8_t   size_t_ctz(  size_t);
-
-/*
-** Function Implementations
-*/
-
 #define def_min_max(T) \
   static inline circa_gnu_attr(const) T C2(T, min)(T a, T b) { return a < b ? a : b; } \
   static inline circa_gnu_attr(const) T C2(T, max)(T a, T b) { return a > b ? a : b; }

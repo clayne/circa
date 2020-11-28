@@ -1,5 +1,5 @@
 # The Circa Library Set
-## 0.2.0
+## 0.3.0
 
 ### Introduction
 
@@ -18,7 +18,8 @@ would care much for this library anyways.
 
 There's no real documentation, everything is clarified through code comments.
 Things are formatted cleanly enough that you should hopefully be able to follow
-it regardless, but again this may be a deal breaker.
+it regardless, but again this may be a deal breaker. This might be changed in
+the future; we'll see.
 
 Circa is not exhaustively tested, the API is unstable, and many abstractions are
 intentionally leaky for the sake of simplicity and performance. Caveat emptor.
@@ -31,14 +32,19 @@ focused data structures and functions, shown below.
 ```
 circa
 |- data - Data structure implementations.
-|  |- vec.h - A sequential vector. O(1) read/write, O(1) amortized snoc, O(n) wasted space.
 |  |- hatc.h - A sequential hashed array tree with constant-sized sub-blocks. O(1) read/write/snoc. O(n) wasted space.
 |  |- hatd.h - A sequential hashed array tree with doubling-size sub-blocks. O(1) read/write/snoc. O(n) wasted space.
+|  |- str.h - A dynamic ASCII string. O(1) read/write, O(1) amortized snoc, O(n) wasted space.
+|  |- vec.h - A sequential vector. O(1) read/write, O(1) amortized snoc, O(n) wasted space.
 |- algo - Algorithm implementations.
 |  |- imath.h - Integer math operations. ctz, clz, popcount, the list goes on.
+|  |- simd.h - SIMD types and operations.
 |- macro - Macro utilities.
 |  |- cat.h - Tools for concatenating identifiers. Useful for polymorphism.
 |  |- gnu.h - Macros for optional GNU extension usage. (Still works in standard C!)
+|- misc
+|  |- error.h - Provides an error enum for use in other headers.
+|  |- threadpool.h - Abstraction over threading to allow multi-word CAS and other trickery.
 ```
 
 ### Potential To-Do List
@@ -46,14 +52,13 @@ circa
 More will be added as time goes on. With no particular order, priority, or
 guarantee of delivery:
 
+- Documentation would be nice.
 - Floating point function approximations.
-- Portable SIMD functions.
 - FNV1a hashing.
 - Hashmaps.
 - Concurrent vectors.
 - Concurrent queues.
 - Concurrent hashmaps.
 - A `hatq` hashed array tree type with only `O(sqrt n)` wasted space.
-- A `str` type implementing dynamic strings, based on how `vec_T` works.
 - Functions for handling UTF-8 data in strings.
 - More proper benchmark and test suites to demonstrate the library.

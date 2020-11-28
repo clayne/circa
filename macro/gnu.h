@@ -1,9 +1,11 @@
 #ifdef __GNUC__
   #define circa_if_gnu(...) __VA_ARGS__
   #define circa_std_or_gnu(X, ...) __VA_ARGS__
+  #define circa_gnu_or_std(X, ...) X
 #else
   #define circa_if_gnu(...)
   #define circa_std_or_gnu(X, ...) X
+  #define circa_gnu_or_std(X, ...) __VA_ARGS__
 #endif
 
 #ifndef likely

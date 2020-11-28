@@ -4,14 +4,23 @@
 **   sanely.
 */
 
+#include <threads.h>
+#include <stdbool.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include "macro/cat.h"
 #include "macro/gnu.h"
 
+#include "misc/error.h"
+#include "misc/threadpool.h"
+
 #include "algo/imath.h"
+#include "algo/simd.h"
+
+#include "data/str.h"
 
 #define T int
 #define C 3
@@ -45,10 +54,10 @@ void test_vec() {
   vec_int v;
   vec_int_alloc(&v);
   for (int i = 0; i < 100; i++)
-    vec_int_snoc(&v, &i);
+    vec_int_snoc_v(&v, i);
   assert(v.len == 100);
   for (int i = 0; i < 100; i++)
-    assert(vec_int_get(&v, i) == i);
+    assert(vec_int_get_v(&v, i) == i);
   vec_int_free(&v);
 }
 
@@ -57,10 +66,10 @@ void test_hatc() {
   hatc_int h;
   hatc_int_alloc(&h);
   for (int i = 0; i < 100; i++)
-    hatc_int_snoc(&h, &i);
+    hatc_int_snoc_v(&h, i);
   assert(h.len == 100);
   for (int i = 0; i < 100; i++)
-    assert(hatc_int_get(&h, i) == i);
+    assert(hatc_int_get_v(&h, i) == i);
   hatc_int_free(&h);
 }
 
@@ -69,11 +78,31 @@ void test_hatd() {
   hatd_int h;
   hatd_int_alloc(&h);
   for (int i = 0; i < 100; i++)
-    hatd_int_snoc(&h, &i);
+    hatd_int_snoc_v(&h, i);
   assert(h.len == 100);
   for (int i = 0; i < 100; i++)
-    assert(hatd_int_get(&h, i) == i);
+    assert(hatd_int_get_v(&h, i) == i);
   hatd_int_free(&h);
+}
+
+int test_threadpool_fn(void *arg) {
+  *(size_t*) arg = thread_info.id.idx;
+  return 0;
+}
+
+static
+void test_threadpool() {
+  size_t num_threads = 8;
+  threadpool_alloc(num_threads + 1);
+  thread_id threads[num_threads];
+  size_t results[num_threads];
+  for (size_t i = 0; i < num_threads; i++)
+    threadpool_spawn(threads + i, test_threadpool_fn, results + i);
+  for (size_t i = 0; i < num_threads; i++)
+    threadpool_join(threads[i], NULL);
+  for (size_t i = 0; i < num_threads; i++)
+    printf("%zu\n", results[i]);
+  threadpool_free();
 }
 
 int main() {
@@ -81,5 +110,6 @@ int main() {
   test_vec();
   test_hatc();
   test_hatd();
+  test_threadpool();
   return 0;
 }

@@ -50,10 +50,14 @@ static void C3(hatc, T, alloc)(C2(hatc, T) *);
 static void C3(hatc, T, free)(C2(hatc, T) *);
 
 static inline T *C3(hatc, T, lookup)(C2(hatc, T) *, size_t);
-static inline void C3(hatc, T, set)(C2(hatc, T) *, size_t, T *);
-static inline T C3(hatc, T, get)(C2(hatc, T) *, size_t);
 
-static void C3(hatc, T, snoc)(C2(hatc, T) *, T *);
+static inline void C3(hatc, T, set_v)(C2(hatc, T) *, size_t, T);
+static inline void C3(hatc, T, set_r)(C2(hatc, T) *, size_t, T *);
+static inline T C3(hatc, T, get_v)(C2(hatc, T) *, size_t);
+static inline void C3(hatc, T, get_r)(C2(hatc, T) *, size_t, T *x);
+
+static void C3(hatc, T, snoc_v)(C2(hatc, T) *, T);
+static void C3(hatc, T, snoc_r)(C2(hatc, T) *, T *);
 
 /*
 ** Function Implementations
@@ -99,23 +103,70 @@ T *C3(hatc, T, lookup)(C2(hatc, T) *h, size_t i) {
 }
 
 static inline
-void C3(hatc, T, set)(C2(hatc, T) *h, size_t i, T *x) {
+void C3(hatc, T, set_v)(C2(hatc, T) *h, size_t i, T x) {
   assert(h);
+  assert(i < h->len);
+  C3(hatc, T, idx) idx = C3(hatc, T, locate)(i);
+  h->m[idx.fst][idx.snd] = x;
+}
+
+static inline
+void C3(hatc, T, set_r)(C2(hatc, T) *h, size_t i, T *x) {
+  assert(h);
+  assert(i < h->len);
   assert(x);
   C3(hatc, T, idx) idx = C3(hatc, T, locate)(i);
   h->m[idx.fst][idx.snd] = *x;
 }
 
 static inline
-T C3(hatc, T, get)(C2(hatc, T) *h, size_t i) {
+T C3(hatc, T, get_v)(C2(hatc, T) *h, size_t i) {
   assert(h);
   assert(i < h->len);
   C3(hatc, T, idx) idx = C3(hatc, T, locate)(i);
   return h->m[idx.fst][idx.snd];
 }
 
+static inline
+void C3(hatc, T, get_r)(C2(hatc, T) *h, size_t i, T *x) {
+  assert(h);
+  assert(i < h->len);
+  assert(x);
+  C3(hatc, T, idx) idx = C3(hatc, T, locate)(i);
+  *x = h->m[idx.fst][idx.snd];
+}
+
 static
-void C3(hatc, T, snoc)(C2(hatc, T) *h, T *x) {
+void C3(hatc, T, snoc_v)(C2(hatc, T) *h, T x) {
+  assert(h);
+  C3(hatc, T, idx) idx = C3(hatc, T, locate)(h->len);
+  if (unlikely(idx.fst >= h->m_len)) {
+    if (unlikely(idx.fst >= h->m_cap)) {
+      h->m_cap <<= 1;
+      free(h->l);
+      h->l = h->m;
+      h->l_len = h->m_len;
+      h->m = h->h;
+      h->h = malloc((h->m_cap << 1) * sizeof(*h->h));
+      h->h_len = 0;
+    }
+    h->m[h->m_len] = malloc(C3(hatc, T, siz) * sizeof(T));
+    h->m_len++;
+    if (likely((h->m_len - h->h_len) > 0)) {
+      h->h[h->h_len] = h->m[h->h_len];
+      h->h_len++;
+    }
+    if (likely((h->m_len - h->h_len) > 0)) {
+      h->h[h->h_len] = h->m[h->h_len];
+      h->h_len++;
+    }
+  }
+  h->m[idx.fst][idx.snd] = x;
+  h->len++;
+}
+
+static
+void C3(hatc, T, snoc_r)(C2(hatc, T) *h, T *x) {
   assert(h);
   assert(x);
   C3(hatc, T, idx) idx = C3(hatc, T, locate)(h->len);
