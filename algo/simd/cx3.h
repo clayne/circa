@@ -1,7 +1,9 @@
-typedef circa_std_or_gnu(struct { T x; T y; T z; }, T) C2(T, x3) circa_if_gnu(__attribute__((vector_size(4 * sizeof(T)))));
-
 static inline C2(T, x3) C2(T, x3_set)(T x, T y, T z) { C2(T, x3) v; x(v) = x; y(v) = y; z(v) = z; return v; }
 static inline C2(T, x3) C2(T, x3_set1)(T f) { C2(T, x3) v; x(v) = f; y(v) = f; z(v) = f; return v; }
+
+#define GEN_UNARY(F, O) static inline C2(T, x3) C3(T, x3, F)(C2(T, x3) v) { return circa_gnu_or_std(O v, (C2(T, x3)) {O x(v), O y(v), O z(v)}); }
+  GEN_UNARY(neg, -);
+#undef GEN_UNARY
 
 #define GEN_OP(F, O) static inline C2(T, x3) C3(T, x3, F)(C2(T, x3) a, C2(T, x3) b) { return circa_gnu_or_std(a O b, (C2(T, x3)) { a.x O b.x, a.y O b.y, a.z O b.z }); }
   GEN_OP(add, +)
@@ -21,3 +23,7 @@ static inline C2(T, x3) C2(T, x3_set1)(T f) { C2(T, x3) v; x(v) = f; y(v) = f; z
   GEN_1OP(1sub, -)
   GEN_1OP(1div, /)
 #undef GEN_1OP
+
+static inline C2(T, x3) C2(T, x3_sq)(C2(T, x3) v) { return C2(T, x3_mul)(v, v); }
+
+static inline T C2(T, x3_sum)(C2(T, x3) v) { return x(v) + y(v) + z(v); }

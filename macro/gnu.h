@@ -8,6 +8,10 @@
   #define circa_gnu_or_std(X, ...) __VA_ARGS__
 #endif
 
+#ifndef __has_builtin
+  #define __has_builtin(X) 0
+#endif
+
 #ifndef likely
   #define likely(X) circa_std_or_gnu(X, __builtin_expect(!!(X), 1))
 #endif

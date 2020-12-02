@@ -7,9 +7,12 @@
 #include <threads.h>
 #include <stdbool.h>
 #include <assert.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 #include <stdio.h>
+#include <math.h>
 
 #include "macro/cat.h"
 #include "macro/gnu.h"

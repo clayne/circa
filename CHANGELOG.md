@@ -1,5 +1,13 @@
 # Circa Changelog
 
+## 0.3.2/2020-12-02
+
+More SIMD and string goodies.
+
+- Added some definitions.
+  * functions: For `T` in `{float, double}`: `T_x2_mod`, `T_x2_mod1`, `T_x2_abs`, `T_x3_abs`, `T_x3_yzx`, `T_x3_cross`, `T_x3_rot`, `T_x4_abs`.
+  * functions: `str_cat`, `str_cat_n`, `str_cat_cstr`, `str_cat_cstr_n`, `str_cat_cstr_len`, `str_fmt_va`, `str_fmt`, `str_cat_fmt_va`, `str_cat_fmt`.
+
 ## 0.3.1/2020-11-28-hotfix1
 
 Apparently `str_read` did not insert a null terminator. Whoops.

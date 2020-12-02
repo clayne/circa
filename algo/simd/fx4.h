@@ -4,3 +4,10 @@
   GEN_FUSED(fma, *, +)
   GEN_FUSED(fms, *, -)
 #undef GEN_FUSED
+
+static inline
+C2(T, x4) C2(T, x4_abs)(C2(T, x4) v) {
+  union { C2(T, x4) f; C2(U, x4) u; } conv = {.f = v};
+  conv.u = C2(U, x4_and1)(conv.u, 0x7FFFFFFF);
+  return conv.f;
+}
