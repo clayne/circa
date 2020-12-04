@@ -1,5 +1,12 @@
 # Circa Changelog
 
+## 0.3.3/2020-12-04
+
+Endianness swapping functionality.
+
+- Added some definitions.
+  * functions: For `T` in `{uint8_t, uint16_t, uint32_t, uint64_t, size_t}`: `T_bswap`.
+
 ## 0.3.2/2020-12-02
 
 More SIMD and string goodies.

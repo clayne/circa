@@ -22,6 +22,39 @@ def_min_max(uint64_t)
 def_min_max(size_t)
 #undef def_min_max
 
+static inline circa_gnu_attr(const)
+uint8_t uint8_t_bswap(uint8_t n) {
+  return n;
+}
+
+static inline circa_gnu_attr(const)
+uint16_t uint16_t_bswap(uint16_t n) {
+  circa_if_gnu(return __builtin_bswap16(n));
+  return (n << 8) | (n >> 8);
+}
+
+static inline circa_gnu_attr(const)
+uint32_t uint32_t_bswap(uint32_t n) {
+  circa_if_gnu(return __builtin_bswap32(n));
+  n = (n << 16) | (n >> 16);
+  n = ((n & 0x00FF00FF) << 8) | ((n & 0xFF00FF00) >> 8);
+  return n;
+}
+
+static inline circa_gnu_attr(const)
+uint64_t uint64_t_bswap(uint64_t n) {
+  circa_if_gnu(return __builtin_bswap64(n));
+  n = (n << 32) | (n >> 32);
+  n = ((n & 0x0000FFFF0000FFFF) << 16) | ((n & 0xFFFF0000FFFF0000) >> 16);
+  n = ((n & 0x00FF00FF00FF00FF) << 8) | ((n & 0xFF00FF00FF00FF00) >> 8);
+  return n;
+}
+
+static inline circa_gnu_attr(const)
+size_t size_t_bswap(size_t n) {
+  return (sizeof(size_t) == 8) ? uint64_t_bswap(n) : uint32_t_bswap(n);
+}
+
 static circa_if_gnu(inline) circa_gnu_attr(const)
 uint8_t uint8_t_pop(uint8_t n) {
   circa_gnu_builtin(popcount, n);
