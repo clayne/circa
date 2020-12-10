@@ -1,5 +1,5 @@
 # The Circa Library Set
-## 0.3.3
+## 0.4.0
 
 ### Introduction
 
@@ -16,11 +16,6 @@ However, you don't get parallelized compilation. This may be a deal-breaker for
 some people who have massive projects and powerful CPU, not that I think they
 would care much for this library anyways.
 
-There's no real documentation, everything is clarified through code comments.
-Things are formatted cleanly enough that you should hopefully be able to follow
-it regardless, but again this may be a deal breaker. This might be changed in
-the future; we'll see.
-
 Circa is not exhaustively tested, the API is unstable, and many abstractions are
 intentionally leaky for the sake of simplicity and performance. Caveat emptor.
 
@@ -36,12 +31,12 @@ circa
 |  |- hatd.h - A sequential hashed array tree with doubling-size sub-blocks. O(1) read/write/snoc. O(n) wasted space.
 |  |- str.h - A dynamic ASCII string. O(1) read/write, O(1) amortized snoc, O(n) wasted space.
 |  |- vec.h - A sequential vector. O(1) read/write, O(1) amortized snoc, O(n) wasted space.
-|- algo - Algorithm implementations.
+|- math - Mathematical functions.
 |  |- imath.h - Integer math operations. ctz, clz, popcount, the list goes on.
 |  |- simd.h - SIMD types and operations.
 |- macro - Macro utilities.
 |  |- cat.h - Tools for concatenating identifiers. Useful for polymorphism.
-|  |- gnu.h - Macros for optional GNU extension usage. (Still works in standard C!)
+|  |- gnu.h - Macros for optional GNU extension usage. (Still works in standard C.)
 |- misc
 |  |- error.h - Provides an error enum for use in other headers.
 |  |- threadpool.h - Abstraction over threading to allow multi-word CAS and other trickery.
@@ -52,7 +47,6 @@ circa
 More will be added as time goes on. With no particular order, priority, or
 guarantee of delivery:
 
-- Documentation would be nice.
 - Floating point function approximations.
 - FNV1a hashing.
 - Hashmaps.

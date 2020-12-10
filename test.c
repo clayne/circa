@@ -20,8 +20,8 @@
 #include "misc/error.h"
 #include "misc/threadpool.h"
 
-#include "algo/imath.h"
-#include "algo/simd.h"
+#include "math/imath.h"
+#include "math/simd.h"
 
 #include "data/str.h"
 

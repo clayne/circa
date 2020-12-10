@@ -1,29 +1,8 @@
-/*
-** Description
-**   An implementation of vectors with amortized growth.
-** Macro Parameters
-**   T : Type = The type that the vector stores.
-** Dependencies
-**   <stdlib.h>
-**   "circa/macro/cat.h"
-**   "circa/macro/gnu.h"
-** Source
-**   https://github.com/davidgarland/circa
-*/
-
-/*
-** Type Definitions
-*/
-
 typedef struct {
   T *data;
   size_t len;
   size_t cap;
 } C2(vec, T);
-
-/*
-** Function Prototypes
-*/
 
 static void C3(vec, T, alloc)(C2(vec, T) *);
 static void C3(vec, T, prealloc)(C2(vec, T) *, size_t);
@@ -39,10 +18,6 @@ static inline void C3(vec, T, get_r)(C2(vec, T) *, size_t, T *);
 
 static inline void C3(vec, T, snoc_v)(C2(vec, T) *, T);
 static inline void C3(vec, T, snoc_r)(C2(vec, T) *, T *);
-
-/*
-** Function Implementations
-*/
 
 static
 void C3(vec, T, alloc)(C2(vec, T) *v) {

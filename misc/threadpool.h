@@ -1,14 +1,3 @@
-/*
-** Description
-**   Circa's intrusive abstraction over threads. This is necessary in order to
-**   allow for things like wait-free multi-word compare and swap, which must
-**   have thread IDs for each thread and know how many threads exist.
-*/
-
-/*
-** Type Definitions
-*/
-
 typedef struct {
   size_t idx;
 } thread_id;
@@ -43,22 +32,12 @@ typedef struct mcas_helper {
   cas_row *cr;
 } mcas_helper;
 
-/*
-** Function Prototypes
-*/
-
-/* Threadpool Allocation */
 static void threadpool_alloc(size_t);
 static void threadpool_free(void);
 
-/* Threadpool Manipulation */
 static int threadpool_spawn(thread_id *, thrd_start_t, void *);
 static void threadpool_join(thread_id, int *);
 static void threadpool_detach(thread_id);
-
-/*
-** Function Implementations
-*/
 
 static
 void threadpool_alloc(size_t num_threads) {

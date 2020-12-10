@@ -1,23 +1,8 @@
-/*
-** Description
-**   An implementation of dynamic ASCII strings with amortized growth.
-** Dependencies
-**   <stdlib.h>
-*/
-
-/*
-** Type Definitions
-*/
-
 typedef struct {
   char *data;
   size_t len;
   size_t cap;
 } str;
-
-/*
-** Function Prototypes
-*/
 
 static void str_alloc(str *);
 static void str_prealloc(str *, size_t);
@@ -36,10 +21,6 @@ static inline void str_snoc_r(str *, char *);
 
 static circa_err str_read(str *, FILE *);
 static circa_err str_write(str *, FILE *);
-
-/*
-** Function Definitions
-*/
 
 static
 void str_alloc(str *s) {

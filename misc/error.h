@@ -1,9 +1,3 @@
-/*
-** Description
-**   This header defines an enumeration `circa_err` for return codes, along with
-**   some utilies related to it.
-*/
-
 typedef enum {
   CIRCA_ERR_NONE,
   CIRCA_ERR_READ,

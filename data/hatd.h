@@ -1,21 +1,3 @@
-/*
-** Description
-**   An implementation of hashed array trees with size-doubling sub-blocks.
-** Macro Parameters
-**   T : Type = The type that the hashed array tree stores.
-** Dependencies
-**   <stdlib.h>
-**   "circa/macro/cat.h"
-**   "circa/macro/gnu.h"
-**   "circa/algo/bits.h"
-** Source
-**   https://github.com/davidgarland/circa
-*/
-
-/*
-** Type Definitions
-*/
-
 typedef struct {
   T **l;
   T **m;
@@ -32,10 +14,6 @@ typedef struct {
   size_t snd;
 } C3(hatd, T, idx);
 
-/*
-** Function Prototypes
-*/
-
 static circa_if_gnu(inline) circa_gnu_attr(const) C3(hatd, T, idx) C3(hatd, T, locate)(size_t);
 
 static void C3(hatd, T, alloc)(C2(hatd, T) *);
@@ -51,10 +29,6 @@ static inline void C3(hatd, T, get_r)(C2(hatd, T) *, size_t, T *);
 
 static void C3(hatd, T, snoc_v)(C2(hatd, T) *, T);
 static void C3(hatd, T, snoc_r)(C2(hatd, T) *, T *);
-
-/*
-** Function Implementations
-*/
 
 static circa_if_gnu(inline) circa_gnu_attr(const)
 C3(hatd, T, idx) C3(hatd, T, locate)(size_t idx) {

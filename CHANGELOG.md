@@ -1,5 +1,23 @@
 # Circa Changelog
 
+## 0.4.0/2020-12-09
+
+Major rework to how the SIMD library works; it's enough that I really don't want
+to write an extensive changelog for it. In a nutshell, though, some features
+were removed because they encouraged the use of SIMD types as vectors,
+which is not the most efficient way of doing things (instead you would want to
+have SIMD types for your vectors' xs, ys, and zs individually, and think in
+terms of "I want to do 8 raycasts at once" as opposed to "I will do one raycast
+but with 4-wide SIMD instructions on my vec3s/vec4s", because this scales
+up to an arbitrary width better. On the other hand, the maximum vector width
+has increased; now every combination of types is supported, up to the maximum
+for AVX-512 (which is still pretty uncommon; it's only recently rolling out to
+super consumer-grade parts, and even then only on Intel machines, while AMD
+chips are becoming more popular.)
+
+I've started working on documentation too; not complete yet but now at least
+hatd and hatc are written down.
+
 ## 0.3.3/2020-12-04
 
 Endianness swapping functionality.
