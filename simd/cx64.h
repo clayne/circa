@@ -29,3 +29,25 @@ static inline C2(T, x64) C2(T, x64_set1)(T f) { return (C2(T, x64)) {f, f, f, f,
 static inline C2(T, x64) C2(T, x64_sq)(C2(T, x64) v) { return C2(T, x64_mul)(v, v); }
 
 static inline T C2(T, x64_sum)(C2(T, x64) v) { return V0(v) + V1(v) + V2(v) + V3(v) + V4(v) + V5(v) + V6(v) + V7(v) + V8(v) + V9(v) + V10(v) + V11(v) + V12(v) + V13(v) + V14(v) + V15(v) + V16(v) + V17(v) + V18(v) + V19(v) + V20(v) + V21(v) + V22(v) + V23(v) + V24(v) + V25(v) + V26(v) + V27(v) + V28(v) + V29(v) + V30(v) + V31(v) + V32(v) + V33(v) + V34(v) + V35(v) + V36(v) + V37(v) + V38(v) + V39(v) + V40(v) + V41(v) + V42(v) + V43(v) + V44(v) + V45(v) + V46(v) + V47(v) + V48(v) + V49(v) + V50(v) + V51(v) + V52(v) + V53(v) + V54(v) + V55(v) + V56(v) + V57(v) + V58(v) + V59(v) + V60(v) + V61(v) + V62(v) + V63(v); }
+
+/*
+** Copyright 2020 David Garland
+**
+** Permission is hereby granted, free of charge, to any person obtaining a copy
+** of this software and associated documentation files (the "Software"), to deal
+** in the Software without restriction, including without limitation the rights
+** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+** copies of the Software, and to permit persons to whom the Software is
+** furnished to do so, subject to the following conditions:
+**
+** The above copyright notice and this permission notice shall be included in
+** all copies or substantial portions of the Software.
+**
+** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+** SOFTWARE.
+*/
