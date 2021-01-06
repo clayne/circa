@@ -1,4 +1,4 @@
-typedef circa_std_or_gnu(struct { T V0; T V1; T V2; T V3; }, T) C2(T, x4) circa_if_gnu(__attribute__((vector_size(4 * sizeof(T)))));
+typedef circa_std_or_gnu(struct { T V0; T V1; T V2; T V3; }, T) C2(T, x4) circa_gnu_only(__attribute__((vector_size(4 * sizeof(T)))));
 
 static inline C2(T, x4) C2(T, x4_set)(T v0, T v1, T v2, T v3) { return (C2(T, x4)) {v0, v1, v2, v3}; }
 static inline C2(T, x4) C2(T, x4_set1)(T f) { return (C2(T, x4)) {f, f, f, f}; }

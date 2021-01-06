@@ -1,23 +1,12 @@
-#ifndef EXIT_FAILURE
-  #error "circa/arr.h depends upon <stdlib.h>. Please include it beforehand."
+#ifdef CIRCA_STATIC
+  #define circa_static static
+#else
+  #include "circa_arr.h"
+  #define circa_static
 #endif
 
-#ifndef CIRCA_MAC
-  #error "circa/arr.h depends upon circa/mac.h. Please include it beforehand."
-#endif
-
-#ifndef CIRCA_ERR
-  #error "circa/arr.h depends upon circa/err.h. Please include it beforehand."
-#endif
-
-typedef struct C2(arr, T) {
-  T *data;
-  size_t cap;
-  size_t len;
-} C2(arr, T);
- 
-static
-circa_err C3(arr, T, alloc)(C2(arr, T) *a) {
+circa_static
+circa_err C3(arr, T, alloc)(C2(arr, T) *const restrict a) {
   circa_nullck(a);
   a->data = malloc(2 * sizeof(T));
   circa_oomck(a->data);
@@ -26,8 +15,8 @@ circa_err C3(arr, T, alloc)(C2(arr, T) *a) {
   return CE_NONE;
 }
 
-static
-circa_err C3(arr, T, prealloc)(C2(arr, T) *a, size_t cap) {
+circa_static
+circa_err C3(arr, T, prealloc)(C2(arr, T) *const restrict a, register const size_t cap) {
   circa_nullck(a);
   circa_oneck(cap);
   a->data = malloc(cap * sizeof(T));
@@ -37,8 +26,8 @@ circa_err C3(arr, T, prealloc)(C2(arr, T) *a, size_t cap) {
   return CE_NONE;
 }
 
-static
-circa_err C3(arr, T, amort)(C2(arr, T) *a) {
+circa_static
+circa_err C3(arr, T, amort)(C2(arr, T) *const restrict a) {
   circa_nullck(a);
   if_unlikely (a->len == a->cap) {
     a->cap += (a->cap >> 1);
@@ -48,76 +37,69 @@ circa_err C3(arr, T, amort)(C2(arr, T) *a) {
   return CE_NONE;
 }
 
-static
-circa_err C3(arr, T, free)(C2(arr, T) *a) {
+circa_static
+circa_err C3(arr, T, free)(C2(arr, T) *const restrict a) {
   circa_nullck(a);
   free(a->data);
   return CE_NONE;
 }
 
-static
-T *C3(arr, T, lookup)(C2(arr, T) *a, size_t idx) {
-  circa_if_nullck(!a)
-    return (circa_log("%s returned NULL due to %s; %s", __func__, circa_err_name[CE_NULL], circa_err_explain[CE_NULL]), NULL);
-
-  circa_if_oobck(idx >= a->len)
-    return (circa_log("%s returned NULL due to %s; %s", __func__, circa_err_name[CE_OOB], circa_err_explain[CE_OOB]), NULL);
-
-  circa_log("Hello!");
+circa_static
+T *C3(arr, T, lookup)(C2(arr, T) *const restrict a, register const size_t idx) {
+  // TODO bounds + null checking
+  return a->data + idx;
 }
 
-static
-circa_err C3(arr, T, set_v)(C2(arr, T) *a, size_t idx, T v) {
+circa_static
+circa_err C3(arr, T, set_v)(C2(arr, T) *const restrict a, register const size_t idx, T v) {
   circa_nullck(a);
+  a->data[idx] = v;
   return CE_NONE;
 }
 
-static
-circa_err C3(arr, T, set_r)(C2(arr, T) *a, size_t idx, T *v) {
+circa_static
+circa_err C3(arr, T, set_r)(C2(arr, T) *const restrict a, register const size_t idx, T *const restrict v) {
   circa_nullck(a);
-  circa_if_oobck(idx >= a->len)
-    circa_throw(CE_OOB);
+  circa_oobck(idx < a->len);
   circa_nullck(v);
   return CE_NONE;
 }
 
-static
-T C3(arr, T, get_v)(C2(arr, T) *a, size_t idx) {
-  circa_if_nullck(!a)
-    return (circa_log("%s returned binary-zeroed value due to %s; %s", __func__, circa_err_name[CE_NULL], circa_err_explain[CE_NULL]), (T) {0});
-  circa_if_oobck(idx >= a->len)
-    return (circa_log("%s returned binary-zeroed value due to %s; %s", __func__, circa_err_name[CE_OOB], circa_err_explain[CE_OOB]), (T) {0});
+circa_static
+T C3(arr, T, get_v)(C2(arr, T) *const restrict a, register const size_t idx) {
+  // TODO: bounds + null checking
   return a->data[idx];
 }
 
-static
-circa_err C3(arr, T, get_r)(C2(arr, T) *a, size_t idx, T *v) {
+circa_static
+circa_err C3(arr, T, get_r)(C2(arr, T) *const restrict a, register const size_t idx, T *const restrict v) {
   circa_nullck(a);
-  circa_if_oobck(idx >= a->len)
-    circa_throw(CE_OOB);
+  circa_oobck(idx < a->len);
   circa_nullck(v);
   *v = a->data[idx];
   return CE_NONE;
 }
 
-static
-circa_err C3(arr, T, snoc_v)(C2(arr, T) *a, T v) {
+circa_static
+circa_err C3(arr, T, snoc_v)(C2(arr, T) *const restrict a, register const T v) {
   circa_nullck(a);
-  circa_err r = C3(arr, T, amort)(a);
-  circa_if_oomck (r) return r;
+  register const circa_err r = C3(arr, T, amort)(a);
+  circa_if_oomck (r) circa_throw(r, "Ran out of memory.");
   a->data[a->len++] = v;
   return CE_NONE;
 }
 
-static
-circa_err C3(arr, T, snoc_r)(C2(arr, T) *a, T *v) {
+circa_static
+circa_err C3(arr, T, snoc_r)(C2(arr, T) *const restrict a, T *const restrict v) {
   circa_nullck(a);
   circa_nullck(v);
-  circa_err r = C3(arr, T, amort)(a);
-  circa_if_oomck (r) return r;
+  register const circa_err r = C3(arr, T, amort)(a);
+  circa_if_oomck (r) circa_throw(r, "Ran out of memory.");
   a->data[a->len++] = *v;
   return CE_NONE;
 }
+
+#undef circa_static
 
 /*
 ** Copyright 2020 David Garland

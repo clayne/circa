@@ -1,11 +1,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "../err.h"
-#include "../mac.h"
+#include "../circa_mac.h"
+#include "../circa_err.h"
 
 #define T int
-  #include "../arr.h"
+  #include "../circa_arr.c"
 #undef T
 
 int main() {

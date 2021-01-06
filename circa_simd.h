@@ -1,3 +1,8 @@
+#ifndef CIRCA_SIMD_H
+#define CIRCA_SIMD_H
+
+#include "circa_mac.h"
+
 #define  V0(V) circa_std_or_gnu((V).V0,  (V)[ 0])
 #define  V1(V) circa_std_or_gnu((V).V1,  (V)[ 1])
 #define  V2(V) circa_std_or_gnu((V).V2,  (V)[ 2])
@@ -163,6 +168,4 @@
   GEN_DOUBLE_ABS(x2)
 #undef GEN_FLOAT_ABS
 
-#ifdef __GNUC__
-  #pragma GCC diagnostic pop
-#endif
+#endif // CIRCA_SIMD_H
