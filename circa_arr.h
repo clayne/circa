@@ -24,6 +24,8 @@ circa_static circa_err C3(arr, T, get_r)(C2(arr, T) *const restrict, register co
 circa_static circa_err C3(arr, T, snoc_v)(C2(arr, T) *const restrict a, register const T v);
 circa_static circa_err C3(arr, T, snoc_r)(C2(arr, T) *const restrict a, T *const restrict v);
 
+circa_static T *C3(arr, T, reserve)(C2(arr, T) *const restrict a);
+
 #undef circa_static
 
 #ifdef CIRCA_STATIC

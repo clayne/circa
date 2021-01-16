@@ -68,6 +68,7 @@
 #define V62(V) circa_std_or_gnu((V).V62, (V)[62])
 #define V63(V) circa_std_or_gnu((V).V63, (V)[63])
 #define VN(V, N) circa_std_or_gnu((*((float*) V) + (N)), (V)[N])
+// TODO: cant just use float here, lmao, the type can vary! duh
 
 #ifdef __GNUC__
   #pragma GCC diagnostic push
@@ -75,72 +76,72 @@
 #endif
 
 #define T uint8_t
-  #include "simd/ux64.h"
-  #include "simd/ux32.h"
-  #include "simd/ux16.h"
-  #include "simd/ux8.h"
-  #include "simd/ux4.h"
-  #include "simd/ux2.h"
+  #include "circa_simd/ux64.h"
+  #include "circa_simd/ux32.h"
+  #include "circa_simd/ux16.h"
+  #include "circa_simd/ux8.h"
+  #include "circa_simd/ux4.h"
+  #include "circa_simd/ux2.h"
 #undef T
 
 #define T uint16_t
-  #include "simd/ux32.h"
-  #include "simd/ux16.h"
-  #include "simd/ux8.h"
-  #include "simd/ux4.h"
-  #include "simd/ux2.h"
+  #include "circa_simd/ux32.h"
+  #include "circa_simd/ux16.h"
+  #include "circa_simd/ux8.h"
+  #include "circa_simd/ux4.h"
+  #include "circa_simd/ux2.h"
 #undef T
 
 #define T uint32_t
-  #include "simd/ux16.h"
-  #include "simd/ux8.h"
-  #include "simd/ux4.h"
-  #include "simd/ux2.h"
+  #include "circa_simd/ux16.h"
+  #include "circa_simd/ux8.h"
+  #include "circa_simd/ux4.h"
+  #include "circa_simd/ux2.h"
 #undef T
 
 #define T uint64_t
-  #include "simd/ux8.h"
-  #include "simd/ux4.h"
-  #include "simd/ux2.h"
+  #include "circa_simd/ux8.h"
+  #include "circa_simd/ux4.h"
+  #include "circa_simd/ux2.h"
 #undef T
 
 #define T int8_t
-  #include "simd/ix64.h"
-  #include "simd/ix32.h"
-  #include "simd/ix16.h"
-  #include "simd/ix8.h"
-  #include "simd/ix4.h"
-  #include "simd/ix2.h"
+  #include "circa_simd/ix64.h"
+  #include "circa_simd/ix32.h"
+  #include "circa_simd/ix16.h"
+  #include "circa_simd/ix8.h"
+  #include "circa_simd/ix4.h"
+  #include "circa_simd/ix2.h"
 #undef T
 
 #define T int16_t
-  #include "simd/ix32.h"
-  #include "simd/ix16.h"
-  #include "simd/ix8.h"
-  #include "simd/ix4.h"
-  #include "simd/ix2.h"
+  #include "circa_simd/ix32.h"
+  #include "circa_simd/ix16.h"
+  #include "circa_simd/ix8.h"
+  #include "circa_simd/ix4.h"
+  #include "circa_simd/ix2.h"
 #undef T
 
 #define T int32_t
-  #include "simd/ix16.h"
-  #include "simd/ix8.h"
-  #include "simd/ix4.h"
-  #include "simd/ix2.h"
+  #include "circa_simd/ix16.h"
+  #include "circa_simd/ix8.h"
+  #include "circa_simd/ix4.h"
+  #include "circa_simd/ix2.h"
 #undef T
 
 #define T int64_t
-  #include "simd/ix8.h"
-  #include "simd/ix4.h"
-  #include "simd/ix2.h"
+  #include "circa_simd/ix8.h"
+  #include "circa_simd/ix4.h"
+  #include "circa_simd/ix2.h"
 #undef T
 
 #define T float
 #define I int32_t
 #define U uint32_t
-  #include "simd/fx16.h"
-  #include "simd/fx8.h"
-  #include "simd/fx4.h"
-  #include "simd/fx2.h"
+  #include "circa_simd/fx16.h"
+  #include "circa_simd/fx8.h"
+  #include "circa_simd/fx4.h"
+  #include "circa_simd/fx2.h"
 #undef U
 #undef I
 #undef T
@@ -148,9 +149,9 @@
 #define T double
 #define I int64_t
 #define U uint64_t
-  #include "simd/fx8.h"
-  #include "simd/fx4.h"
-  #include "simd/fx2.h"
+  #include "circa_simd/fx8.h"
+  #include "circa_simd/fx4.h"
+  #include "circa_simd/fx2.h"
 #undef U
 #undef I
 #undef T
