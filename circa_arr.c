@@ -100,10 +100,17 @@ circa_err C3(arr, T, snoc_r)(C2(arr, T) *const restrict a, T *const restrict v) 
 }
 
 circa_static
-T *C3(arr, T, reserve)(C2(arr, T) *const restrict a) {
+T *C3(arr, T, reserve_r)(C2(arr, T) *const restrict a) {
   register const circa_err r = C3(arr, T, amort)(a);
   circa_if_oomck(r) return NULL;
   return a->data + a->len++;
+}
+
+circa_static
+size_t C3(arr, T, reserve_i)(C2(arr, T) *const restrict a) {
+  register const circa_err r = C3(arr, T, amort)(a);
+  circa_if_oomck(r) return (size_t) -1;
+  return a->len++;
 }
 
 #undef circa_static

@@ -12,12 +12,12 @@
   circa_static uint8_t C2(T, clz)(T); \
   circa_static uint8_t C2(T, bsr)(T); \
   circa_static uint8_t C2(T, ctz)(T);
-  CIRCA_DECL_MIN_MAX(uint8_t)
-  CIRCA_DECL_MIN_MAX(uint16_t)
-  CIRCA_DECL_MIN_MAX(uint32_t)
-  CIRCA_DECL_MIN_MAX(uint64_t)
-  CIRCA_DECL_MIN_MAX(size_t)
-#undef def_min_max
+  CIRCA_IMATH_DECL(uint8_t)
+  CIRCA_IMATH_DECL(uint16_t)
+  CIRCA_IMATH_DECL(uint32_t)
+  CIRCA_IMATH_DECL(uint64_t)
+  CIRCA_IMATH_DECL(size_t)
+#undef CIRCA_IMATH_DECL
 
 #undef circa_static
 
