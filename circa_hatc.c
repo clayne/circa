@@ -18,7 +18,12 @@ circa_err C3(hatc, T, alloc)(C2(hatc, T) *const restrict h) {
   circa_nullck(h);
   h->l = NULL;
   h->m = malloc(sizeof(*h->m));
+  circa_oomck(h->m);
   h->h = malloc(sizeof(*h->h) << 1);
+  circa_if_oomck(!h->h) {
+    free(h->m);
+    circa_throw(CE_OOM, "Out of memory.");
+  }
   h->m_cap = 1;
   h->l_len = 0;
   h->m_len = 0;
@@ -38,7 +43,7 @@ circa_err C3(hatc, T, free)(C2(hatc, T) *const restrict h) {
   return CE_NONE;
 }
 
-circa_static
+static
 C3(hatc, T, idx) C3(hatc, T, index)(register const size_t i) {
   return (C3(hatc, T, idx)) {
     i >> C,
@@ -93,8 +98,8 @@ circa_static
 circa_err C3(hatc, T, snoc_v)(C2(hatc, T) *const restrict h, register const T x) {
   circa_nullck(h);
   C3(hatc, T, idx) idx = C3(hatc, T, index)(h->len);
-  if (idx == h->m_len) {
-    if (idx == h->m_cap) {
+  if (idx.fst == h->m_len) {
+    if (idx.fst == h->m_cap) {
       h->m_cap <<= 1;
       free(h->l);
       h->l = h->m;
@@ -104,12 +109,13 @@ circa_err C3(hatc, T, snoc_v)(C2(hatc, T) *const restrict h, register const T x)
       h->h_len = 0;
     }
     h->m[h->m_len] = malloc(C3(hatc, T, siz) * sizeof(T));
+    // TODO: OOM checking & rollback here
     h->m_len++;
-    if ((h->m-len - h->h_len) > 0) {
+    if ((h->m_len - h->h_len) > 0) {
       h->h[h->h_len] = h->m[h->h_len];
       h->h_len++;
     }
-    if ((h->m-len - h->h_len) > 0) {
+    if ((h->m_len - h->h_len) > 0) {
       h->h[h->h_len] = h->m[h->h_len];
       h->h_len++; 
     }
@@ -124,8 +130,8 @@ circa_err C3(hatc, T, snoc_r)(C2(hatc, T) *const restrict h, T *const restrict x
   circa_nullck(h);
   circa_nullck(x);
   C3(hatc, T, idx) idx = C3(hatc, T, index)(h->len);
-  if (idx == h->m_len) {
-    if (idx == h->m_cap) {
+  if (idx.fst == h->m_len) {
+    if (idx.fst == h->m_cap) {
       h->m_cap <<= 1;
       free(h->l);
       h->l = h->m;
@@ -136,11 +142,11 @@ circa_err C3(hatc, T, snoc_r)(C2(hatc, T) *const restrict h, T *const restrict x
     }
     h->m[h->m_len] = malloc(C3(hatc, T, siz) * sizeof(T));
     h->m_len++;
-    if ((h->m-len - h->h_len) > 0) {
+    if ((h->m_len - h->h_len) > 0) {
       h->h[h->h_len] = h->m[h->h_len];
       h->h_len++;
     }
-    if ((h->m-len - h->h_len) > 0) {
+    if ((h->m_len - h->h_len) > 0) {
       h->h[h->h_len] = h->m[h->h_len];
       h->h_len++; 
     }
@@ -164,6 +170,7 @@ T C3(hatc, T, pop_v)(C2(hatc, T) *const restrict h) {
       h->m = h->l;
       h->m_len = h->l_len;
       h->l = malloc(size_t_max(1, h->m_cap >> 1) * sizeof(*h->l));
+      // TODO: OOM checking & rollback here
       h->l_len = 0;
     } else {
       h->m_len--;
@@ -184,6 +191,7 @@ T C3(hatc, T, pop_v)(C2(hatc, T) *const restrict h) {
 circa_static
 circa_err C3(hatc, T, pop_r)(C2(hatc, T) *const restrict h, T *const restrict x) {
   circa_nullck(h);
+  circa_oobck(h->len > 0);
   circa_nullck(x);
   C3(hatc, T, idx) idx = C3(hatc, T, index)(h->len - 1);
   *x = h->m[idx.fst][idx.snd];
@@ -196,6 +204,7 @@ circa_err C3(hatc, T, pop_r)(C2(hatc, T) *const restrict h, T *const restrict x)
       h->m = h->l;
       h->m_len = h->l_len;
       h->l = malloc(size_t_max(1, h->m_cap >> 1) * sizeof(*h->l));
+      // TODO: OOM checking & rollback here
       h->l_len = 0;
     } else {
       h->m_len--;
@@ -210,7 +219,7 @@ circa_err C3(hatc, T, pop_r)(C2(hatc, T) *const restrict h, T *const restrict x)
     }
   }
   h->len--;
-  return x;
+  return CE_NONE;
 }
 
 

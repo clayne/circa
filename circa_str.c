@@ -378,6 +378,17 @@ circa_err str_write_cat_name(str *const restrict s, char *const restrict path) {
   return e;
 }
 
+circa_static
+cmp str_cmp(str a, str b) {
+  if (a.data == b.data) return EQ;
+  for (size_t i = 0; i < size_t_min(a->len, b->len); i++)
+    if (a.data[i] < b.data[i])
+      return LT;
+    else if (a.data[i] > b.data[i])
+      return GT;
+  return size_t_cmp(a->len, b->len);
+}
+
 #undef circa_static
 
 /*

@@ -24,12 +24,6 @@
 #define circa_attr(A) circa_gnu_only(__attribute__((A)))
 #define circa_use circa_attr(warn_unused_result)
 
-#ifdef CIRCA_STATIC
-  #define circa_static static
-#else
-  #define circa_static
-#endif
-
 #ifndef likely
   #define likely(X) circa_gnu_or_std(__builtin_expect(!!(X), 1), (X))
 #endif

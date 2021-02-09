@@ -6,16 +6,8 @@ if detected).
 ## features
 
 - polymorphic dynamic arrays
-- dynamic ascii strings
-- functions for using SIMD if present, or scalar ops otherwise (these are ALWAYS static inline, unlike the others)
-
-## todo
-
-these were previously implemented, just need to redo them
-
-- builtins for clz and the like
-- polymorphic hashed array trees
-- polymorphic robin hood hash maps with linear probing and backwards shift deletion
+- polymorphic dynamic hashed array trees
+- dynamic ascii strings (no real utf-8 support yet)
 
 ## how to use
 
