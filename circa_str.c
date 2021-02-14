@@ -17,7 +17,7 @@ circa_err str_alloc(str *const restrict s) {
 }
 
 circa_static
-circa_err str_prealloc(str *const restrict s, register const size_t cap) {
+circa_err str_alloc_cap(str *const restrict s, register const size_t cap) {
   circa_nullck(s);
   circa_oneck(cap);
   s->data = malloc(cap);
@@ -379,14 +379,14 @@ circa_err str_write_cat_name(str *const restrict s, char *const restrict path) {
 }
 
 circa_static
-cmp str_cmp(str a, str b) {
-  if (a.data == b.data) return EQ;
+cmp str_cmp(str *a, str *b) {
+  if (a->data == b->data) return EQ;
   for (size_t i = 0; i < size_t_min(a->len, b->len); i++)
-    if (a.data[i] < b.data[i])
+    if (a->data[i] < b->data[i])
       return LT;
-    else if (a.data[i] > b.data[i])
+    else if (a->data[i] > b->data[i])
       return GT;
-  return size_t_cmp(a->len, b->len);
+  return size_t_cmp(&a->len, &b->len);
 }
 
 #undef circa_static

@@ -4,33 +4,27 @@
   #define circa_static
 #endif
 
-typedef struct C2(arr, T) {
-  T *data;
-  size_t cap;
-  size_t len;
-} C2(arr, T);
-
-circa_static circa_err C3(arr, T, alloc)(C2(arr, T) *const restrict);
-circa_static circa_err C3(arr, T, alloc_cap)(C2(arr, T) *const restrict, register const size_t);
-circa_static circa_err C3(arr, T, amort)(C2(arr, T) *const restrict);
-circa_static circa_err C3(arr, T, free)(C2(arr, T) *const restrict);
-
-circa_static T *C3(arr, T, lookup)(C2(arr, T) *const restrict, register const size_t);
-circa_static circa_err C3(arr, T, set_v)(C2(arr, T) *const restrict, register const size_t, T);
-circa_static circa_err C3(arr, T, set_r)(C2(arr, T) *const restrict, register const size_t, T *const restrict);
-circa_static T C3(arr, T, get_v)(C2(arr, T) *const restrict, register const size_t);
-circa_static circa_err C3(arr, T, get_r)(C2(arr, T) *const restrict, register const size_t, T *const restrict);
-
-circa_static circa_err C3(arr, T, snoc_v)(C2(arr, T) *const restrict, register const T);
-circa_static circa_err C3(arr, T, snoc_r)(C2(arr, T) *const restrict, T *const restrict);
-
-circa_static T *C3(arr, T, reserve_r)(C2(arr, T) *const restrict);
-circa_static size_t C3(arr, T, reserve_i)(C2(arr, T) *const restrict);
+#define CIRCA_HASH_DECL(T) static size_t C2(T, hash)(T *x);
+  CIRCA_HASH_DECL(char)
+  CIRCA_HASH_DECL(short)
+  CIRCA_HASH_DECL(int)
+  CIRCA_HASH_DECL(unsigned)
+  CIRCA_HASH_DECL(long)
+  CIRCA_HASH_DECL(uint8_t)
+  CIRCA_HASH_DECL(uint16_t)
+  CIRCA_HASH_DECL(uint32_t)
+  CIRCA_HASH_DECL(uint64_t)
+  CIRCA_HASH_DECL(int8_t)
+  CIRCA_HASH_DECL(int16_t)
+  CIRCA_HASH_DECL(int32_t)
+  CIRCA_HASH_DECL(int64_t)
+  CIRCA_HASH_DECL(size_t)
+#undef CIRCA_HASH_DECL
 
 #undef circa_static
 
 #ifdef CIRCA_STATIC
-  #include "circa_arr.c"
+  #include "circa_hash.c"
 #endif
 
 /*

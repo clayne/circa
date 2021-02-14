@@ -17,12 +17,12 @@ typedef enum {
 } circa_err;
 
 #ifndef CIRCA_N_LOG
-  #define circa_log(FMT, ...) fprintf(stderr, "[circa]: " FMT "\n", ##__VA_ARGS__)
+  #define circa_log(FMT, ...) fprintf(stderr, "[circa] %s: " FMT "\n", __func__, ##__VA_ARGS__)
 #else
   #define circa_log(FMT, ...) ((void) 0)
 #endif
 
-#define circa_throw(E, FMT, ...) return (circa_log("%s: " FMT, __func__, ##__VA_ARGS__), E)
+#define circa_throw(E, FMT, ...) return (circa_log("%s: " FMT, ##__VA_ARGS__), E)
 
 #ifndef if_debug
   #ifndef CIRCA_N_DEBUG

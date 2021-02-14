@@ -4,33 +4,32 @@
   #define circa_static
 #endif
 
-typedef struct C2(arr, T) {
-  T *data;
-  size_t cap;
-  size_t len;
-} C2(arr, T);
+typedef struct {
+  K *keys;      // the array of map keys
+  V *vals;      // the array of map values
+  size_t *psls; // the array of probe sequence lengths
+  size_t *hshs; // the array of key hashes (currently unimplemented)
+  size_t cap;   // the capacity (amount allocated)
+  size_t len;   // the length (amount used)
+} C3(map, K, V);
 
-circa_static circa_err C3(arr, T, alloc)(C2(arr, T) *const restrict);
-circa_static circa_err C3(arr, T, alloc_cap)(C2(arr, T) *const restrict, register const size_t);
-circa_static circa_err C3(arr, T, amort)(C2(arr, T) *const restrict);
-circa_static circa_err C3(arr, T, free)(C2(arr, T) *const restrict);
+circa_static circa_err C4(map, K, V, alloc)(C3(map, K, V) *const restrict);
+circa_static circa_err C4(map, K, V, free)(C3(map, K, V) *const restrict);
 
-circa_static T *C3(arr, T, lookup)(C2(arr, T) *const restrict, register const size_t);
-circa_static circa_err C3(arr, T, set_v)(C2(arr, T) *const restrict, register const size_t, T);
-circa_static circa_err C3(arr, T, set_r)(C2(arr, T) *const restrict, register const size_t, T *const restrict);
-circa_static T C3(arr, T, get_v)(C2(arr, T) *const restrict, register const size_t);
-circa_static circa_err C3(arr, T, get_r)(C2(arr, T) *const restrict, register const size_t, T *const restrict);
+circa_static circa_err C4(map, K, V, set)(C3(map, K, V) *const restrict, K *const restrict, V *const restrict); 
 
-circa_static circa_err C3(arr, T, snoc_v)(C2(arr, T) *const restrict, register const T);
-circa_static circa_err C3(arr, T, snoc_r)(C2(arr, T) *const restrict, T *const restrict);
+circa_static V *C4(map, K, V, lookup)(C3(map, K, V) *const restrict, K *const restrict);
 
-circa_static T *C3(arr, T, reserve_r)(C2(arr, T) *const restrict);
-circa_static size_t C3(arr, T, reserve_i)(C2(arr, T) *const restrict);
+circa_static circa_err C4(map, K, V, get)(C3(map, K, V) *const restrict, K *const restrict, V *const restrict);
+
+circa_static bool C4(map, K, V, has)(C3(map, K, V) *const restrict, K *const restrict);
+
+circa_static circa_err C4(map, K, V, del)(C3(map, K, V) *const restrict, K *const restrict);
 
 #undef circa_static
 
 #ifdef CIRCA_STATIC
-  #include "circa_arr.c"
+  #include "circa_map.c"
 #endif
 
 /*

@@ -16,7 +16,7 @@ circa_err C3(arr, T, alloc)(C2(arr, T) *const restrict a) {
 }
 
 circa_static
-circa_err C3(arr, T, prealloc)(C2(arr, T) *const restrict a, register const size_t cap) {
+circa_err C3(arr, T, alloc_cap)(C2(arr, T) *const restrict a, register const size_t cap) {
   circa_nullck(a);
   circa_oneck(cap);
   a->data = malloc(cap * sizeof(T));

@@ -1,19 +1,21 @@
+#include <stdarg.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
 
 #define CIRCA_STATIC
 
 #include "../circa_mac.h"
 #include "../circa_err.h"
+#include "../circa_cmp.h"
+#include "../circa_imath.h"
 
-#define T int
-  #include "../circa_arr.h"
-#undef T
+#include "../circa_str.h"
 
 int main() {
-  arr_int xs;
-  arr_int_alloc(&xs);
-  arr_int_free(&xs);
+  str s;
+  str_alloc(&s);
+  str_free(&s);
   return 0;
 }

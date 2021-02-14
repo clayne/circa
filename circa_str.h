@@ -13,7 +13,7 @@ typedef struct str {
 } str;
 
 circa_static circa_err str_alloc(str *const restrict);
-circa_static circa_err str_prealloc(str *const restrict, register const size_t);
+circa_static circa_err str_alloc_cap(str *const restrict, register const size_t);
 circa_static circa_err str_require(str *const restrict, register const size_t);
 circa_static circa_err str_amort(str *const restrict);
 circa_static circa_err str_free(str *const restrict);
