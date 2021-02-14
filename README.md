@@ -6,7 +6,8 @@ if detected).
 ## features
 
 - polymorphic dynamic arrays
-- polymorphic dynamic hashed array trees
+- polymorphic dynamic hashed array trees (constant or doubling block size)
+- polymorphic robin hood hash maps
 - dynamic ascii strings (no real utf-8 support yet)
 
 ## how to use
