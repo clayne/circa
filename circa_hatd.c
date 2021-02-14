@@ -1,26 +1,23 @@
 #ifdef CIRCA_STATIC
   #define circa_static static
 #else
-  #include "circa_hatc.h"
+  #include "circa_hatd.h"
   #define circa_static
 #endif
-
-static const size_t C3(hatc, T, siz) = 1 << C;
-static const size_t C3(hatc, T, mask) = (1 << C) - 1;
 
 typedef struct {
   size_t fst;
   size_t snd;
-} C3(hatc, T, idx);
+} C3(hatd, T, idx);
 
 circa_static
-circa_err C3(hatc, T, alloc)(C2(hatc, T) *const restrict h) {
+circa_err C3(hatd, T, alloc)(C2(hatd, T) *const restrict h) {
   circa_nullck(h);
   h->l = NULL;
   h->m = malloc(sizeof(*h->m));
   circa_oomck(h->m);
   h->h = malloc(sizeof(*h->h) << 1);
-  circa_if_oomck(!h->h) {
+  circa_if_oomck(!h->m) {
     free(h->m);
     circa_throw(CE_OOM, "Out of memory.");
   }
@@ -33,7 +30,7 @@ circa_err C3(hatc, T, alloc)(C2(hatc, T) *const restrict h) {
 }
 
 circa_static
-circa_err C3(hatc, T, free)(C2(hatc, T) *const restrict h) {
+circa_err C3(hatd, T, free)(C2(hatd, T) *const restrict h) {
   circa_nullck(h);
   free(h->l);
   free(h->h);
@@ -44,72 +41,73 @@ circa_err C3(hatc, T, free)(C2(hatc, T) *const restrict h) {
 }
 
 static
-C3(hatc, T, idx) C3(hatc, T, index)(register const size_t i) {
-  return (C3(hatc, T, idx)) {
-    i >> C,
-    i & C3(hatc, T, mask)
+C3(hatd, T, idx) C3(hatd, T, index)(register const size_t i) {
+  register const size_t w = i + 1;
+  register const size_t l = size_t_bsr(w);
+  return (C3(hatd, T, idx)) {
+    l,
+    w - (1 << l)
   };
 }
 
 circa_static
-T *C3(hatc, T, lookup)(C2(hatc, T) *const restrict h, register const size_t i) {
+T *C3(hatd, T, lookup)(C2(hatd, T) *const restrict h, register const size_t i) {
   circa_if_nullck (!h) return NULL;
   circa_if_oobck (i >= h->len) return NULL;
-  register const C3(hatc, T, idx) idx = C3(hatc, T, index)(i);
+  register const C3(hatd, T, idx) idx = C3(hatd, T, index)(i);
   return h->m[idx.fst] + idx.snd;
 }
 
 circa_static
-circa_err C3(hatc, T, set_v)(C2(hatc, T) *const restrict h, register const size_t i, register const T x) {
+circa_err C3(hatd, T, set_v)(C2(hatd, T) *const restrict h, register const size_t i, register const T x) {
   circa_nullck(h);
   circa_oobck(i < h->len);
-  C3(hatc, T, idx) idx = C3(hatc, T, index)(i);
+  C3(hatd, T, idx) idx = C3(hatd, T, index)(i);
   h->m[idx.fst][idx.snd] = x;
   return CE_NONE;
 }
 
 circa_static
-circa_err C3(hatc, T, set_r)(C2(hatc, T) *const restrict h, register const size_t i, T *const restrict x) {
+circa_err C3(hatd, T, set_r)(C2(hatd, T) *const restrict h, register const size_t i, T *const restrict x) {
   circa_nullck(h);
   circa_oobck(i < h->len);
   circa_nullck(x);
-  C3(hatc, T, idx) idx = C3(hatc, T, index)(i);
+  C3(hatd, T, idx) idx = C3(hatd, T, index)(i);
   h->m[idx.fst][idx.snd] = *x;
   return CE_NONE;
 }
 
 circa_static
-T C3(hatc, T, get_v)(C2(hatc, T) *const restrict h, register const size_t i) {
+T C3(hatd, T, get_v)(C2(hatd, T) *const restrict h, register const size_t i) {
   // TODO: null checking, out of bounds checking
-  C3(hatc, T, idx) idx = C3(hatc, T, index)(i);
+  C3(hatd, T, idx) idx = C3(hatd, T, index)(i);
   return h->m[idx.fst][idx.snd];
 }
 
 circa_static
-circa_err C3(hatc, T, get_r)(C2(hatc, T) *const restrict h, register const size_t i, T *const restrict x) {
+circa_err C3(hatd, T, get_r)(C2(hatd, T) *const restrict h, register const size_t i, T *const restrict x) {
   circa_nullck(h);
   circa_oobck(i < h->len);
   circa_nullck(x);
-  C3(hatc, T, idx) idx = C3(hatc, T, index)(i);
+  C3(hatd, T, idx) idx = C3(hatd, T, index)(i);
   *x = h->m[idx.fst][idx.snd];
 }
 
 circa_static
-circa_err C3(hatc, T, snoc_v)(C2(hatc, T) *const restrict h, register const T x) {
+circa_err C3(hatd, T, snoc_v)(C2(hatd, T) *const restrict h, register const T x) {
   circa_nullck(h);
-  C3(hatc, T, idx) idx = C3(hatc, T, index)(h->len);
+  C3(hatd, T, idx) idx = C3(hatd, T, index)(h->len);
   if (idx.fst == h->m_len) {
     if (idx.fst == h->m_cap) {
       h->m_cap <<= 1;
       free(h->l);
       h->l = h->m;
-      h->l_len = h->m_len;
+      h->l_len = h->m_cap;
       h->m = h->h;
       h->h = malloc((h->m_cap << 1) * sizeof(*h->h));
       h->h_len = 0;
     }
-    h->m[h->m_len] = malloc(C3(hatc, T, siz) * sizeof(T));
-    // TODO: OOM checking & rollback here
+    h->m[h->m_len] = malloc((1 << h->m_len) * sizeof(T));
     h->m_len++;
     if ((h->m_len - h->h_len) > 0) {
       h->h[h->h_len] = h->m[h->h_len];
@@ -117,7 +115,7 @@ circa_err C3(hatc, T, snoc_v)(C2(hatc, T) *const restrict h, register const T x)
     }
     if ((h->m_len - h->h_len) > 0) {
       h->h[h->h_len] = h->m[h->h_len];
-      h->h_len++; 
+      h->h_len++;
     }
   }
   h->m[idx.fst][idx.snd] = x;
@@ -126,21 +124,21 @@ circa_err C3(hatc, T, snoc_v)(C2(hatc, T) *const restrict h, register const T x)
 }
 
 circa_static
-circa_err C3(hatc, T, snoc_r)(C2(hatc, T) *const restrict h, T *const restrict x) {
+circa_err C3(hatd, T, snoc_r)(C2(hatd, T) *const restrict h, T *const restrict x) {
   circa_nullck(h);
   circa_nullck(x);
-  C3(hatc, T, idx) idx = C3(hatc, T, index)(h->len);
+  C3(hatd, T, idx) idx = C3(hatd, T, index)(h->len);
   if (idx.fst == h->m_len) {
     if (idx.fst == h->m_cap) {
       h->m_cap <<= 1;
       free(h->l);
       h->l = h->m;
-      h->l_len = h->m_len;
+      h->l_len = h->m_cap;
       h->m = h->h;
       h->h = malloc((h->m_cap << 1) * sizeof(*h->h));
       h->h_len = 0;
     }
-    h->m[h->m_len] = malloc(C3(hatc, T, siz) * sizeof(T));
+    h->m[h->m_len] = malloc((1 << h->m_len) * sizeof(T));
     h->m_len++;
     if ((h->m_len - h->h_len) > 0) {
       h->h[h->h_len] = h->m[h->h_len];
@@ -148,7 +146,7 @@ circa_err C3(hatc, T, snoc_r)(C2(hatc, T) *const restrict h, T *const restrict x
     }
     if ((h->m_len - h->h_len) > 0) {
       h->h[h->h_len] = h->m[h->h_len];
-      h->h_len++; 
+      h->h_len++;
     }
   }
   h->m[idx.fst][idx.snd] = *x;
@@ -157,10 +155,9 @@ circa_err C3(hatc, T, snoc_r)(C2(hatc, T) *const restrict h, T *const restrict x
 }
 
 circa_static
-T C3(hatc, T, pop_v)(C2(hatc, T) *const restrict h) {
-  // TODO: null checking, bounds checking
-  C3(hatc, T, idx) idx = C3(hatc, T, index)(h->len - 1);
-  printf("%zu, %zu\n", idx.fst, idx.snd);
+T C3(hatd, T, pop_v)(C2(hatd, T) *const restrict h) {
+  circa_nullck(h);
+  C3(hatd, T, idx) idx = C3(hatd, T, index)(h->len - 1);
   T x = h->m[idx.fst][idx.snd];
   if (idx.fst < (h->m_len - 1)) {
     free(h->m[h->m_len - 1]);
@@ -189,14 +186,14 @@ T C3(hatc, T, pop_v)(C2(hatc, T) *const restrict h) {
 }
 
 circa_static
-circa_err C3(hatc, T, pop_r)(C2(hatc, T) *const restrict h, T *const restrict x) {
+circa_err C3(hatd, T, pop_r)(C2(hatd, T) *const restrict h, T *const restrict x) {
   circa_nullck(h);
   circa_oobck(h->len > 0);
   circa_nullck(x);
-  C3(hatc, T, idx) idx = C3(hatc, T, index)(h->len - 1);
+  C3(hatd, T, idx) idx = C3(hatd, T, index)(h->len - 1);
   *x = h->m[idx.fst][idx.snd];
   if (idx.fst < (h->m_len - 1)) {
-    free(h->m[h->m->len - 1]);
+    free(h->m[h->m_len - 1]);
     if (idx.fst < (h->m_cap >> 1)) {
       h->m_cap >>= 1;
       free(h->h);
@@ -220,7 +217,6 @@ circa_err C3(hatc, T, pop_r)(C2(hatc, T) *const restrict h, T *const restrict x)
   h->len--;
   return CE_NONE;
 }
-
 
 #undef circa_static
 
