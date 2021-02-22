@@ -4,7 +4,18 @@
   #define circa_static
 #endif
 
-#define CIRCA_HASH_DECL(T) static size_t C2(T, hash)(T *x);
+circa_static const uint32_t fnv_prime_32;
+circa_static const uint32_t fnv_offset_32;
+
+circa_static const uint64_t fnv_prime_64;
+circa_static const uint64_t fnv_offset_64;
+
+circa_static const size_t fnv_prime_size;
+circa_static const size_t fnv_offset_size;
+
+#define CIRCA_HASH_DECL(T) \
+  static size_t C2(T, hash_seeded)(T *x, size_t hash); \
+  static size_t C2(T, hash)(T *x);
   CIRCA_HASH_DECL(char)
   CIRCA_HASH_DECL(short)
   CIRCA_HASH_DECL(int)

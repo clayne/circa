@@ -5,7 +5,18 @@
   #define circa_static
 #endif
 
-#define CIRCA_HASH_DEF(T) circa_static size_t C2(T, hash)(T *x) { return (size_t) *x; }
+circa_static const uint32_t fnv_prime_32 = 16777619U;
+circa_static const uint32_t fnv_offset_32 = 2166136261U;
+
+circa_static const uint64_t fnv_prime_64 = 1099511628211ULL;
+circa_static const uint64_t fnv_offset_64 = 14695981039346656037ULL;
+
+circa_static const size_t fnv_prime_size = sizeof(size_t) == 8 ? fnv_prime_64 : fnv_prime_32;
+circa_static const size_t fnv_offset_size = sizeof(size_t) == 8 ? fnv_offset_64 : fnv_offset_32;
+
+#define CIRCA_HASH_DEF(T) \
+  circa_static size_t C2(T, hash_seeded)(T *x, size_t seed) { return (seed ^ *x) * fnv_prime_size; } \
+  circa_static size_t C2(T, hash)(T *x) { return C2(T, hash_seeded)(x, fnv_offset_size); }
   CIRCA_HASH_DEF(char)
   CIRCA_HASH_DEF(short)
   CIRCA_HASH_DEF(int)

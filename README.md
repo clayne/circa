@@ -65,7 +65,6 @@ this is the library I would say is closest to circa in goal and implementation.
 there are a few differences in the principles of our libraries:
 
 - ctl does not support the non-static use case, whereas circa does.
-- ctl is far more focused, implementing only data structures and operations on them. this minimalist vibe is nice.
 - ctl has a memory ownership model that may improve safety. for my own use cases I think this could introduce friction, especially with use of other peoples' types for which orphan instances would be needed, but I see the appeal.
 - ctl will never support unordered containers or maps, at the expense of speed.
 

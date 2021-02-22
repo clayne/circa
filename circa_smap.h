@@ -4,33 +4,27 @@
   #define circa_static
 #endif
 
-typedef enum cmp {
-  LT,
-  GT,
-  EQ
-} cmp;
+typedef struct {
+  _Alignas(128) C3(map, K, V) map;
+  mtx_t lock;
+} C3(amap, K, V);
 
-#define CIRCA_CMP_DECL(T) circa_static cmp C2(T, cmp)(T *, T *);
-  CIRCA_CMP_DECL(char)
-  CIRCA_CMP_DECL(short)
-  CIRCA_CMP_DECL(int)
-  CIRCA_CMP_DECL(unsigned)
-  CIRCA_CMP_DECL(long)
-  CIRCA_CMP_DECL(uint8_t)
-  CIRCA_CMP_DECL(uint16_t)
-  CIRCA_CMP_DECL(uint32_t)
-  CIRCA_CMP_DECL(uint64_t)
-  CIRCA_CMP_DECL(int8_t)
-  CIRCA_CMP_DECL(int16_t)
-  CIRCA_CMP_DECL(int32_t)
-  CIRCA_CMP_DECL(int64_t)
-  CIRCA_CMP_DECL(size_t)
-#undef CIRCA_CMP_DECL
+typedef struct {
+  _Alignas(128) C3(amap, K, V) *amaps;
+  _Alignas(128) size_t len;
+} C3(smap, K, V);
+
+circa_static circa_err C4(smap, K, V, alloc)(C3(smap, K, V) *const restrict, register const size_t);
+circa_static circa_err C4(smap, K, V, alloc_cap)(C3(smap, K, V) *const restrict, register const size_t, register const size_t);
+circa_static circa_err C4(smap, K, V, free)(C3(smap, K, V) *const restrict);
+
+circa_static circa_err C4(smap, K, V, set)(C3(smap, K, V) *const restrict, K *k, V *v);
+circa_static circa_err C4(smap, K, V, get)(C3(smap, K, V) *const restrict, K *k, V *v);
 
 #undef circa_static
 
 #ifdef CIRCA_STATIC
-  #include "circa_cmp.c"
+  #include "circa_smap.c"
 #endif
 
 /*
