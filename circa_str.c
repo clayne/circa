@@ -389,6 +389,19 @@ cmp str_cmp(str *a, str *b) {
   return size_t_cmp(&a->len, &b->len);
 }
 
+circa_static
+size_t str_hash_seeded(str *s, size_t seed) {
+  for (size_t i = 0; i < s->len; i++) {
+    seed = (seed ^ s->data[i]) * fnv_prime_size;
+  }
+  return seed;
+}
+
+circa_static
+size_t str_hash(str *s) {
+  return str_hash_seeded(s, fnv_offset_size);
+}
+
 #undef circa_static
 
 /*

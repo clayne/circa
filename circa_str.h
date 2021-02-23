@@ -1,5 +1,3 @@
-#include "circa_err.h"
-
 #ifdef CIRCA_STATIC
   #define circa_static static
 #else
@@ -51,6 +49,10 @@ circa_static circa_err str_cat_read_name(str *const restrict, char *const restri
 circa_static circa_err str_write(str *const restrict, FILE *const restrict);
 circa_static circa_err str_write_name(str *const restrict s, char *const restrict);
 circa_static circa_err str_write_cat_name(str *const restrict s, char *const restrict);
+
+circa_static cmp str_cmp(str *, str *);
+circa_static size_t str_hash_seeded(str *, size_t);
+circa_static size_t str_hash(str *);
 
 #undef circa_static
 

@@ -1,44 +1,23 @@
+
 #ifdef CIRCA_STATIC
   #define circa_static static
 #else
-  #include "circa_hash.h"
   #define circa_static
 #endif
 
-circa_static const uint32_t fnv_prime_32 = 16777619U;
-circa_static const uint32_t fnv_offset_32 = 2166136261U;
+typedef struct {
+  T val;
+  bool is_just;
+} C2(maybe, T);
 
-circa_static const uint64_t fnv_prime_64 = 1099511628211ULL;
-circa_static const uint64_t fnv_offset_64 = 14695981039346656037ULL;
-
-#if SIZE_MAX == 4294967296
-  circa_static const size_t fnv_prime_size = 16777619U;
-  circa_static const size_t fnv_offset_size = 2166136261U;
-#else
-  circa_static const size_t fnv_prime_size = 1099511628211ULL;
-  circa_static const size_t fnv_offset_size = 14695981039346656037ULL;
-#endif
-
-#define CIRCA_HASH_DEF(T) \
-  circa_static size_t C2(T, hash_seeded)(T *x, size_t seed) { return (seed ^ *x) * fnv_prime_size; } \
-  circa_static size_t C2(T, hash)(T *x) { return C2(T, hash_seeded)(x, fnv_offset_size); }
-  CIRCA_HASH_DEF(char)
-  CIRCA_HASH_DEF(short)
-  CIRCA_HASH_DEF(int)
-  CIRCA_HASH_DEF(unsigned)
-  CIRCA_HASH_DEF(long)
-  CIRCA_HASH_DEF(uint8_t)
-  CIRCA_HASH_DEF(uint16_t)
-  CIRCA_HASH_DEF(uint32_t)
-  CIRCA_HASH_DEF(uint64_t)
-  CIRCA_HASH_DEF(int8_t)
-  CIRCA_HASH_DEF(int16_t)
-  CIRCA_HASH_DEF(int32_t)
-  CIRCA_HASH_DEF(int64_t)
-  CIRCA_HASH_DEF(size_t)
-#undef CIRCA_HASH_DEF
+circa_static C2(maybe, T) C2(just, T)(register const T x);
+circa_static const C2(maybe, T) C2(nothing, T);
 
 #undef circa_static
+
+#ifdef CIRCA_STATIC
+  #include "circa_maybe.c"
+#endif
 
 /*
 ** Copyright 2020 David Garland
