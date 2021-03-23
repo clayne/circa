@@ -5,7 +5,7 @@
   #define circa_static
 #endif
 
-#define CIRCA_CMP_DEF(T) circa_static cmp C2(T, cmp)(T *a, T *b) { return (*a < *b) ? LT : (*a > *b) ? GT : EQ; }
+#define CIRCA_CMP_DEF(T) circa_static cmp C2(T, cmp)(const T *const a, const T *const b) { return (*a < *b) ? LT : (*a > *b) ? GT : EQ; }
   CIRCA_CMP_DEF(char)
   CIRCA_CMP_DEF(short)
   CIRCA_CMP_DEF(int)

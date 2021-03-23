@@ -246,11 +246,11 @@ circa_err str_vfmt(str *const restrict s, const char *const restrict fmt, regist
   circa_nullck(fmt);
   va_list ap2;
   va_copy(ap2, ap);
-  register const size_t len = vsnprintf(NULL, 0, fmt, ap2);
+  register const size_t len = (size_t) vsnprintf(NULL, 0, fmt, ap2);
   va_end(ap2);
   register const circa_err e = str_require(s, len + 1);
   circa_if_oomck (e) circa_throw(e, "Out of memory.");
-  if_unlikely (vsnprintf(s->data, len + 1, fmt, ap) != len) circa_throw(CE_FMT, "Formatting error.");
+  if_unlikely ((size_t) vsnprintf(s->data, len + 1, fmt, ap) != len) circa_throw(CE_FMT, "Formatting error.");
   // NOTE: vsnprintf null terminates, so there is no need to do that manually
   s->len = len;
   return CE_NONE;
@@ -274,11 +274,11 @@ circa_err str_cat_vfmt(str *const restrict s, const char *const restrict fmt, re
   circa_nullck(fmt);
   va_list ap2;
   va_copy(ap2, ap);
-  register const size_t len = vsnprintf(NULL, 0, fmt, ap2);
+  register const size_t len = (size_t) vsnprintf(NULL, 0, fmt, ap2);
   va_end(ap2);
   register const circa_err e = str_require(s, s->len + len + 1);
   circa_if_oomck (e) circa_throw(e, "Out of memory.");
-  if_unlikely (vsnprintf(s->data + s->len, len + 1, fmt, ap) != len) circa_throw(CE_FMT, "Formatting error.");
+  if_unlikely ((size_t) vsnprintf(s->data + s->len, len + 1, fmt, ap) != len) circa_throw(CE_FMT, "Formatting error.");
   // NOTE: vsnprintf null terminates, so there is no need to do that manually
   s->len += len;
   return CE_NONE;
@@ -301,7 +301,7 @@ circa_err str_read(str *const restrict s, FILE *const restrict fp) {
   circa_nullck(s);
   circa_nullck(fp);
   if_unlikely (fseek(fp, 0, SEEK_END)) circa_throw(CE_READ, "Failed to read from file.");
-  register const size_t len = ftell(fp);
+  register const size_t len = (size_t) ftell(fp);
   if_unlikely (fseek(fp, 0, SEEK_SET)) circa_throw(CE_READ, "Failed to read from file.");
   register const circa_err e = str_require(s, len + 1);
   circa_if_oomck (e) circa_throw(e, "Out of memory.");
@@ -327,7 +327,7 @@ circa_err str_cat_read(str *const restrict s, FILE *const restrict fp) {
   circa_nullck(s);
   circa_nullck(fp);
   if_unlikely (fseek(fp, 0, SEEK_END)) circa_throw(CE_READ, "Failed to read from file.");
-  register const size_t len = ftell(fp);
+  register const size_t len = (size_t) ftell(fp);
   if_unlikely (fseek(fp, 0, SEEK_SET)) circa_throw(CE_READ, "Failed to read from file.");
   register const circa_err e = str_require(s, s->len + len + 1);
   circa_if_oomck (e) circa_throw(e, "Out of memory.");
@@ -391,9 +391,8 @@ cmp str_cmp(str *a, str *b) {
 
 circa_static
 size_t str_hash_seeded(str *s, size_t seed) {
-  for (size_t i = 0; i < s->len; i++) {
-    seed = (seed ^ s->data[i]) * fnv_prime_size;
-  }
+  for (size_t i = 0; i < s->len; i++)
+    seed = (seed ^ (size_t) s->data[i]) * fnv_prime_size;
   return seed;
 }
 

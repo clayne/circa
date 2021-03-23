@@ -18,8 +18,14 @@ circa_static circa_err C4(smap, K, V, alloc)(C3(smap, K, V) *const restrict, reg
 circa_static circa_err C4(smap, K, V, alloc_cap)(C3(smap, K, V) *const restrict, register const size_t, register const size_t);
 circa_static circa_err C4(smap, K, V, free)(C3(smap, K, V) *const restrict);
 
-circa_static circa_err C4(smap, K, V, set)(C3(smap, K, V) *const restrict, K *k, V *v);
-circa_static circa_err C4(smap, K, V, get)(C3(smap, K, V) *const restrict, K *k, V *v);
+circa_static circa_err C4(smap, K, V, set)(C3(smap, K, V) *const restrict, const K *const restrict, const V *const restrict);
+circa_static circa_err C4(smap, K, V, set_with_hash)(C3(smap, K, V) *const restrict, const K *const restrict, const V *const restrict, register const size_t);
+
+circa_static circa_err C4(smap, K, V, get)(C3(smap, K, V) *const restrict, const K *const restrict, V *const restrict);
+circa_static circa_err C4(smap, K, V, get_with_hash)(C3(smap, K, V) *const restrict, const K *const restrict, V *const restrict, register const size_t);
+
+circa_static circa_err C4(smap, K, V, try_set)(C3(smap, K, V) *const restrict, const K *const restrict, V *const restrict);
+circa_static circa_err C4(smap, K, V, try_set_with_hash)(C3(smap, K, V) *const restrict, const K *const restrict, V *const restrict, register const size_t);
 
 #undef circa_static
 

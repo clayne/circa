@@ -38,12 +38,19 @@ circa_err C4(smap, K, V, free)(C3(smap, K, V) *const restrict sm) {
 }
 
 circa_static
-circa_err C4(smap, K, V, set)(C3(smap, K, V) *const restrict sm, K *const restrict k, V *const restrict v) {
+circa_err C4(smap, K, V, set)(C3(smap, K, V) *const restrict sm, const K *const restrict k, const V *const restrict v) {
   circa_nullck(sm);
   circa_nullck(k);
   circa_nullck(v);
-  register const size_t hash = C2(K, hash)(k);
-  register const size_t pos = (hash >> (sizeof(size_t) >> 1)) & (sm->len - 1);
+  return C4(smap, K, V, set_with_hash)(sm, k, v, C2(K, hash)(k));
+}
+
+circa_static
+circa_err C4(smap, K, V, set_with_hash)(C3(smap, K, V) *const restrict sm, const K *const restrict k, const V *const restrict v, register const size_t hash) {
+  circa_nullck(sm);
+  circa_nullck(k);
+  circa_nullck(v);
+  register const size_t pos = (hash >> (sizeof(size_t) << 2)) & (sm->len - 1);
   mtx_lock(&sm->amaps[pos].lock);
   circa_err e = C4(map, K, V, set_with_hash)(&sm->amaps[pos].map, k, v, hash);
   mtx_unlock(&sm->amaps[pos].lock);
@@ -51,16 +58,49 @@ circa_err C4(smap, K, V, set)(C3(smap, K, V) *const restrict sm, K *const restri
 }
 
 circa_static
-circa_err C4(smap, K, V, get)(C3(smap, K, V) *const restrict sm, K *const restrict k, V *const restrict v) {
+circa_err C4(smap, K, V, get)(C3(smap, K, V) *const restrict sm, const K *const restrict k, V *const restrict v) {
   circa_nullck(sm);
   circa_nullck(k);
   circa_nullck(v);
-  register const size_t hash = C2(K, hash)(k);
-  register const size_t pos = (hash >> (sizeof(size_t) >> 1)) & (sm->len - 1);
+  return C4(smap, K, V, get_with_hash)(sm, k, v, C2(K, hash)(k));
+}
+
+circa_static
+circa_err C4(smap, K, V, get_with_hash)(C3(smap, K, V) *const restrict sm, const K *const restrict k, V *const restrict v, register const size_t hash) {
+  circa_nullck(sm);
+  circa_nullck(k);
+  circa_nullck(v);
+  register const size_t pos = (hash >> (sizeof(size_t) << 2)) & (sm->len - 1);
   mtx_lock(&sm->amaps[pos].lock);
   circa_err e = C4(map, K, V, get_with_hash)(&sm->amaps[pos].map, k, v, hash);
   mtx_unlock(&sm->amaps[pos].lock);
   return e;
+}
+
+circa_static
+circa_err C4(smap, K, V, try_set)(C3(smap, K, V) *const restrict sm, const K *const restrict k, V *const restrict v) {
+  circa_nullck(sm);
+  circa_nullck(k);
+  circa_nullck(v);
+  return C4(smap, K, V, try_set_with_hash)(sm, k, v, C2(K, hash)(k));
+}
+
+circa_static
+circa_err C4(smap, K, V, try_set_with_hash)(C3(smap, K, V) *const restrict sm, const K *const restrict k, V *const restrict v, register const size_t hash) {
+  circa_nullck(sm);
+  circa_nullck(k);
+  circa_nullck(v);
+  register const size_t pos = (hash >> (sizeof(size_t) << 2)) & (sm->len - 1);
+  mtx_lock(&sm->amaps[pos].lock);
+  V *mv = C4(map, K, V, lookup_with_hash)(&sm->amaps[pos].map, k, hash);
+  if (!mv) {
+    circa_err e = C4(map, K, V, set)(&sm->amaps[pos].map, k, v);
+    circa_if_oomck(e) return e;
+  } else {
+    *v = *mv;
+  }
+  mtx_unlock(&sm->amaps[pos].lock);
+  return CE_NONE;
 }
 
 #undef circa_static

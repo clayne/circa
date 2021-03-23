@@ -76,7 +76,7 @@ circa_err C4(map, K, V, rehash)(C3(map, K, V) *m) {
 }
 
 circa_static
-circa_err C4(map, K, V, set_with_hash)(C3(map, K, V) *const restrict m, K *const restrict k, V *const restrict v, size_t hash) {
+circa_err C4(map, K, V, set_with_hash)(C3(map, K, V) *const restrict m, const K *const restrict k, const V *const restrict v, size_t hash) {
   circa_nullck(m);
   circa_nullck(k);
   circa_nullck(v);
@@ -117,7 +117,7 @@ not_found:;
 }
 
 circa_static
-circa_err C4(map, K, V, set)(C3(map, K, V) *const restrict m, K *const restrict k, V *const restrict v) {
+circa_err C4(map, K, V, set)(C3(map, K, V) *const restrict m, const K *const restrict k, const V *const restrict v) {
   circa_nullck(m);
   circa_nullck(k);
   circa_nullck(v);
@@ -125,7 +125,7 @@ circa_err C4(map, K, V, set)(C3(map, K, V) *const restrict m, K *const restrict 
 }
 
 circa_static
-circa_err C4(map, K, V, get_with_hash)(C3(map, K, V) *const restrict m, K *const restrict k, V *const restrict v, register const size_t hash) {
+circa_err C4(map, K, V, get_with_hash)(C3(map, K, V) *const restrict m, const K *const restrict k, V *const restrict v, register const size_t hash) {
   circa_nullck(m);
   circa_nullck(k);
   circa_nullck(v);
@@ -136,7 +136,7 @@ circa_err C4(map, K, V, get_with_hash)(C3(map, K, V) *const restrict m, K *const
 }
 
 circa_static
-circa_err C4(map, K, V, get)(C3(map, K, V) *const restrict m, K *const restrict k, V *const restrict v) {
+circa_err C4(map, K, V, get)(C3(map, K, V) *const restrict m, const K *const restrict k, V *const restrict v) {
   circa_nullck(m);
   circa_nullck(k);
   circa_nullck(v);
@@ -144,14 +144,14 @@ circa_err C4(map, K, V, get)(C3(map, K, V) *const restrict m, K *const restrict 
 }
 
 circa_static
-V *C4(map, K, V, lookup)(C3(map, K, V) *const restrict m, K *const restrict k) {
+V *C4(map, K, V, lookup)(C3(map, K, V) *const restrict m, const K *const restrict k) {
   circa_if_oomck (!m) return NULL;
   circa_if_oomck (!k) return NULL;
   return C4(map, K, V, lookup_with_hash)(m, k, C2(K, hash)(k));
 }
 
 circa_static
-V *C4(map, K, V, lookup_with_hash)(C3(map, K, V) *const restrict m, K *const restrict k, register const size_t hash) {
+V *C4(map, K, V, lookup_with_hash)(C3(map, K, V) *const restrict m, const K *const restrict k, register const size_t hash) {
   circa_if_oomck (!m) return NULL;
   circa_if_oomck (!k) return NULL;
   register const size_t initial_pos = hash & (m->cap - 1);
@@ -171,12 +171,12 @@ V *C4(map, K, V, lookup_with_hash)(C3(map, K, V) *const restrict m, K *const res
 }
 
 circa_static
-bool C4(map, K, V, has)(C3(map, K, V) *const restrict m, K *const restrict k) {
+bool C4(map, K, V, has)(C3(map, K, V) *const restrict m, const K *const restrict k) {
   return C4(map, K, V, lookup)(m, k) != NULL;
 }
 
 circa_static
-circa_err C4(map, K, V, del)(C3(map, K, V) *const restrict m, K *const restrict k) {
+circa_err C4(map, K, V, del)(C3(map, K, V) *const restrict m, const K *const restrict k) {
   circa_nullck(m);
   circa_nullck(k);
   // TODO implement

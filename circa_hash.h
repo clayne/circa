@@ -14,8 +14,8 @@ circa_static const size_t fnv_prime_size;
 circa_static const size_t fnv_offset_size;
 
 #define CIRCA_HASH_DECL(T) \
-  static size_t C2(T, hash_seeded)(T *x, size_t hash); \
-  static size_t C2(T, hash)(T *x);
+  static size_t C2(T, hash_seeded)(const T *const restrict x, size_t hash); \
+  static size_t C2(T, hash)(const T *const restrict x);
   CIRCA_HASH_DECL(char)
   CIRCA_HASH_DECL(short)
   CIRCA_HASH_DECL(int)

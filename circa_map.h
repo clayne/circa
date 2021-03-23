@@ -16,18 +16,18 @@ typedef struct {
 circa_static circa_err C4(map, K, V, alloc)(C3(map, K, V) *const restrict);
 circa_static circa_err C4(map, K, V, free)(C3(map, K, V) *const restrict);
 
-circa_static circa_err C4(map, K, V, set)(C3(map, K, V) *const restrict, K *const restrict, V *const restrict); 
-circa_static circa_err C4(map, K, V, set_with_hash)(C3(map, K, V) *const restrict, K *const restrict, V *const restrict, register const size_t);
+circa_static circa_err C4(map, K, V, set)(C3(map, K, V) *const restrict, const K *const restrict, const V *const restrict); 
+circa_static circa_err C4(map, K, V, set_with_hash)(C3(map, K, V) *const restrict, const K *const restrict, const V *const restrict, register const size_t);
 
-circa_static V *C4(map, K, V, lookup)(C3(map, K, V) *const restrict, K *const restrict);
-circa_static V *C4(map, K, V, lookup_with_hash)(C3(map, K, V) *const restrict, K *const restrict, register const size_t);
+circa_static V *C4(map, K, V, lookup)(C3(map, K, V) *const restrict, const K *const restrict);
+circa_static V *C4(map, K, V, lookup_with_hash)(C3(map, K, V) *const restrict, const K *const restrict, register const size_t);
 
-circa_static circa_err C4(map, K, V, get)(C3(map, K, V) *const restrict, K *const restrict, V *const restrict);
-circa_static circa_err C4(map, K, V, get_with_hash)(C3(map, K, V) *const restrict, K *const restrict, V *const restrict, register const size_t);
+circa_static circa_err C4(map, K, V, get)(C3(map, K, V) *const restrict, const K *const restrict, V *const restrict);
+circa_static circa_err C4(map, K, V, get_with_hash)(C3(map, K, V) *const restrict, const K *const restrict, V *const restrict, register const size_t);
 
-circa_static bool C4(map, K, V, has)(C3(map, K, V) *const restrict, K *const restrict);
+circa_static bool C4(map, K, V, has)(C3(map, K, V) *const restrict, const K *const restrict);
 
-circa_static circa_err C4(map, K, V, del)(C3(map, K, V) *const restrict, K *const restrict);
+circa_static circa_err C4(map, K, V, del)(C3(map, K, V) *const restrict, const K *const restrict);
 
 #ifndef map_foreach
   #define map_foreach(M, KN, VN) \

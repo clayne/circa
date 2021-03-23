@@ -4,33 +4,27 @@
   #define circa_static
 #endif
 
-typedef enum cmp {
-  LT,
-  GT,
-  EQ
-} cmp;
+typedef struct C3(region, T, node) {
+  struct C3(region, T, node) *next;
+  size_t len;
+  T data[];
+} C3(region, T, node);
 
-#define CIRCA_CMP_DECL(T) circa_static cmp C2(T, cmp)(const T *const, const T *const);
-  CIRCA_CMP_DECL(char)
-  CIRCA_CMP_DECL(short)
-  CIRCA_CMP_DECL(int)
-  CIRCA_CMP_DECL(unsigned)
-  CIRCA_CMP_DECL(long)
-  CIRCA_CMP_DECL(uint8_t)
-  CIRCA_CMP_DECL(uint16_t)
-  CIRCA_CMP_DECL(uint32_t)
-  CIRCA_CMP_DECL(uint64_t)
-  CIRCA_CMP_DECL(int8_t)
-  CIRCA_CMP_DECL(int16_t)
-  CIRCA_CMP_DECL(int32_t)
-  CIRCA_CMP_DECL(int64_t)
-  CIRCA_CMP_DECL(size_t)
-#undef CIRCA_CMP_DECL
+typedef struct C2(region, T) {
+  C3(region, T, node) *head;
+} C2(region, T);
+
+circa_static circa_err C3(region, T, alloc)(C2(region, T) *const restrict);
+circa_static circa_err C3(region, T, free)(C2(region, T) *const restrict);
+
+circa_static T *C3(region, T, new)(C2(region, T) *const restrict);
+circa_static T *C3(region, T, new_v)(C2(region, T) *const restrict, register const T);
+circa_static T *C3(region, T, new_r)(C2(region, T) *const restrict, const T *const restrict);
 
 #undef circa_static
 
 #ifdef CIRCA_STATIC
-  #include "circa_cmp.c"
+  #include "circa_region.c"
 #endif
 
 /*

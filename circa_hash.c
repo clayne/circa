@@ -20,8 +20,8 @@ circa_static const uint64_t fnv_offset_64 = 14695981039346656037ULL;
 #endif
 
 #define CIRCA_HASH_DEF(T) \
-  circa_static size_t C2(T, hash_seeded)(T *x, size_t seed) { return (seed ^ *x) * fnv_prime_size; } \
-  circa_static size_t C2(T, hash)(T *x) { return C2(T, hash_seeded)(x, fnv_offset_size); }
+  circa_static size_t C2(T, hash_seeded)(const T *const restrict x, size_t seed) { return (seed ^ (size_t) *x) * fnv_prime_size; } \
+  circa_static size_t C2(T, hash)(const T *const restrict x) { return C2(T, hash_seeded)(x, fnv_offset_size); }
   CIRCA_HASH_DEF(char)
   CIRCA_HASH_DEF(short)
   CIRCA_HASH_DEF(int)

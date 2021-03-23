@@ -25,7 +25,7 @@ def_min_max(size_t)
       return (uint8_t) __builtin_##F(A); \
     }
 #else
-  #define circa_gnu_builtin(F, A)
+  #define circa_gnu_builtin(F, A) do {} while (0)
 #endif
 
 circa_static 
@@ -36,7 +36,7 @@ uint8_t uint8_t_bswap(uint8_t n) {
 circa_static 
 uint16_t uint16_t_bswap(uint16_t n) {
   circa_gnu_only(return __builtin_bswap16(n));
-  return (n << 8) | (n >> 8);
+  return ((uint16_t) (n << (uint16_t) 8)) | ((uint16_t) (n >> (uint16_t) 8));
 }
 
 circa_static 
@@ -63,7 +63,7 @@ size_t size_t_bswap(size_t n) {
 
 circa_static  
 uint8_t uint8_t_pop(uint8_t n) {
-  circa_gnu_only(return __builtin_popcount(n));
+  circa_gnu_builtin(popcount, n);
   n -= ((n >> 1) & 0x55);
   n = (n & 0x33) + ((n >> 2) & 0x33);
   return (((n + (n >> 4)) & 0x0F) * 0x01);
