@@ -85,7 +85,6 @@ circa_err C4(map, K, V, set_with_hash)(C3(map, K, V) *const restrict m, const K 
   register size_t swp_psl = 1, tmp_psl;
   register const size_t initial_pos = hash & (m->cap - 1);
   register size_t i = initial_pos;
-  register bool found = false;
 loop:
   if (m->psls[i] == 0) { m->len++; goto found; } // if empty spot, take
   if (C2(K, cmp)(m->keys + i, &swp_key) == EQ) goto found; // if match, overwrite

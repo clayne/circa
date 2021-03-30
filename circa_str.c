@@ -162,7 +162,6 @@ circa_static
 circa_err str_cpy_cstr(str *const restrict dst, char *restrict src) {
   circa_nullck(dst);
   circa_nullck(src);
-  register const size_t old_len = dst->len;
   dst->len = 0;
   while (*src) {
     register const circa_err e = str_snoc_r(dst, src++);

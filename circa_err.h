@@ -22,7 +22,7 @@ typedef enum {
   #define circa_log(FMT, ...) ((void) 0)
 #endif
 
-#define circa_throw(E, FMT, ...) return (circa_log("%s: " FMT, ##__VA_ARGS__), E)
+#define circa_throw(E, FMT, ...) return (circa_log(FMT, ##__VA_ARGS__), E)
 
 #ifndef if_debug
   #ifndef CIRCA_N_DEBUG
