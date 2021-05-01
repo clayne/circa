@@ -38,7 +38,7 @@ circa_err C4(smap, K, V, free)(C3(smap, K, V) *const restrict sm) {
 }
 
 circa_static
-circa_err C4(smap, K, V, set)(C3(smap, K, V) *const restrict sm, const K *const restrict k, const V *const restrict v) {
+circa_err C4(smap, K, V, set)(C3(smap, K, V) *const restrict sm, K *const restrict k, const V *const restrict v) {
   circa_nullck(sm);
   circa_nullck(k);
   circa_nullck(v);
@@ -46,7 +46,7 @@ circa_err C4(smap, K, V, set)(C3(smap, K, V) *const restrict sm, const K *const 
 }
 
 circa_static
-circa_err C4(smap, K, V, set_with_hash)(C3(smap, K, V) *const restrict sm, const K *const restrict k, const V *const restrict v, register const size_t hash) {
+circa_err C4(smap, K, V, set_with_hash)(C3(smap, K, V) *const restrict sm, K *const restrict k, const V *const restrict v, register const size_t hash) {
   circa_nullck(sm);
   circa_nullck(k);
   circa_nullck(v);
@@ -58,7 +58,7 @@ circa_err C4(smap, K, V, set_with_hash)(C3(smap, K, V) *const restrict sm, const
 }
 
 circa_static
-circa_err C4(smap, K, V, get)(C3(smap, K, V) *const restrict sm, const K *const restrict k, V *const restrict v) {
+circa_err C4(smap, K, V, get)(C3(smap, K, V) *const restrict sm, K *const restrict k, V *const restrict v) {
   circa_nullck(sm);
   circa_nullck(k);
   circa_nullck(v);
@@ -66,7 +66,7 @@ circa_err C4(smap, K, V, get)(C3(smap, K, V) *const restrict sm, const K *const 
 }
 
 circa_static
-circa_err C4(smap, K, V, get_with_hash)(C3(smap, K, V) *const restrict sm, const K *const restrict k, V *const restrict v, register const size_t hash) {
+circa_err C4(smap, K, V, get_with_hash)(C3(smap, K, V) *const restrict sm, K *const restrict k, V *const restrict v, register const size_t hash) {
   circa_nullck(sm);
   circa_nullck(k);
   circa_nullck(v);
@@ -78,7 +78,7 @@ circa_err C4(smap, K, V, get_with_hash)(C3(smap, K, V) *const restrict sm, const
 }
 
 circa_static
-circa_err C4(smap, K, V, try_set)(C3(smap, K, V) *const restrict sm, const K *const restrict k, V *const restrict v) {
+circa_err C4(smap, K, V, try_set)(C3(smap, K, V) *const restrict sm, K *const restrict k, V *const restrict v) {
   circa_nullck(sm);
   circa_nullck(k);
   circa_nullck(v);
@@ -86,7 +86,7 @@ circa_err C4(smap, K, V, try_set)(C3(smap, K, V) *const restrict sm, const K *co
 }
 
 circa_static
-circa_err C4(smap, K, V, try_set_with_hash)(C3(smap, K, V) *const restrict sm, const K *const restrict k, V *const restrict v, register const size_t hash) {
+circa_err C4(smap, K, V, try_set_with_hash)(C3(smap, K, V) *const restrict sm, K *const restrict k, V *const restrict v, register const size_t hash) {
   circa_nullck(sm);
   circa_nullck(k);
   circa_nullck(v);
