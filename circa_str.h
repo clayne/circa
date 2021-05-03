@@ -14,6 +14,7 @@ circa_static circa_err str_alloc(str *const restrict);
 circa_static circa_err str_alloc_cap(str *const restrict, register const size_t);
 circa_static circa_err str_require(str *const restrict, register const size_t);
 circa_static circa_err str_amort(str *const restrict);
+circa_static circa_err str_clear(str *const restrict);
 circa_static circa_err str_free(str *const restrict);
 
 circa_static circa_err str_set_v(str *const restrict, register const size_t, register const char);

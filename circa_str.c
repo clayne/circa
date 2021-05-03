@@ -53,6 +53,14 @@ circa_err str_amort(str *const restrict s) {
 }
 
 circa_static
+circa_err str_clear(str *const restrict s) {
+  circa_nullck(s);
+  s->len = 0;
+  s->data[0] = '\0';
+  return CE_NONE;
+}
+
+circa_static
 circa_err str_free(str *const restrict s) {
   circa_nullck(s);
   free(s->data);
